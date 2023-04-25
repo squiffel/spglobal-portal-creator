@@ -1,6 +1,19 @@
 
 My goal is to:
 
+-- Focal point
+-- Flip portals (big / small)
 
-Focal point
-Flip portals (big / small)
+-- Fix logo alignment at bottom
+-- Add dropdown templates to opening screen
+-- Add dropdown templates to LAYOUT
+-- Copy
+-- Layouts
+-- Logo size
+
+-- Styles
+---- Seek & Prosper
+---- CI Event
+---- Podcast
+
+-- Speakers*
