@@ -521,20 +521,7 @@
           />
         </svg>
       </button>
-      <!-- Add an additional button to toggle the left-panel width -->
-      <!-- <button
-        id="toggle_button"
-        class="toolbox_button"
-        name="toggleButton"
-        onclick="collapseLeftPanel()"
-        style="display: none"
-        ;
-      >
-        <svg viewBox="0 0 20 20">
-          <rect x="2" y="9" width="16" height="2" fill="#666666" />
-        </svg>
-      </button> -->
-      <!-- Expanded toolset-->
+
       <div class="tools">
         <div class="inside_tools_container">
           <!-- Add your content here -->
@@ -565,22 +552,33 @@
       };
 
       // User defined settings
-      let canvasContent = {};
+      let canvas_content = {};
       let userDefinedAspectRatio;
       let userDefinedWidth;
       let userDefinedHeight;
+      let resetFocalPoint = [false, false];
 
       // Set to default
-      canvasContent.logo = "spg_corporate";
-      canvasContent.portal_image_flip = [false, false];
-      canvasContent.portal_size_percent = 50;
-      canvasContent.portal_upload_image_number = 0;
-      canvasContent.portal_override_margins = false;
-      canvasContent.portal_primary_image_side = true;
+      canvas_content.logo = "spg_corporate";
+      canvas_content.portal_image_flip = [false, false];
+      canvas_content.portal_size_percent = 50;
+      canvas_content.portal_upload_image_number = 0;
+      canvas_content.portal_override_margins = false;
+      canvas_content.portal_primary_image_side = true;
+
+      canvas_content.portal_focal_point = [];
+      for (var i = 0; i < 2; i++) {
+        canvas_content.portal_focal_point[i] = {
+          x: 0,
+          y: 0,
+          size: 20,
+          dragging: false,
+        };
+      }
       update_color_scheme("white");
 
       // UI States
-      let panelOpen = "None";
+      let current_panel_open = "None";
 
       // Functions
       function createCanvas() {
@@ -646,11 +644,11 @@
         get_canvas_type();
 
         // Set default to right
-        canvasContent.portal_side = "right";
+        canvas_content.portal_side = "right";
 
         // Set if vertical set to top
-        if (canvasContent.orientation == "vertical") {
-          canvasContent.portal_side = "top";
+        if (canvas_content.orientation == "vertical") {
+          canvas_content.portal_side = "top";
         }
 
         // Update the canvas with the custom attributes
@@ -802,7 +800,7 @@
           img.src = event.target.result;
           img.style.display = "none";
 
-          let n = canvasContent.portal_upload_image_number;
+          let n = canvas_content.portal_upload_image_number;
           // If there are no images add one
           if (userImagesDiv.children.length == 0) {
             userImagesDiv.appendChild(img);
@@ -821,13 +819,13 @@
             userImagesDiv.children[n].src = img.src;
           }
 
-          //userImagesDiv.appendChild(img);
-          //canvasContent.portal_upload_image_number
+          // New image has been uploaded
+          resetFocalPoint[n] = true;
 
           // Update canvas once image has loaded
           updateCanvas();
           // Upload panel
-          if (panelOpen == "Image") {
+          if (current_panel_open == "Image") {
             // Update panel
             update_toolbox_panel("image_button");
           }
@@ -844,12 +842,12 @@
         container.appendChild(dragDropArea);
 
         // Image to change
-        if (canvasContent.portal_count > 0) {
+        if (canvas_content.portal_count > 0) {
           // Only show if there are images
           let select_image = createDropdownMenu(
             ["0", "1"],
             "portal_image",
-            canvasContent.portal_upload_image_number
+            canvas_content.portal_upload_image_number
           );
           changeDropdownMenuText(select_image, "0", "Primary Portal");
           changeDropdownMenuText(select_image, "1", "Secondary Portal");
@@ -914,7 +912,13 @@
           // Delete the uploaded image
           let image_container = document.getElementById("user-image-container");
           if (image_container) {
-            let img = image_container.children[parseInt(button_label)];
+            let n = parseInt(button_label);
+            let img = image_container.children[n];
+            // If you delete the primary image, move the secondary focal point to the primary
+            if (n == 0) {
+              canvas_content.portal_focal_point[0] =
+                canvas_content.portal_focal_point[1];
+            }
             image_container.removeChild(img);
           }
 
@@ -1011,18 +1015,18 @@
         console.log("Button pressed: " + button_label);
 
         // Color scheme
-        if (panelOpen == "Color") {
+        if (current_panel_open == "Color") {
           update_color_scheme(button_label); // Set background color, font and logo colors
         }
 
         // Logo type
-        if (panelOpen == "Logo") {
+        if (current_panel_open == "Logo") {
           var logo_name = button_label.toLowerCase().replace(/ /g, "_");
-          canvasContent.logo = "spg_" + logo_name;
+          canvas_content.logo = "spg_" + logo_name;
         }
 
         // Layout
-        if (panelOpen == "Layout") {
+        if (current_panel_open == "Layout") {
           // Resize Canvas
           if (button_label.includes("Submit")) {
             createCanvas();
@@ -1073,26 +1077,26 @@
       function toggleSwitchValueChanged(element, toggleValue) {
         let button_label = element.innerText;
 
-        if (panelOpen == "Layout") {
+        if (current_panel_open == "Layout") {
           if (button_label.includes("Show Grid")) {
-            canvasContent.show_guides = toggleValue;
+            canvas_content.show_guides = toggleValue;
           }
         }
 
-        if (panelOpen == "Image") {
+        if (current_panel_open == "Image") {
           if (button_label.includes("Mirror horizontally")) {
             // Flip image horizontally
             let n = parseInt(element.name);
-            canvasContent.portal_image_flip[n] =
-              !canvasContent.portal_image_flip[n];
+            canvas_content.portal_image_flip[n] =
+              !canvas_content.portal_image_flip[n];
           }
           if (button_label.includes("Show margins")) {
-            canvasContent.portal_override_margins =
-              !canvasContent.portal_override_margins;
+            canvas_content.portal_override_margins =
+              !canvas_content.portal_override_margins;
           }
           if (button_label.includes("Primary image side")) {
-            canvasContent.portal_primary_image_side =
-              !canvasContent.portal_primary_image_side;
+            canvas_content.portal_primary_image_side =
+              !canvas_content.portal_primary_image_side;
           }
         }
 
@@ -1121,7 +1125,7 @@
           return;
         }
 
-        panelOpen = "None";
+        current_panel_open = "None";
         clearInsideToolsContainer();
 
         // Remove the 'active' class from all buttons
@@ -1137,7 +1141,7 @@
         if (buttonName === "download_button") {
           collapseLeftPanel();
           // Turn off guides
-          canvasContent.show_guides = false;
+          canvas_content.show_guides = false;
           updateCanvas();
           // Download canvas
           setTimeout(function () {
@@ -1148,7 +1152,7 @@
 
         if (buttonName === "color_button") {
           expandLeftPanel();
-          panelOpen = "Color";
+          current_panel_open = "Color";
           addLabelToInsideToolsContainer("Background color");
           addColorIndicator(
             addButtonToInsideToolsContainer("White"),
@@ -1174,7 +1178,7 @@
 
         if (buttonName === "logo_button") {
           expandLeftPanel();
-          panelOpen = "Logo";
+          current_panel_open = "Logo";
           addLabelToInsideToolsContainer("Logo");
           addButtonToInsideToolsContainer("Corporate");
           addButtonToInsideToolsContainer("Ratings");
@@ -1186,7 +1190,7 @@
 
         if (buttonName === "text_button") {
           expandLeftPanel();
-          panelOpen = "Text";
+          current_panel_open = "Text";
 
           addLabelToInsideToolsContainer("Headline");
           addInputBoxToInsideToolsContainer("headline");
@@ -1200,17 +1204,17 @@
 
         if (buttonName === "layout_button") {
           expandLeftPanel();
-          panelOpen = "Layout";
+          current_panel_open = "Layout";
 
           // Show Grid
-          addToggleSwitchWithLabel("Show Grid", canvasContent.show_guides);
+          addToggleSwitchWithLabel("Show Grid", canvas_content.show_guides);
 
           // Update logo position
           addLabelToInsideToolsContainer("Logo position");
           createDropdownMenu(
             ["bottom left", "top left", "top right", "bottom right"],
             "logo_position",
-            canvasContent.logo_position
+            canvas_content.logo_position
           );
 
           // Layout buttons
@@ -1276,7 +1280,7 @@
         // IMAGES
         if (buttonName === "image_button") {
           expandLeftPanel();
-          panelOpen = "Image";
+          current_panel_open = "Image";
 
           // Portal upload
           addLabelToInsideToolsContainer("Upload");
@@ -1295,7 +1299,7 @@
               let select_position = createDropdownMenu(
                 ["top", "right", "bottom", "left"],
                 "portal_side",
-                canvasContent.portal_side
+                canvas_content.portal_side
               );
               select_position.style.float = "left";
               select_position.style.display = "inline-block";
@@ -1304,7 +1308,7 @@
               let select_size = createDropdownMenu(
                 ["100%", "66%", "50%", "33%", "0%"],
                 "portal_size",
-                canvasContent.portal_size_percent + "%"
+                canvas_content.portal_size_percent + "%"
               );
               select_size.style.float = "right";
               select_size.style.display = "inline-block";
@@ -1329,16 +1333,16 @@
               spacer.appendChild(select_size);
 
               // Show marginss
-              if (canvasContent.portal_count == 1) {
+              if (canvas_content.portal_count == 1) {
                 addToggleSwitchWithLabel(
                   "Show margins",
-                  canvasContent.portal_override_margins
+                  canvas_content.portal_override_margins
                 );
               }
-              if (canvasContent.portal_count == 2) {
+              if (canvas_content.portal_count == 2) {
                 addToggleSwitchWithLabel(
                   "Primary image side",
-                  canvasContent.portal_primary_image_side
+                  canvas_content.portal_primary_image_side
                 );
               }
             }
@@ -1348,8 +1352,8 @@
           let user_image_container = document.getElementById(
             "user-image-container"
           );
-          if (canvasContent.portal_count > 0) {
-            for (var i = 0; i < canvasContent.portal_count; i++) {
+          if (canvas_content.portal_count > 0) {
+            for (var i = 0; i < canvas_content.portal_count; i++) {
               let img = get_image(i);
               if (img) {
                 let portal_label =
@@ -1360,7 +1364,7 @@
                 // Show Grid
                 let toggle_switch = addToggleSwitchWithLabel(
                   "Mirror horizontally",
-                  canvasContent.portal_image_flip[i]
+                  canvas_content.portal_image_flip[i]
                 );
                 toggle_switch.name = i;
                 // Create the delete button
@@ -1384,25 +1388,26 @@
         console.log(selected_value);
 
         // Logo type
-        if (panelOpen == "Layout") {
+        if (current_panel_open == "Layout") {
           if (button_label == "logo_position") {
             var position_name = selected_value.toLowerCase().replace(/ /g, "_");
             console.log("LOGO POSITION: " + position_name);
-            canvasContent.logo_position = position_name;
+            canvas_content.logo_position = position_name;
           }
         }
 
-        if (panelOpen == "Image") {
+        if (current_panel_open == "Image") {
           if (button_label == "portal_side") {
-            canvasContent.portal_side = selected_value;
+            canvas_content.portal_side = selected_value;
           }
           if (button_label == "portal_size") {
             console.log("PORTAL SIZE: " + selected_value);
-            canvasContent.portal_size_percent = parseInt(selected_value);
+            canvas_content.portal_size_percent = parseInt(selected_value);
           }
           if (button_label == "portal_image") {
             console.log("Portal Image Replace " + selected_value);
-            canvasContent.portal_upload_image_number = parseInt(selected_value);
+            canvas_content.portal_upload_image_number =
+              parseInt(selected_value);
           }
         }
 
@@ -1458,17 +1463,17 @@
       function update_color_scheme(color) {
         color = color.toLowerCase();
         // Set background color
-        canvasContent.background_color = spglobal_colors[color];
+        canvas_content.background_color = spglobal_colors[color];
         // Select the correct color scheme
-        canvasContent.color_font = spglobal_colors.black;
-        canvasContent.color_wordmark = spglobal_colors.red;
+        canvas_content.color_font = spglobal_colors.black;
+        canvas_content.color_wordmark = spglobal_colors.red;
 
         if (color == "yellow" || color == "blue") {
-          canvasContent.color_wordmark = spglobal_colors.black;
+          canvas_content.color_wordmark = spglobal_colors.black;
         }
         if (color == "red" || color == "black") {
-          canvasContent.color_font = spglobal_colors.white;
-          canvasContent.color_wordmark = spglobal_colors.white;
+          canvas_content.color_font = spglobal_colors.white;
+          canvas_content.color_wordmark = spglobal_colors.white;
         }
       }
 
@@ -1549,11 +1554,11 @@
           ctx.restore();
 
           // Draw portal divider line
-          if (canvasContent.portal_count > 1) {
+          if (canvas_content.portal_count > 1) {
             drawDivider(
-              canvasContent.portal_divider_x,
-              canvasContent.portal_divider_y,
-              canvasContent.portal_divider_height
+              canvas_content.portal_divider_x,
+              canvas_content.portal_divider_y,
+              canvas_content.portal_divider_height
             );
           }
         };
@@ -1591,12 +1596,12 @@
         let { width, height } = svgElement.getBBox();
 
         // Update colors
-        svgElement.getElementById("Bar").style.fill = canvasContent.color_font;
+        svgElement.getElementById("Bar").style.fill = canvas_content.color_font;
         svgElement.getElementById("Wordmark").style.fill =
-          canvasContent.color_wordmark;
+          canvas_content.color_wordmark;
         let name = svgElement.getElementById("Name");
         if (name != null) {
-          name.style.fill = canvasContent.color_font;
+          name.style.fill = canvas_content.color_font;
         }
 
         // Hide all SVGs
@@ -1617,25 +1622,25 @@
 
         // Default bottom left
         var position = [
-          canvasContent.marginLeft,
-          canvasContent.marginBottom - height,
+          canvas_content.marginLeft,
+          canvas_content.marginBottom - height,
         ];
 
-        if ("logo_position" in canvasContent) {
-          var logo_positon = canvasContent.logo_position;
+        if ("logo_position" in canvas_content) {
+          var logo_positon = canvas_content.logo_position;
           if (logo_positon == "top_left") {
-            position = [canvasContent.marginLeft, canvasContent.marginTop];
+            position = [canvas_content.marginLeft, canvas_content.marginTop];
           }
           if (logo_positon == "top_right") {
             position = [
-              canvasContent.marginRight - width,
-              canvasContent.marginTop,
+              canvas_content.marginRight - width,
+              canvas_content.marginTop,
             ];
           }
           if (logo_positon == "bottom_right") {
             position = [
-              canvasContent.marginRight - width,
-              canvasContent.marginBottom - height,
+              canvas_content.marginRight - width,
+              canvas_content.marginBottom - height,
             ];
           }
         }
@@ -1655,9 +1660,9 @@
 
         // Determine the shortest side of the canvas
         const shortestSide = Math.min(width, height);
-        canvasContent.shortestSide = "height";
+        canvas_content.shortestSide = "height";
         if (shortestSide == width) {
-          canvasContent.shortestSide = "width";
+          canvas_content.shortestSide = "width";
         }
 
         // Calculate 8% of the shortest side
@@ -1665,54 +1670,54 @@
         margin = Math.max(margin, 16); // Minimum of 16px
         margin = Math.min(margin, 96); // Maximum of 96px
 
-        canvasContent.margin = margin;
+        canvas_content.margin = margin;
 
         // Margins at 100% of the Canvas
-        canvasContent.marginTop = canvasContent.margin;
-        canvasContent.marginLeft = canvasContent.margin;
-        canvasContent.marginBottom = height - canvasContent.margin;
-        canvasContent.marginRight = width - canvasContent.margin;
+        canvas_content.marginTop = canvas_content.margin;
+        canvas_content.marginLeft = canvas_content.margin;
+        canvas_content.marginBottom = height - canvas_content.margin;
+        canvas_content.marginRight = width - canvas_content.margin;
 
         // Update margins if there are PORTALS
         if (
-          canvasContent.portal_count > 0 &&
-          canvasContent.portal_size_percent != 100 &&
-          canvasContent.portal_size_percent != 0
+          canvas_content.portal_count > 0 &&
+          canvas_content.portal_size_percent != 100 &&
+          canvas_content.portal_size_percent != 0
         ) {
-          if (canvasContent.portal_side == "right") {
-            canvasContent.marginRight -= canvasContent.portal_width;
+          if (canvas_content.portal_side == "right") {
+            canvas_content.marginRight -= canvas_content.portal_width;
           }
-          if (canvasContent.portal_side == "left") {
-            canvasContent.marginLeft += canvasContent.portal_width;
+          if (canvas_content.portal_side == "left") {
+            canvas_content.marginLeft += canvas_content.portal_width;
           }
-          if (canvasContent.portal_side == "top") {
-            canvasContent.marginTop += canvasContent.portal_height;
+          if (canvas_content.portal_side == "top") {
+            canvas_content.marginTop += canvas_content.portal_height;
           }
-          if (canvasContent.portal_side == "bottom") {
-            canvasContent.marginBottom -= canvasContent.portal_height;
+          if (canvas_content.portal_side == "bottom") {
+            canvas_content.marginBottom -= canvas_content.portal_height;
           }
-          console.log("Portal side: " + canvasContent.portal_side);
+          console.log("Portal side: " + canvas_content.portal_side);
         }
 
         // Add top and bottom margins if the PORTAL has margins and is FULL CANVAS
         if (
-          canvasContent.portal_count > 0 &&
-          canvasContent.portal_size_percent == 100
+          canvas_content.portal_count > 0 &&
+          canvas_content.portal_size_percent == 100
         ) {
           if (
-            canvasContent.portal_margins ||
-            canvasContent.portal_override_margins
+            canvas_content.portal_margins ||
+            canvas_content.portal_override_margins
           ) {
-            canvasContent.marginTop += margin;
-            canvasContent.marginBottom -= margin;
+            canvas_content.marginTop += margin;
+            canvas_content.marginBottom -= margin;
           }
         }
 
         // Margin update
-        canvasContent.marginWidth =
-          canvasContent.marginRight - canvasContent.marginLeft;
-        canvasContent.marginHeight =
-          canvasContent.marginBottom - canvasContent.marginTop;
+        canvas_content.marginWidth =
+          canvas_content.marginRight - canvas_content.marginLeft;
+        canvas_content.marginHeight =
+          canvas_content.marginBottom - canvas_content.marginTop;
 
         if (show_guides) {
           // Set the stroke color and style
@@ -1722,10 +1727,10 @@
           // Draw the blue rectangle outline
           setTimeout(function () {
             ctx.strokeRect(
-              canvasContent.marginLeft,
-              canvasContent.marginTop,
-              canvasContent.marginWidth,
-              canvasContent.marginHeight
+              canvas_content.marginLeft,
+              canvas_content.marginTop,
+              canvas_content.marginWidth,
+              canvas_content.marginHeight
             );
           }, 100);
         }
@@ -1735,7 +1740,7 @@
         clearCanvas();
 
         // Update color scheme
-        if ("background_color" in canvasContent) {
+        if ("background_color" in canvas_content) {
           drawBackground();
         }
 
@@ -1744,15 +1749,15 @@
           "user-image-container"
         );
 
-        canvasContent.portal_margins = false;
-        canvasContent.portal_count = userImageContainer
+        canvas_content.portal_margins = false;
+        canvas_content.portal_count = userImageContainer
           ? userImageContainer.children.length
           : 0;
 
         // Create ONE Portal image on the canvas
         if (
-          canvasContent.portal_count == 1 &&
-          canvasContent.portal_size_percent > 0
+          canvas_content.portal_count == 1 &&
+          canvas_content.portal_size_percent > 0
         ) {
           var portal_full = get_portal_specs(0);
           let img = get_image(0);
@@ -1762,23 +1767,23 @@
             portal_full.y,
             portal_full.width,
             portal_full.height,
-            canvasContent.portal_image_flip[0]
+            canvas_content.portal_image_flip[0]
           );
         }
 
         // Create TWO Portal images on the canvas
         if (
-          canvasContent.portal_count == 2 &&
-          canvasContent.portal_size_percent > 0
+          canvas_content.portal_count == 2 &&
+          canvas_content.portal_size_percent > 0
         ) {
-          canvasContent.portal_margins = true;
+          canvas_content.portal_margins = true;
 
           // Override LARGE on LEFT
           var portal_large = get_portal_specs("big", "left");
           var portal_small = get_portal_specs("small", "right");
 
           // Default LARGE on RIGHT
-          if (canvasContent.portal_primary_image_side) {
+          if (canvas_content.portal_primary_image_side) {
             var portal_large = get_portal_specs("big", "right");
             var portal_small = get_portal_specs("small", "left");
           }
@@ -1790,7 +1795,7 @@
             portal_large.y,
             portal_large.width,
             portal_large.height,
-            canvasContent.portal_image_flip[0]
+            canvas_content.portal_image_flip[0]
           );
 
           let img_b = get_image(1);
@@ -1800,30 +1805,30 @@
             portal_small.y,
             portal_small.width,
             portal_small.height,
-            canvasContent.portal_image_flip[1]
+            canvas_content.portal_image_flip[1]
           );
         }
 
         // Grid system
-        calculateGrid(canvasContent.show_guides);
+        calculateGrid(canvas_content.show_guides);
 
         // Add logo
-        if ("logo" in canvasContent) {
-          drawLogo(canvasContent.logo);
+        if ("logo" in canvas_content) {
+          drawLogo(canvas_content.logo);
         }
       }
 
       function get_portal_specs(portal_size, portal_side) {
         // portal_large: true / false
         // portal_right: true / false
-        let canvas_side = canvasContent.portal_side; // top, bottom, left, right
-        let canvas_size = canvasContent.portal_size_percent; // 100%, 66%, 33%, 50%, 0%
-        let fit_margins = canvasContent.portal_margins; // true || false
+        let canvas_side = canvas_content.portal_side; // top, bottom, left, right
+        let canvas_size = canvas_content.portal_size_percent; // 100%, 66%, 33%, 50%, 0%
+        let fit_margins = canvas_content.portal_margins; // true || false
 
         // Track that we are using portals
-        canvasContent.portal = true;
+        canvas_content.portal = true;
         // Always show margins if it is Double Portal or the margins have been overrided
-        if (portal_size || canvasContent.portal_override_margins) {
+        if (portal_size || canvas_content.portal_override_margins) {
           fit_margins = true;
         }
         // Max 100%
@@ -1844,27 +1849,30 @@
         // Portal height -- Vertical aligned
         if (canvas_side == "top" || canvas_side == "bottom") {
           content_height =
-            canvas.height * canvas_percent - canvasContent.margin * fit_margins;
-          pos_y = canvasContent.margin * fit_margins;
+            canvas.height * canvas_percent -
+            canvas_content.margin * fit_margins;
+          pos_y = canvas_content.margin * fit_margins;
           // Remove bottom margins too
-          if (canvasContent.portal_size_percent == 100) {
+          if (canvas_content.portal_size_percent == 100) {
             content_height =
               canvas.height * canvas_percent -
-              canvasContent.margin * (fit_margins * 2);
+              canvas_content.margin * (fit_margins * 2);
           }
         }
         //Portal position
         if (canvas_side == "bottom") {
           pos_y =
-            canvas.height - content_height - canvasContent.margin * fit_margins;
+            canvas.height -
+            content_height -
+            canvas_content.margin * fit_margins;
         }
 
         // Portal width -- Horizontal aligned
         if (canvas_side == "left" || canvas_side == "right") {
           content_width = canvas.width * canvas_percent;
           content_height =
-            content_height - canvasContent.margin * 2 * fit_margins;
-          pos_y = pos_y + canvasContent.margin * fit_margins;
+            content_height - canvas_content.margin * 2 * fit_margins;
+          pos_y = pos_y + canvas_content.margin * fit_margins;
         }
 
         //Portal position
@@ -1873,24 +1881,25 @@
         }
 
         // Store portal count and side
-        canvasContent.portal_count = 1;
+        canvas_content.portal_count = 1;
         // Store portal total RECT size
-        canvasContent.portal_width = canvas.width * canvas_percent;
-        canvasContent.portal_height = canvas.height * canvas_percent;
+        canvas_content.portal_width = canvas.width * canvas_percent;
+        canvas_content.portal_height = canvas.height * canvas_percent;
         // Store portal TOP LEFT Corner
-        canvasContent.portal_x = 0;
-        canvasContent.portal_y = 0;
+        canvas_content.portal_x = 0;
+        canvas_content.portal_y = 0;
         if (canvas_side == "right") {
-          canvasContent.portal_x = canvas.width - canvasContent.portal_width;
+          canvas_content.portal_x = canvas.width - canvas_content.portal_width;
         }
         if (canvas_side == "bottom") {
-          canvasContent.portal_y = canvas.height - canvasContent.portal_height;
+          canvas_content.portal_y =
+            canvas.height - canvas_content.portal_height;
         }
 
         // If we are using TWO portals
         if (portal_size) {
           // Two Portals
-          canvasContent.portal_count = 2;
+          canvas_content.portal_count = 2;
           // Default left aligned large PORTAL
           let portal_width = content_width * 0.65; // 65%
 
@@ -1904,9 +1913,9 @@
             pos_x = pos_x + content_width - portal_width;
           } else {
             // Portal divider position is the RIGHT SIDE of the LEFT PORTAL
-            canvasContent.portal_divider_x = pos_x + portal_width;
-            canvasContent.portal_divider_y = pos_y;
-            canvasContent.portal_divider_height = content_height;
+            canvas_content.portal_divider_x = pos_x + portal_width;
+            canvas_content.portal_divider_y = pos_y;
+            canvas_content.portal_divider_height = content_height;
           }
 
           content_width = portal_width;
@@ -1923,16 +1932,16 @@
       function get_canvas_type() {
         // Get ratio of canvas
         const shortestCanvasSide = Math.min(canvas.width, canvas.height);
-        canvasContent.orientation = "horizontal";
+        canvas_content.orientation = "horizontal";
         // Vertical Canvas
         if (shortestCanvasSide == canvas.width) {
-          canvasContent.orientation = "vertical";
+          canvas_content.orientation = "vertical";
           // Square Canvas
           if (canvas.width == canvas.height) {
-            canvasContent.orientation = "square";
+            canvas_content.orientation = "square";
           }
         }
-        console.log("Canvas shape: " + canvasContent.orientation);
+        console.log("Canvas shape: " + canvas_content.orientation);
       }
 
       // Clear canvas
@@ -1945,7 +1954,7 @@
         const width = canvas.width;
         const height = canvas.height;
 
-        ctx.fillStyle = canvasContent.background_color;
+        ctx.fillStyle = canvas_content.background_color;
         ctx.fillRect(0, 0, width, height);
       }
 
@@ -1954,7 +1963,7 @@
         let width = Math.max(4, canvas.width * 0.004);
         // Default is bwhite
         let fill_color = "#ffffff";
-        if (canvasContent.background_color == spglobal_colors.black) {
+        if (canvas_content.background_color == spglobal_colors.black) {
           fill_color = "#000000";
         }
         ctx.fillStyle = fill_color;
@@ -1983,20 +1992,21 @@
           portal_canvas.classList.add("focal_point_canvas");
         }
 
+        let n = img_number;
         // Update portal canvas
         let portal_ctx = portal_canvas.getContext("2d");
-        let focalPoint = { x: 0, y: 0, size: 20, dragging: false };
 
         function drawFocalPoint() {
           portal_ctx.beginPath();
+          // Draw circle
           portal_ctx.arc(
-            focalPoint.x,
-            focalPoint.y,
-            focalPoint.size / 2,
+            canvas_content.portal_focal_point[n].x,
+            canvas_content.portal_focal_point[n].y,
+            canvas_content.portal_focal_point[n].size / 2,
             0,
             2 * Math.PI
           );
-          portal_ctx.fillStyle = focalPoint.dragging
+          portal_ctx.fillStyle = canvas_content.portal_focal_point[n].dragging
             ? "rgba(214, 0, 42, 1.0)"
             : "rgba(214, 0, 42, 0.5)";
           portal_ctx.fill();
@@ -2029,8 +2039,12 @@
           portal_canvas.width = insideToolsContainer.clientWidth;
           portal_canvas.height = portal_canvas.width * 0.66;
 
-          focalPoint.x = portal_canvas.width / 2;
-          focalPoint.y = portal_canvas.height / 2;
+          // Reset image location to the center
+          if (resetFocalPoint[n]) {
+            canvas_content.portal_focal_point[n].x = portal_canvas.width / 2;
+            canvas_content.portal_focal_point[n].y = portal_canvas.height / 2;
+            resetFocalPoint[n] = false;
+          }
 
           // Clear the canvas
           portal_ctx.clearRect(0, 0, portal_canvas.width, portal_canvas.height);
@@ -2054,13 +2068,19 @@
           const imgX = (portal_canvas.width - width) / 2;
           const imgY = (portal_canvas.height - height) / 2;
 
-          focalPoint.x = Math.max(imgX, Math.min(x, imgX + width));
-          focalPoint.y = Math.max(imgY, Math.min(y, imgY + height));
-          focalPoint.dragging = true;
+          canvas_content.portal_focal_point[n].x = Math.max(
+            imgX,
+            Math.min(x, imgX + width)
+          );
+          canvas_content.portal_focal_point[n].y = Math.max(
+            imgY,
+            Math.min(y, imgY + height)
+          );
+          canvas_content.portal_focal_point[n].dragging = true;
         });
 
         portal_canvas.addEventListener("mousemove", (event) => {
-          if (focalPoint.dragging) {
+          if (canvas_content.portal_focal_point[n].dragging) {
             const rect = portal_canvas.getBoundingClientRect();
 
             // Move focal point to mouse but constrain inside the image
@@ -2076,16 +2096,22 @@
             const imgX = (portal_canvas.width - width) / 2;
             const imgY = (portal_canvas.height - height) / 2;
 
-            focalPoint.x = Math.max(imgX, Math.min(x, imgX + width));
-            focalPoint.y = Math.max(imgY, Math.min(y, imgY + height));
+            canvas_content.portal_focal_point[n].x = Math.max(
+              imgX,
+              Math.min(x, imgX + width)
+            );
+            canvas_content.portal_focal_point[n].y = Math.max(
+              imgY,
+              Math.min(y, imgY + height)
+            );
 
             drawImageAndFocalPoint();
           }
         });
 
         portal_canvas.addEventListener("mouseup", () => {
-          if (focalPoint.dragging) {
-            focalPoint.dragging = false;
+          if (canvas_content.portal_focal_point[n].dragging) {
+            canvas_content.portal_focal_point[n].dragging = false;
             drawImageAndFocalPoint();
 
             // Calculate the relative position of the focal point within the image
@@ -2098,16 +2124,18 @@
             const imgX = (portal_canvas.width - width) / 2;
             const imgY = (portal_canvas.height - height) / 2;
 
-            const relativeX = (focalPoint.x - imgX) / width;
-            const relativeY = (focalPoint.y - imgY) / height;
+            const relativeX =
+              (canvas_content.portal_focal_point[n].x - imgX) / width;
+            const relativeY =
+              (canvas_content.portal_focal_point[n].y - imgY) / height;
             console.log("Relative position:", { x: relativeX, y: relativeY });
           }
         });
 
         // End dragging if mouse is released outside the canvas
         document.addEventListener("mouseup", () => {
-          if (focalPoint.dragging) {
-            focalPoint.dragging = false;
+          if (canvas_content.portal_focal_point[n].dragging) {
+            canvas_content.portal_focal_point[n].dragging = false;
             drawImageAndFocalPoint();
 
             // Calculate the relative position of the focal point within the image
@@ -2120,8 +2148,10 @@
             const imgX = (portal_canvas.width - width) / 2;
             const imgY = (portal_canvas.height - height) / 2;
 
-            const relativeX = (focalPoint.x - imgX) / width;
-            const relativeY = (focalPoint.y - imgY) / height;
+            const relativeX =
+              (canvas_content.portal_focal_point[n].x - imgX) / width;
+            const relativeY =
+              (canvas_content.portal_focal_point[n].y - imgY) / height;
             console.log("Relative position:", { x: relativeX, y: relativeY });
           }
         });
