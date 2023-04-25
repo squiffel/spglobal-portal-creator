@@ -573,8 +573,8 @@
           y: 0,
           size: 20,
           dragging: false,
-          relative_x: 0,
-          relative_y: 0,
+          relative_x: 0.5,
+          relative_y: 0.5,
         };
       }
 
@@ -1511,7 +1511,8 @@
         pos_y,
         maskRectWidth,
         maskRectHeight,
-        image_flip
+        image_flip,
+        image_number
       ) {
         if (!img) {
           return;
@@ -1536,8 +1537,12 @@
           let scaledHeight = image.height / scaleFactor;
 
           // Calculate the center of the image
-          let img_x_position = Math.abs(maskRectWidth - scaledWidth) / 2;
-          let img_y_position = Math.abs(maskRectHeight - scaledHeight) / 2;
+          let img_x_position =
+            Math.abs(maskRectWidth - scaledWidth) *
+            canvas_content.portal_focal_point[image_number].relative_x;
+          let img_y_position =
+            Math.abs(maskRectHeight - scaledHeight) *
+            canvas_content.portal_focal_point[image_number].relative_y;
 
           // Draw the clipping mask in the center of the canvas
           ctx.save();
@@ -1771,7 +1776,8 @@
             portal_full.y,
             portal_full.width,
             portal_full.height,
-            canvas_content.portal_image_flip[0]
+            canvas_content.portal_image_flip[0],
+            0
           );
         }
 
@@ -1799,7 +1805,8 @@
             portal_large.y,
             portal_large.width,
             portal_large.height,
-            canvas_content.portal_image_flip[0]
+            canvas_content.portal_image_flip[0],
+            0
           );
 
           let img_b = get_image(1);
@@ -1809,7 +1816,8 @@
             portal_small.y,
             portal_small.width,
             portal_small.height,
-            canvas_content.portal_image_flip[1]
+            canvas_content.portal_image_flip[1],
+            1
           );
         }
 
@@ -2047,6 +2055,8 @@
           if (resetFocalPoint[n]) {
             canvas_content.portal_focal_point[n].x = portal_canvas.width / 2;
             canvas_content.portal_focal_point[n].y = portal_canvas.height / 2;
+            canvas_content.portal_focal_point[n].relative_x = 0.5;
+            canvas_content.portal_focal_point[n].relative_y = 0.5;
             resetFocalPoint[n] = false;
           }
 
@@ -2122,6 +2132,9 @@
             const imgX = (portal_canvas.width - width) / 2;
             const imgY = (portal_canvas.height - height) / 2;
 
+            const focal_point_size =
+              canvas_content.portal_focal_point[n].size / 2;
+
             const relativeX =
               (canvas_content.portal_focal_point[n].x - imgX) / width;
             const relativeY =
@@ -2129,7 +2142,10 @@
 
             canvas_content.portal_focal_point[n].relative_x = relativeX;
             canvas_content.portal_focal_point[n].relative_y = relativeY;
-            console.log("Relative position:", { x: relativeX, y: relativeY });
+            //console.log("Relative position:", { x: relativeX, y: relativeY });
+
+            // Update canvas
+            updateCanvas();
           }
         }
 

@@ -1,8 +1,7 @@
 
 My goal is to:
 
--- Focal point
--- Flip portals (big / small)
+-- Focal point -- DOESN'T QUITE MANAGE TO CENTER IT
 
 -- Fix logo alignment at bottom
 -- Add dropdown templates to opening screen
