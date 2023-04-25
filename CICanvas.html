@@ -1,0 +1,2949 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>S&P Global Portal Creator</title>
+    <style>
+      html,
+      body {
+        font-family: sans-serif;
+        margin: 0;
+        padding: 0;
+        height: 100%;
+      }
+
+      #svg-container {
+        display: none;
+      }
+
+      button {
+        display: inline-block;
+        padding: 11px 8px;
+        background-color: #4390df;
+        border: none;
+        border-radius: 4px;
+        text-align: center;
+        font-size: 11px;
+        font-weight: normal;
+        color: white;
+        cursor: pointer;
+        outline: none;
+        box-sizing: border-box;
+        position: relative;
+        margin-bottom: 4px;
+      }
+
+      button:hover {
+        background-color: #4280bf;
+      }
+
+      .secondary {
+        background: none;
+        border: 2px solid #2c92e5;
+        transition: 0.3s;
+        color: #2c92e5;
+      }
+
+      .secondary:hover {
+        background-color: #e7f0f5;
+        border: 2px solid #2c92e5;
+      }
+
+      .toggle-switch-container {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        cursor: pointer;
+        font-size: 11px;
+        font-weight: normal;
+        color: #707070;
+        height: 38px;
+        /* No text highlight */
+        -webkit-user-select: none; /* Safari */
+        -ms-user-select: none; /* IE 10 and IE 11 */
+        user-select: none; /* Standard syntax */
+      }
+
+      .toggle-switch {
+        position: relative;
+        display: inline-block;
+        width: 26px;
+        height: 14px;
+        background-color: #c4c4c4;
+        border-radius: 8px;
+      }
+
+      .toggle-switch .switch-circle {
+        position: absolute;
+        top: 0px;
+        left: 0px;
+        width: 10px;
+        height: 10px;
+        background-color: #f7f7f7;
+        border-radius: 50%;
+        transition: left 0.3s;
+        border: 2px solid #4b4b4b;
+      }
+
+      .toggle-switch.on {
+        background-color: #4b4b4b;
+      }
+
+      .toggle-switch.on .switch-circle {
+        left: 12px;
+      }
+
+      .left-panel,
+      .right-panel {
+        position: fixed;
+        height: 100%;
+      }
+
+      .left-panel {
+        width: 48px;
+        background-color: #f7f7f7;
+        border-right: 2px solid #e4e4e4;
+        overflow-y: auto;
+        overflow-x: none;
+        /* transition: width 0.3s; */
+      }
+
+      .left-panel.expanded {
+        width: 288px;
+        overflow-y: auto;
+        overflow-x: none;
+      }
+
+      .right-panel {
+        left: 50px;
+        right: 0;
+        background-color: #e4e4e4;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        /* transition: left 0.3s; */
+      }
+
+      .right-panel.left-expanded {
+        left: 290px;
+      }
+
+      .toolbox_button {
+        width: 48px;
+        height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: none;
+        border: none;
+        cursor: pointer;
+      }
+
+      .toolbox_button + .toolbox_button {
+        margin-top: 4px;
+      }
+
+      .toolbox_button:hover {
+        background: none;
+        outline: 2px solid #666666;
+        outline-offset: -2px;
+      }
+
+      .toolbox_button svg path {
+        fill: #666666;
+      }
+
+      .toolbox_button.active svg path {
+        fill: #2c92e5;
+      }
+
+      .toolbox_dropdown {
+        width: 100%;
+        padding: 8px;
+        color: #666666;
+        font-size: 11px;
+      }
+
+      .tools {
+        display: none;
+        position: absolute;
+        right: 0;
+        top: 0;
+        width: 240px;
+        height: 100%;
+        border-left: 2px solid #e4e4e4;
+        padding: 12px;
+        padding-right: 24px;
+        box-sizing: border-box;
+        overflow-y: auto;
+        overflow-x: none;
+      }
+
+      .left-panel.expanded .tools {
+        display: block;
+      }
+
+      .inside_tools_container {
+        width: 100%;
+        height: 100%;
+      }
+
+      .toolbox_expanded_button {
+        display: block;
+        padding: 11px 8px;
+        width: 100%;
+        background-color: #ffffff;
+        border: none;
+        border-radius: 4px;
+        text-align: left;
+        font-size: 11px;
+        font-weight: normal;
+        color: #707070;
+        cursor: pointer;
+        outline: none;
+        box-sizing: border-box;
+        position: relative;
+        margin-bottom: 4px;
+      }
+
+      .toolbox_expanded_button .active {
+        border: 1px solid #666666;
+      }
+
+      .toolbox_expanded_button:hover {
+        background-color: #ffffff;
+      }
+
+      .toolbox_expanded_button:hover::before {
+        content: "";
+        display: block;
+        position: absolute;
+        top: 1px;
+        left: 1px;
+        right: 1px;
+        bottom: 1px;
+        border: 1px solid #e1e1e1;
+        border-radius: 2px;
+        pointer-events: none;
+      }
+
+      .toolbox_expanded_label {
+        padding: 11px 0;
+        width: 100%;
+        text-align: left;
+        font-size: 11px;
+        font-weight: normal;
+        color: #707070;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+      }
+
+      .toolbox_expanded_inputbox {
+        font-family: sans-serif;
+        padding: 11px 8px;
+        width: 100%;
+        text-align: left;
+        font-size: 11px;
+        font-weight: normal;
+        color: #707070;
+        border: 1px solid #cccccc;
+        border-radius: 0px;
+        outline: none;
+        box-sizing: border-box;
+        resize: none; /* Prevent manual resizing */
+        overflow: hidden; /* Hide scrollbars */
+        overflow-y: auto;
+        white-space: wrap; /* Prevent text from wrapping to the next line */
+      }
+
+      svg {
+        width: 20px;
+        height: 20px;
+        fill: #666666;
+      }
+
+      .toolbox_icon_button_container {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: start;
+      }
+
+      .toolbox_icon_button {
+        width: 44px;
+        height: 44px;
+        background-color: #ffffff;
+        border: none;
+        border-radius: 4px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        margin: 4px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+        padding: 0;
+      }
+
+      .toolbox_icon_button:hover {
+        background-color: #e7f0f5;
+      }
+
+      .toolbox_icon_button.active_icon_button svg {
+        fill: #2c92e5;
+      }
+
+      .toolbox_icon_button.active_icon_button svg path {
+        fill: #2c92e5;
+      }
+
+      svg.icon {
+        width: 20px;
+        height: 20px;
+        fill: #666666;
+      }
+
+      .drag-drop-area {
+        width: 100%;
+        height: 64px;
+        background-color: transparent;
+        border-radius: 4px;
+        color: #666666;
+        border: 2px dashed #666666;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+      }
+
+      .drag-drop-area:hover {
+        color: #4280bf;
+        border: 2px dashed #4280bf;
+        background-color: #e8f0f5;
+      }
+
+      .user-image-container {
+        display: none;
+      }
+
+      .color-indicator {
+        width: 12px;
+        height: 12px;
+        border: 1px solid #666666;
+        position: absolute;
+        right: 16px;
+        top: 50%;
+        transform: translateY(-50%);
+      }
+
+      .text-container {
+        color: #757575;
+        font-size: 10px;
+        line-height: 1.3;
+        font-style: italic;
+        margin-bottom: 4px;
+      }
+
+      .focal_point_canvas {
+        border-radius: 4px;
+        border: 1px solid #a0a0a0;
+      }
+
+      #canvas {
+        background-color: #ffffff;
+        border: 1px solid #a0a0a0;
+        margin: 96px;
+        display: block;
+        max-width: calc(100% - 48px * 2);
+        max-height: calc(100% - 48px * 2);
+      }
+
+      .container {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        width: 200px;
+      }
+
+      .container > * {
+        width: 100%;
+        text-align: left;
+      }
+
+      .container input {
+        padding: 8px;
+        width: calc(100% - 14px);
+      }
+
+      .input_fixed_height {
+        height: 37px;
+        overflow: none;
+      }
+
+      .container button {
+        margin-top: 12px;
+        text-align: center;
+        font-size: 14px;
+        font-weight: bold;
+      }
+
+      label {
+        margin-right: 8px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="left-panel">
+      <!-- Download -->
+      <button
+        class="toolbox_button"
+        name="download_button"
+        onclick="pressed_toolbox_button(this.name)"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="15"
+          height="17.5"
+          viewBox="0 0 15 17.5"
+        >
+          <path
+            id="Path_1"
+            data-name="Path 1"
+            d="M.938,19.25H0V17.375H15V19.25H.938Zm7.246-5.3L7.5,14.68l-.684-.727-5-5.312-.641-.68L2.543,6.676l.641.684,3.379,3.59V1.75H8.438v9.2l3.379-3.59.645-.684,1.367,1.285-.641.684-5,5.313Z"
+            transform="translate(0 -1.75)"
+            fill="#666"
+          />
+        </svg>
+      </button>
+      <!-- Color -->
+      <button
+        class="toolbox_button"
+        name="color_button"
+        onclick="pressed_toolbox_button(this.name)"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="20"
+          height="20"
+          viewBox="0 0 20 20"
+        >
+          <path
+            id="Path_2"
+            data-name="Path 2"
+            d="M6.25,10.465a1.25,1.25,0,0,1-2.5,0,1.25,1.25,0,0,1,2.5,0ZM5,6.715a1.25,1.25,0,0,1,2.5,0,1.25,1.25,0,0,1-2.5,0Zm6.25-1.25a1.25,1.25,0,0,1-2.5,0,1.25,1.25,0,0,1,2.5,0Zm1.25,1.25a1.25,1.25,0,0,1,2.5,0,1.25,1.25,0,0,1-2.5,0Zm4.762,6.25H13.438a1.906,1.906,0,0,0-1.875,1.91,2.094,2.094,0,0,0,.039.387,6.965,6.965,0,0,0,.426,1.168A4.217,4.217,0,0,1,12.5,18.07a2.3,2.3,0,0,1-2.086,2.422c-.137,0-.277.008-.414.008a10,10,0,1,1,10-10c0,.035-.035.07-.035.105A2.525,2.525,0,0,1,17.262,13Zm.828-2.379c0-.031.035-.059.035-.121A8.125,8.125,0,1,0,10,18.625c.113,0,.227,0,.336-.008a.174.174,0,0,0,.063-.012.341.341,0,0,0,.078-.07.744.744,0,0,0,.148-.465,2.015,2.015,0,0,0-.219-.668c-.023-.047-.047-.1-.074-.164a8.1,8.1,0,0,1-.562-1.59,3.609,3.609,0,0,1-.082-.773,3.736,3.736,0,0,1,3.75-3.785h3.824a1.184,1.184,0,0,0,.7-.191A.346.346,0,0,0,18.09,10.586Z"
+            transform="translate(0 -0.5)"
+            fill="#666"
+          />
+        </svg>
+      </button>
+
+      <!-- Typography -->
+      <button
+        class="toolbox_button"
+        name="text_button"
+        onclick="pressed_toolbox_button(this.name)"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="25"
+          height="17.5"
+          viewBox="0 0 25 17.5"
+        >
+          <path
+            id="Path_8"
+            data-name="Path 8"
+            d="M.938,1.75H0V6.438H1.875V3.625H6.563v13.75H3.75V19.25h7.5V17.375H8.438V3.625h4.688V6.438H15V1.75H.938Zm12.188,7.5h-.937V13h1.875V11.125h3.75v6.25H15.625V19.25h6.25V17.375H19.688v-6.25h3.438V13H25V9.25H13.125Z"
+            transform="translate(0 -1.75)"
+            fill="#666"
+          />
+        </svg>
+      </button>
+      <!-- Images -->
+      <button
+        class="toolbox_button"
+        name="image_button"
+        onclick="pressed_toolbox_button(this.name)"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="20"
+          height="17.5"
+          viewBox="0 0 20 17.5"
+        >
+          <path
+            id="Path_6"
+            data-name="Path 6"
+            d="M18.125,3.625V17.188l-.492-.676-5-6.875-.766-1.051-.754,1.055L7.59,14.574l-1.3-1.3-.7-.7-.66.734L2.117,16.434l-.242.27V3.625ZM1.875,1.75H0v17.5H20V1.75H1.875ZM7.5,7.375A1.875,1.875,0,1,0,6.562,9,1.875,1.875,0,0,0,7.5,7.375Z"
+            transform="translate(0 -1.75)"
+            fill="#666"
+          />
+        </svg>
+      </button>
+      <!-- Layout -->
+      <button
+        class="toolbox_button"
+        name="layout_button"
+        onclick="pressed_toolbox_button(this.name)"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="20"
+          height="17.5"
+          viewBox="0 0 20 17.5"
+        >
+          <path
+            id="Path_4"
+            data-name="Path 4"
+            d="M18.125,3.625V6.75H1.875V3.625ZM1.875,17.375V8.625h3.75v8.75Zm5.625,0V8.625H18.125v8.75ZM1.875,1.75H0v17.5H20V1.75H1.875Z"
+            transform="translate(0 -1.75)"
+            fill="#666"
+          />
+        </svg>
+      </button>
+      <!-- Logo -->
+      <button
+        class="toolbox_button"
+        name="logo_button"
+        onclick="pressed_toolbox_button(this.name)"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="23.064"
+          height="8.844"
+          viewBox="0 0 23.064 8.844"
+        >
+          <path
+            id="Path_3"
+            data-name="Path 3"
+            d="M3.828.168c1.872,0,3.4-1,3.4-2.688,0-1.428-1.044-2.22-2.436-2.436L3.2-5.208c-.612-.1-1.032-.432-1.032-.948,0-.8.8-1.2,1.668-1.2a1.486,1.486,0,0,1,1.668,1.32H7.092c-.024-1.572-1.464-2.64-3.228-2.64-1.68,0-3.24,1.092-3.24,2.628,0,1.38.912,2.124,2.316,2.352l1.632.264c.588.1,1.092.384,1.092,1,0,.864-.756,1.272-1.812,1.272A1.643,1.643,0,0,1,2-2.688H.4C.4-.936,1.9.168,3.828.168Zm7.224,0a3.163,3.163,0,0,0,2.328-.96L14.064,0h1.812L14.232-1.8a3.656,3.656,0,0,0,.6-1.8H15.8V-4.788H13.62v.42a3.3,3.3,0,0,1-.3,1.6L11.892-4.32l.144-.084a2.442,2.442,0,0,0,1.476-2.172,2.178,2.178,0,0,0-2.352-2.1,2.161,2.161,0,0,0-2.316,2.1,2.382,2.382,0,0,0,.7,1.632l.216.252-.12.072A2.58,2.58,0,0,0,8.244-2.328,2.58,2.58,0,0,0,11.052.168Zm.084-1.284A1.3,1.3,0,0,1,9.672-2.4a1.436,1.436,0,0,1,.816-1.284l.132-.072L12.5-1.716A1.725,1.725,0,0,1,11.136-1.116Zm-.12-4.14-.24-.252a1.66,1.66,0,0,1-.552-1.068.9.9,0,0,1,.948-.888.892.892,0,0,1,.948.912c0,.588-.408.924-.972,1.224Zm6.108-3.252V0H18.66V-3.288h1.824c1.956,0,2.976-1.1,2.976-2.616s-1.02-2.6-2.976-2.6ZM20.4-4.644H18.66V-7.152H20.4c1.032,0,1.5.48,1.5,1.26S21.432-4.644,20.4-4.644Z"
+            transform="translate(-0.396 8.676)"
+            fill="#666"
+          />
+        </svg>
+      </button>
+      <!-- Add an additional button to toggle the left-panel width -->
+      <!-- <button
+        id="toggle_button"
+        class="toolbox_button"
+        name="toggleButton"
+        onclick="collapseLeftPanel()"
+        style="display: none"
+        ;
+      >
+        <svg viewBox="0 0 20 20">
+          <rect x="2" y="9" width="16" height="2" fill="#666666" />
+        </svg>
+      </button> -->
+      <!-- Expanded toolset-->
+      <div class="tools">
+        <div class="inside_tools_container">
+          <!-- Add your content here -->
+        </div>
+      </div>
+    </div>
+    <div class="right-panel">
+      <div class="container">
+        <label class="toolbox_expanded_label" for="widthInput">Width:</label>
+        <input type="number" id="widthInput" value="1200" />
+        <label class="toolbox_expanded_label" for="heightInput">Height:</label>
+        <input type="number" id="heightInput" value="628" />
+        <button onclick="createCanvas()">Create</button>
+      </div>
+    </div>
+
+    <!-- ---------------------- SCRIPTS ---------------------- -->
+    <script>
+      var canvas, ctx;
+
+      // enums
+      var spglobal_colors = {
+        black: "#000000",
+        white: "#ffffff",
+        red: "#d6002a",
+        yellow: "#EDF86F",
+        blue: "#C7DAE0",
+      };
+
+      // User defined settings
+      let canvasContent = {};
+      let userDefinedAspectRatio;
+      let userDefinedWidth;
+      let userDefinedHeight;
+
+      // Set to default
+      canvasContent.logo = "spg_corporate";
+      canvasContent.portal_image_flip = [false, false];
+      canvasContent.portal_size_percent = 50;
+      canvasContent.portal_upload_image_number = 0;
+      canvasContent.portal_override_margins = false;
+      update_color_scheme("white");
+
+      // UI States
+      let panelOpen = "None";
+
+      // Functions
+      function createCanvas() {
+        let width = parseInt(document.getElementById("widthInput").value);
+        let height = parseInt(document.getElementById("heightInput").value);
+
+        // Add constraints
+        var min_width_resolution = 144;
+        var min_height_resolution = 88;
+
+        var max_resolution = 1920;
+        var exceeded_maximum =
+          width > max_resolution || height > max_resolution;
+        if (exceeded_maximum) {
+          alert("Size cannot exceed " + max_resolution + "px");
+        }
+        width = Math.min(max_resolution, width);
+        height = Math.min(max_resolution, height);
+
+        width = Math.max(min_width_resolution, width);
+        height = Math.max(min_height_resolution, height);
+
+        // Store the user-defined width, height, and aspect ratio
+        userDefinedWidth = width;
+        userDefinedHeight = height;
+        userDefinedAspectRatio = width / height;
+
+        if (isNaN(width) || isNaN(height)) {
+          alert("Please enter valid width and height values.");
+          return;
+        }
+
+        // Delete initial load input box if exists
+        const container = document.querySelector(".container");
+        if (container) {
+          container.remove();
+        }
+
+        // Remove canvas if it exists
+        canvas = document.getElementById("canvas");
+        if (canvas) {
+          canvas.remove();
+        }
+
+        // Create a new canvas
+        canvas = document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = height;
+        canvas.id = "canvas";
+        ctx = canvas.getContext("2d");
+        // Add canvas to document
+        document.querySelector(".right-panel").appendChild(canvas);
+
+        // Update the input boxes
+        let inputbox_width = document.getElementById("widthInput");
+        let inputbox_height = document.getElementById("wheightInput");
+        if (inputbox_width) {
+          document.getElementById("widthInput").value = width;
+          document.getElementById("heightInput").value = height;
+        }
+
+        // Get canvas type (Vertical, Horizontal, Square)
+        get_canvas_type();
+
+        // Set default to right
+        canvasContent.portal_side = "right";
+
+        // Set if vertical set to top
+        if (canvasContent.orientation == "vertical") {
+          canvasContent.portal_side = "top";
+        }
+
+        // Update the canvas with the custom attributes
+        updateCanvas();
+      }
+
+      function handleWindowResize() {
+        if (!canvas) return;
+
+        const panelWidth = document.querySelector(".left-panel").offsetWidth;
+
+        var padding = 48;
+        const maxWidth = Math.min(
+          userDefinedWidth,
+          window.innerWidth - panelWidth - padding * 2
+        );
+        const maxHeight = Math.min(
+          userDefinedHeight,
+          window.innerHeight - padding * 2
+        );
+
+        let newWidth = maxWidth;
+        let newHeight = newWidth / userDefinedAspectRatio;
+
+        if (newHeight > maxHeight) {
+          newHeight = maxHeight;
+          newWidth = newHeight * userDefinedAspectRatio;
+        }
+
+        canvas.style.width = `${newWidth}px`;
+        canvas.style.height = `${newHeight}px`;
+      }
+
+      window.addEventListener("resize", handleWindowResize);
+
+      // Download Canvas
+      function downloadCanvasAsPng() {
+        if (!canvas) {
+          alert("Please create the canvas before downloading.");
+          return;
+        }
+
+        const link = document.createElement("a");
+        link.href = canvas.toDataURL("image/png");
+        const today = new Date();
+        const formattedDate = `${today.getDate()}-${
+          today.getMonth() + 1
+        }-${today.getFullYear()}`;
+        link.download = `CI-Event-${formattedDate}.png`;
+        link.click();
+      }
+
+      // Expand the left side toolbox
+      function clearInsideToolsContainer() {
+        const insideToolsContainer = document.querySelector(
+          ".inside_tools_container"
+        );
+        insideToolsContainer.innerHTML = "";
+        // Remove active state from main menu buttons
+        const buttons = document.querySelectorAll(".toolbox_button");
+        buttons.forEach((btn) => {
+          btn.classList.remove("active");
+        });
+      }
+
+      // Expanding the left panel
+      function toggleLeftPanel() {
+        const leftPanel = document.querySelector(".left-panel");
+        const rightPanel = document.querySelector(".right-panel");
+        const isExpanded = leftPanel.classList.contains("expanded");
+
+        leftPanel.classList.toggle("expanded");
+        rightPanel.classList.toggle("left-expanded");
+        handleWindowResize();
+
+        if (isExpanded) {
+          clearInsideToolsContainer();
+        }
+      }
+
+      function show_hide_panel() {
+        let hide_panel_button = document.getElementById("toggle_button");
+        if (hide_panel_button) {
+          const leftPanel = document.querySelector(".left-panel");
+          const isExpanded = leftPanel.classList.contains("expanded");
+          hide_panel_button.style.display = "none";
+          if (isExpanded) {
+            hide_panel_button.style.display = "block";
+          }
+        }
+      }
+
+      // Expanding the left panel
+      function collapseLeftPanel() {
+        const leftPanel = document.querySelector(".left-panel");
+        const rightPanel = document.querySelector(".right-panel");
+        leftPanel.classList.remove("expanded");
+        rightPanel.classList.remove("left-expanded");
+        handleWindowResize();
+        clearInsideToolsContainer();
+        show_hide_panel();
+      }
+
+      function expandLeftPanel() {
+        const leftPanel = document.querySelector(".left-panel");
+        const rightPanel = document.querySelector(".right-panel");
+        leftPanel.classList.add("expanded");
+        rightPanel.classList.add("left-expanded");
+        handleWindowResize();
+        show_hide_panel();
+      }
+
+      // Clicked icon buttons
+      function pressed_toolbox_icon_button(event) {
+        const button = event.target.closest(".toolbox_icon_button");
+        const buttonName = button.getAttribute("name");
+        console.log(buttonName);
+
+        const buttons = document.querySelectorAll(".toolbox_icon_button");
+        buttons.forEach((btn) => {
+          btn.classList.remove("active_icon_button");
+        });
+
+        button.classList.add("active_icon_button");
+      }
+
+      // Color indicator
+      function addColorIndicator(button, rgb) {
+        const colorIndicator = document.createElement("div");
+        colorIndicator.classList.add("color-indicator");
+        colorIndicator.style.backgroundColor = rgb;
+        button.style.position = "relative";
+        button.appendChild(colorIndicator);
+      }
+
+      // File upload
+      function add_user_image(file) {
+        let userImagesDiv = document.getElementById("user-image-container");
+        if (userImagesDiv == null) {
+          userImagesDiv = document.createElement("div");
+          userImagesDiv.id = "user-image-container";
+          document.body.appendChild(userImagesDiv);
+        }
+
+        // Upload image
+        const reader = new FileReader();
+        reader.onload = function (event) {
+          const img = new Image();
+          img.src = event.target.result;
+          img.style.display = "none";
+
+          let n = canvasContent.portal_upload_image_number;
+          // If there are no images add one
+          if (userImagesDiv.children.length == 0) {
+            userImagesDiv.appendChild(img);
+          }
+          // If there is one child
+          if (userImagesDiv.children.length == 1) {
+            // Update the primary image or add an image
+            if (n == 0) {
+              userImagesDiv.children[0].src = img.src;
+            } else {
+              userImagesDiv.appendChild(img);
+            }
+          }
+          // If there are 2 children, replace with the user selected image src
+          if (userImagesDiv.children.length == 2) {
+            userImagesDiv.children[n].src = img.src;
+          }
+
+          //userImagesDiv.appendChild(img);
+          //canvasContent.portal_upload_image_number
+
+          // Update canvas once image has loaded
+          updateCanvas();
+          // Upload panel
+          if (panelOpen == "Image") {
+            // Update panel
+            update_toolbox_panel("image_button");
+          }
+        };
+        reader.readAsDataURL(file);
+      }
+
+      function addFileUploadArea() {
+        const container = document.querySelector(".inside_tools_container");
+
+        const dragDropArea = document.createElement("div");
+        dragDropArea.classList.add("drag-drop-area");
+        dragDropArea.textContent = "Drag and drop files here";
+        container.appendChild(dragDropArea);
+
+        // Image to change
+        if (canvasContent.portal_count > 0) {
+          // Only show if there are images
+          let select_image = createDropdownMenu(
+            ["0", "1"],
+            "portal_image",
+            canvasContent.portal_upload_image_number
+          );
+          changeDropdownMenuText(select_image, "0", "Primary Portal");
+          changeDropdownMenuText(select_image, "1", "Secondary Portal");
+          select_image.style.marginTop = "8px";
+        }
+
+        const fileInput = document.createElement("input");
+        fileInput.type = "file";
+        fileInput.accept = "image/png, image/jpeg";
+        fileInput.style.display = "none";
+        container.appendChild(fileInput);
+
+        const browseButton = document.createElement("button");
+        browseButton.style.marginTop = "8px";
+        browseButton.textContent = "Upload image";
+        container.appendChild(browseButton);
+
+        browseButton.addEventListener("click", function () {
+          fileInput.click();
+        });
+
+        fileInput.addEventListener("change", function () {
+          if (fileInput.files.length > 0) {
+            add_user_image(fileInput.files[0]);
+            fileInput.value = ""; // Reset the file input value to allow the same file to be selected again.
+          }
+        });
+
+        ["dragenter", "dragover", "dragleave", "drop"].forEach((eventName) => {
+          dragDropArea.addEventListener(eventName, function (event) {
+            event.preventDefault();
+            event.stopPropagation();
+          });
+        });
+
+        dragDropArea.addEventListener("drop", function (event) {
+          if (event.dataTransfer.files.length > 0) {
+            const file = event.dataTransfer.files[0];
+            if (file.type === "image/png" || file.type === "image/jpeg") {
+              add_user_image(file);
+            }
+          }
+        });
+      }
+
+      // Delete photo
+      function removeImageButton(image_id) {
+        const container = document.querySelector(".inside_tools_container");
+
+        // Otherwise create the button
+        const deleteButton = document.createElement("button");
+        let buttonText = ["primary image", "secondary image"];
+        deleteButton.textContent = "Delete " + buttonText[image_id];
+        deleteButton.name = image_id;
+        deleteButton.id = "delete_" + image_id;
+        deleteButton.classList.add("secondary");
+        container.appendChild(deleteButton);
+
+        deleteButton.addEventListener("click", function () {
+          let button_label = event.target.name;
+
+          // Delete the uploaded image
+          let image_container = document.getElementById("user-image-container");
+          if (image_container) {
+            let img = image_container.children[parseInt(button_label)];
+            image_container.removeChild(img);
+          }
+
+          // Update Canvas
+          updateCanvas();
+
+          // Update panel
+          update_toolbox_panel("image_button");
+        });
+        return deleteButton;
+      }
+
+      function update_toolbox_panel(button_label) {
+        let image_button = document.getElementsByName(button_label)[0];
+        image_button.click();
+      }
+
+      // Add icon buttons
+      function addSquareButtonsToInsideToolsContainer(
+        button_container_id,
+        svg_id
+      ) {
+        const container = document.querySelector(".inside_tools_container");
+
+        var buttonContainer = document.getElementById(button_container_id);
+        if (buttonContainer == null) {
+          // Add button container if it doesnt exist
+          buttonContainer = document.createElement("div");
+          buttonContainer.id = button_container_id;
+          buttonContainer.classList.add("toolbox_icon_button_container");
+          container.appendChild(buttonContainer);
+        }
+
+        const button = document.createElement("button");
+        button.classList.add("toolbox_icon_button");
+        var button_name = svg_id.replace("layout_", "");
+        button.setAttribute("name", button_name);
+
+        const svg = document.getElementById(svg_id).cloneNode(true);
+        svg.id = `icon_button_${Math.random(0, 1000)}`; // Assign random name
+        svg.classList.add("icon");
+        //svg.setAttribute("viewBox", "0 0 20 20");
+
+        button.appendChild(svg);
+        button.addEventListener("click", pressed_toolbox_icon_button);
+        buttonContainer.appendChild(button);
+      }
+
+      // Add buttons
+      function addButtonToInsideToolsContainer(label_string) {
+        const insideToolsContainer = document.querySelector(
+          ".inside_tools_container"
+        );
+        const button = document.createElement("button");
+        button.className = "toolbox_expanded_button";
+        button.textContent = label_string;
+        button.addEventListener("click", panelButtonClicked);
+        insideToolsContainer.appendChild(button);
+        return button;
+      }
+
+      // Add labels
+      function addLabelToInsideToolsContainer(label_string) {
+        const insideToolsContainer = document.querySelector(
+          ".inside_tools_container"
+        );
+        const label = document.createElement("div");
+        label.className = "toolbox_expanded_label";
+        label.textContent = label_string;
+        insideToolsContainer.appendChild(label);
+        return insideToolsContainer;
+      }
+
+      // Text label
+      function addTextToInsideToolsContainer(text) {
+        const insideToolsContainer = document.querySelector(
+          ".inside_tools_container"
+        );
+        const textContainer = document.createElement("div");
+        textContainer.classList.add("text-container");
+        textContainer.textContent = text;
+        insideToolsContainer.appendChild(textContainer);
+      }
+
+      //Input box modified
+      function inputbox_modified(event) {
+        console.log(event.target.name, event.target.value);
+      }
+
+      // Button clicked
+      function panelButtonClicked(event) {
+        // Which button was pressed
+        var button_label = event.target.textContent;
+        console.log("Button pressed: " + button_label);
+
+        // Color scheme
+        if (panelOpen == "Color") {
+          update_color_scheme(button_label); // Set background color, font and logo colors
+        }
+
+        // Logo type
+        if (panelOpen == "Logo") {
+          var logo_name = button_label.toLowerCase().replace(/ /g, "_");
+          canvasContent.logo = "spg_" + logo_name;
+        }
+
+        // Layout
+        if (panelOpen == "Layout") {
+          // Resize Canvas
+          if (button_label.includes("Submit")) {
+            createCanvas();
+          }
+        }
+        // Update
+        updateCanvas();
+      }
+
+      // Toggle switch
+      function addToggleSwitchWithLabel(labelText, state) {
+        const insideToolsContainer = document.querySelector(
+          ".inside_tools_container"
+        );
+
+        const toggleSwitchContainer = document.createElement("div");
+        toggleSwitchContainer.className = "toggle-switch-container";
+
+        const label = document.createElement("span");
+        label.innerText = labelText;
+        toggleSwitchContainer.appendChild(label);
+
+        const toggleSwitch = document.createElement("div");
+        toggleSwitch.className = "toggle-switch";
+        toggleSwitchContainer.appendChild(toggleSwitch);
+
+        const switchCircle = document.createElement("div");
+        switchCircle.className = "switch-circle";
+        toggleSwitch.appendChild(switchCircle);
+
+        // Toggle state on or off when created
+        if (state) {
+          toggleSwitch.classList.add("on");
+        }
+
+        toggleSwitchContainer.addEventListener("click", () => {
+          toggleSwitch.classList.toggle("on");
+          toggleSwitchValueChanged(
+            toggleSwitchContainer,
+            toggleSwitch.classList.contains("on")
+          );
+        });
+
+        insideToolsContainer.appendChild(toggleSwitchContainer);
+        return toggleSwitchContainer;
+      }
+
+      function toggleSwitchValueChanged(element, toggleValue) {
+        let button_label = element.innerText;
+
+        if (panelOpen == "Layout") {
+          if (button_label.includes("Show Grid")) {
+            canvasContent.show_guides = toggleValue;
+          }
+        }
+
+        if (panelOpen == "Image") {
+          if (button_label.includes("Mirror horizontally")) {
+            // Flip image horizontally
+            let n = parseInt(element.name);
+            canvasContent.portal_image_flip[n] =
+              !canvasContent.portal_image_flip[n];
+          }
+          if (button_label.includes("Show margins")) {
+            canvasContent.portal_override_margins =
+              !canvasContent.portal_override_margins;
+          }
+        }
+
+        // Update canvas
+        updateCanvas();
+      }
+
+      function addInputBoxToInsideToolsContainer(input_box_name) {
+        const insideToolsContainer = document.querySelector(
+          ".inside_tools_container"
+        );
+        const inputBox = document.createElement("textarea");
+        inputBox.className = "toolbox_expanded_inputbox";
+        inputBox.placeholder = "Type...";
+        inputBox.name = "input_" + input_box_name;
+        inputBox.addEventListener("input", inputbox_modified);
+        insideToolsContainer.appendChild(inputBox);
+        return inputBox;
+      }
+
+      // Side panel buttons default click behavior
+      function pressed_toolbox_button(buttonName) {
+        // Buttons do not work if there is no canvas
+        if (canvas == undefined) {
+          alert("Create a Canvas first");
+          return;
+        }
+
+        panelOpen = "None";
+        clearInsideToolsContainer();
+
+        // Remove the 'active' class from all buttons
+        const buttons = document.querySelectorAll(".toolbox_button");
+        buttons.forEach((btn) => {
+          btn.classList.remove("active");
+        });
+
+        // Add the 'active' class to the clicked button
+        const button = event.target.closest(".toolbox_button");
+        button.classList.add("active");
+
+        if (buttonName === "download_button") {
+          collapseLeftPanel();
+          // Turn off guides
+          canvasContent.show_guides = false;
+          updateCanvas();
+          // Download canvas
+          setTimeout(function () {
+            downloadCanvasAsPng();
+          }, 250); // Slight delay to ensure that the canvas is updated
+          //downloadCanvasAsPng();
+        }
+
+        if (buttonName === "color_button") {
+          expandLeftPanel();
+          panelOpen = "Color";
+          addLabelToInsideToolsContainer("Background color");
+          addColorIndicator(
+            addButtonToInsideToolsContainer("White"),
+            spglobal_colors.white
+          );
+          addColorIndicator(
+            addButtonToInsideToolsContainer("Black"),
+            spglobal_colors.black
+          );
+          addColorIndicator(
+            addButtonToInsideToolsContainer("Red"),
+            spglobal_colors.red
+          );
+          addColorIndicator(
+            addButtonToInsideToolsContainer("Yellow"),
+            spglobal_colors.yellow
+          );
+          addColorIndicator(
+            addButtonToInsideToolsContainer("Blue"),
+            spglobal_colors.blue
+          );
+        }
+
+        if (buttonName === "logo_button") {
+          expandLeftPanel();
+          panelOpen = "Logo";
+          addLabelToInsideToolsContainer("Logo");
+          addButtonToInsideToolsContainer("Corporate");
+          addButtonToInsideToolsContainer("Ratings");
+          addButtonToInsideToolsContainer("Dow Jones Indices");
+          addButtonToInsideToolsContainer("Commodity Insights");
+          addButtonToInsideToolsContainer("Market Intelligence");
+          addButtonToInsideToolsContainer("Mobility");
+        }
+
+        if (buttonName === "text_button") {
+          expandLeftPanel();
+          panelOpen = "Text";
+
+          addLabelToInsideToolsContainer("Headline");
+          addInputBoxToInsideToolsContainer("headline");
+          addLabelToInsideToolsContainer("Body");
+          addInputBoxToInsideToolsContainer("body");
+          addLabelToInsideToolsContainer("Call to action");
+          addInputBoxToInsideToolsContainer("cta");
+          addLabelToInsideToolsContainer("Details");
+          addInputBoxToInsideToolsContainer("detail");
+        }
+
+        if (buttonName === "layout_button") {
+          expandLeftPanel();
+          panelOpen = "Layout";
+
+          // Update logo position
+          addLabelToInsideToolsContainer("Logo position");
+          createDropdownMenu(
+            ["bottom left", "top left", "top right", "bottom right"],
+            "logo_position",
+            canvasContent.logo_position
+          );
+
+          // Layout buttons
+          addLabelToInsideToolsContainer("Layout");
+          addSquareButtonsToInsideToolsContainer(
+            "layout_buttons",
+            "layout_4_split_assymetrical"
+          );
+          addSquareButtonsToInsideToolsContainer(
+            "layout_buttons",
+            "layout_4_split_symetrical"
+          );
+          addSquareButtonsToInsideToolsContainer(
+            "layout_buttons",
+            "layout_bottom_split_assymetrical"
+          );
+          addSquareButtonsToInsideToolsContainer(
+            "layout_buttons",
+            "layout_bottom_split_symetrical"
+          );
+          addSquareButtonsToInsideToolsContainer(
+            "layout_buttons",
+            "layout_side_split_assymetrical"
+          );
+          addSquareButtonsToInsideToolsContainer(
+            "layout_buttons",
+            "layout_side_split_symetrical"
+          );
+          addSquareButtonsToInsideToolsContainer(
+            "layout_buttons",
+            "layout_3_row"
+          );
+          addSquareButtonsToInsideToolsContainer(
+            "layout_buttons",
+            "layout_3_col"
+          );
+          addSquareButtonsToInsideToolsContainer(
+            "layout_buttons",
+            "layout_2_row"
+          );
+          addSquareButtonsToInsideToolsContainer(
+            "layout_buttons",
+            "layout_2_col"
+          );
+
+          // Show Grid
+          addToggleSwitchWithLabel("Show Grid", canvasContent.show_guides);
+
+          // Update layout size
+          addLabelToInsideToolsContainer("Size");
+          addTextToInsideToolsContainer("Width (min 88, max 1920)");
+          let btn = addInputBoxToInsideToolsContainer("width");
+          btn.value = canvas.width;
+          btn.id = "widthInput";
+          btn.classList.add("input_fixed_height");
+          addTextToInsideToolsContainer("Height (min 88, max 1920)");
+          btn = addInputBoxToInsideToolsContainer("height");
+          btn.value = canvas.height;
+          btn.id = "heightInput";
+          btn.classList.add("input_fixed_height");
+          let submit_button = addButtonToInsideToolsContainer("Submit");
+          submit_button.style.marginTop = "4px";
+          convert_to_blue_button_style(submit_button);
+        }
+
+        // IMAGES
+        if (buttonName === "image_button") {
+          expandLeftPanel();
+          panelOpen = "Image";
+
+          // Portal upload
+          addLabelToInsideToolsContainer("Upload");
+          addFileUploadArea();
+
+          // Size and position
+          let userImageContainer = document.getElementById(
+            "user-image-container"
+          );
+
+          if (userImageContainer) {
+            if (userImageContainer.children.length > 0) {
+              // Position
+              addLabelToInsideToolsContainer("Portal Position & Size");
+
+              let select_position = createDropdownMenu(
+                ["top", "right", "bottom", "left"],
+                "portal_side",
+                canvasContent.portal_side
+              );
+              select_position.style.float = "left";
+              select_position.style.display = "inline-block";
+              select_position.style.width = "47%";
+              // Size
+              let select_size = createDropdownMenu(
+                ["100%", "66%", "50%", "33%", "0%"],
+                "portal_size",
+                canvasContent.portal_size_percent + "%"
+              );
+              select_size.style.float = "right";
+              select_size.style.display = "inline-block";
+              select_size.style.width = "47%";
+              changeDropdownMenuText(select_size, "100%", "Fill Canvas");
+              changeDropdownMenuText(select_size, "66%", "Two Thirds");
+              changeDropdownMenuText(select_size, "50%", "Half");
+              changeDropdownMenuText(select_size, "33%", "One Third");
+              changeDropdownMenuText(select_size, "0%", "Hide");
+
+              // Move inside the container
+              const insideToolsContainer = document.querySelector(
+                ".inside_tools_container"
+              );
+              // Create container
+              let spacer = document.createElement("div");
+              spacer.style.display = "block";
+              spacer.style.width = "100%";
+              spacer.style.height = "32px";
+              insideToolsContainer.appendChild(spacer);
+              spacer.appendChild(select_position);
+              spacer.appendChild(select_size);
+
+              // Show marginss
+              if (canvasContent.portal_count == 1) {
+                addToggleSwitchWithLabel(
+                  "Show margins",
+                  canvasContent.portal_override_margins
+                );
+              }
+            }
+          }
+
+          // Add IMAGE controls
+          let user_image_container = document.getElementById(
+            "user-image-container"
+          );
+          if (canvasContent.portal_count > 0) {
+            for (var i = 0; i < canvasContent.portal_count; i++) {
+              let img = get_image(i);
+              if (img) {
+                let portal_label =
+                  i == 0 ? "Portal [PRIMARY]" : "Portal [Secondary]";
+                addLabelToInsideToolsContainer(portal_label);
+                // Focal point setter
+                createImagePreviewWithFocalPoint(img, i);
+                // Show Grid
+                let toggle_switch = addToggleSwitchWithLabel(
+                  "Mirror horizontally",
+                  canvasContent.portal_image_flip[i]
+                );
+                toggle_switch.name = i;
+                // Create the delete button
+                let removeButton = removeImageButton(i);
+                if (i == 1) {
+                  removeButton.style.marginBottom = "16px";
+                }
+              }
+            }
+          }
+        }
+      }
+
+      // Dropdown menus
+      function userModifiedSelectionDropdown(event) {
+        //console.log("Element that called the function:", event.target.name);
+        //console.log("Selected option:", event.target.value);
+
+        let selected_value = event.target.value;
+        let button_label = event.target.name;
+        console.log(selected_value);
+
+        // Logo type
+        if (panelOpen == "Layout") {
+          if (button_label == "logo_position") {
+            var position_name = selected_value.toLowerCase().replace(/ /g, "_");
+            console.log("LOGO POSITION: " + position_name);
+            canvasContent.logo_position = position_name;
+          }
+        }
+
+        if (panelOpen == "Image") {
+          if (button_label == "portal_side") {
+            canvasContent.portal_side = selected_value;
+          }
+          if (button_label == "portal_size") {
+            console.log("PORTAL SIZE: " + selected_value);
+            canvasContent.portal_size_percent = parseInt(selected_value);
+          }
+          if (button_label == "portal_image") {
+            console.log("Portal Image Replace " + selected_value);
+            canvasContent.portal_upload_image_number = parseInt(selected_value);
+          }
+        }
+
+        // Update canvas
+        updateCanvas();
+      }
+
+      function convert_to_blue_button_style(button) {
+        button.classList.remove("toolbox_expanded_button");
+      }
+
+      // Dropdown menu
+      function createDropdownMenu(options, name, selected_string) {
+        const insideToolsContainer = document.querySelector(
+          ".inside_tools_container"
+        );
+
+        const select = document.createElement("select");
+        select.name = name;
+        select.classList.add("toolbox_dropdown");
+        select.addEventListener("change", userModifiedSelectionDropdown);
+
+        options.forEach((option) => {
+          const opt = document.createElement("option");
+          opt.value = option;
+          if (option == selected_string) {
+            opt.selected = true;
+          }
+          opt.textContent = option.toTitleCase();
+          select.appendChild(opt);
+        });
+
+        insideToolsContainer.appendChild(select);
+        return select;
+      }
+
+      function changeDropdownMenuText(element, current, replacement) {
+        for (let i = 0; i < element.children.length; i++) {
+          let child = element.children[i];
+          if (child.textContent == current) {
+            child.textContent = replacement;
+          }
+        }
+      }
+
+      // Title case
+      String.prototype.toTitleCase = function () {
+        return this.replace(/\w\S*/g, function (txt) {
+          return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+        });
+      };
+
+      function update_color_scheme(color) {
+        color = color.toLowerCase();
+        // Set background color
+        canvasContent.background_color = spglobal_colors[color];
+        // Select the correct color scheme
+        canvasContent.color_font = spglobal_colors.black;
+        canvasContent.color_wordmark = spglobal_colors.red;
+
+        if (color == "yellow" || color == "blue") {
+          canvasContent.color_wordmark = spglobal_colors.black;
+        }
+        if (color == "red" || color == "black") {
+          canvasContent.color_font = spglobal_colors.white;
+          canvasContent.color_wordmark = spglobal_colors.white;
+        }
+      }
+
+      function get_image(image_number) {
+        // Default
+        if (image_number == undefined) {
+          image_number = 0;
+        }
+
+        const userImageContainer = document.getElementById(
+          "user-image-container"
+        );
+        if (!userImageContainer) {
+          // console.log("No user image div container.");
+          return null;
+        }
+
+        // Default loads the primary image if there is one
+        let img = null; //userImageContainer.querySelector("img");
+
+        // Looks for the image ID
+        img = userImageContainer.children[image_number];
+
+        return img;
+      }
+
+      // Add image to the canvas
+      function addImageToCanvas(
+        img,
+        pos_x,
+        pos_y,
+        maskRectWidth,
+        maskRectHeight,
+        image_flip
+      ) {
+        if (!img) {
+          return;
+        }
+        // Load image and draw it on the canvas
+        const image = new Image();
+        image.src = img.src;
+
+        image.onload = function () {
+          // To scaling proportionally to fit to frame
+          // Divide the image dimensions by the mask dimensions
+          const width_scale = image.width / maskRectWidth;
+          const height_scale = image.height / maskRectHeight;
+
+          // One side it rescaled to 100% the width/height of the Canvas.
+          // The other side rescaled larger or equal to the canvas width/height
+          // The side that is a smaller scale is set to 100%
+          const scaleFactor = Math.min(width_scale, height_scale); // Smallest scale wins
+
+          // Calculate the scale of the change
+          let scaledWidth = image.width / scaleFactor;
+          let scaledHeight = image.height / scaleFactor;
+
+          // Calculate the center of the image
+          let img_x_position = Math.abs(maskRectWidth - scaledWidth) / 2;
+          let img_y_position = Math.abs(maskRectHeight - scaledHeight) / 2;
+
+          // Draw the clipping mask in the center of the canvas
+          ctx.save();
+          ctx.beginPath();
+          ctx.rect(pos_x, pos_y, maskRectWidth, maskRectHeight);
+          ctx.clip();
+
+          // Draw the image in the center of the mask
+          let transformed_image = flipImageHorizontally(image, image_flip);
+
+          ctx.drawImage(
+            transformed_image,
+            pos_x - img_x_position,
+            pos_y - img_y_position,
+            scaledWidth,
+            scaledHeight
+          );
+          ctx.restore();
+
+          // Draw portal divider line
+          if (canvasContent.portal_count > 1) {
+            drawDivider(
+              canvasContent.portal_divider_x,
+              canvasContent.portal_divider_y,
+              canvasContent.portal_divider_height
+            );
+          }
+        };
+      }
+
+      function flipImageHorizontally(img, flip) {
+        // Create an offscreen canvas
+        const offscreenCanvas = document.createElement("canvas");
+        offscreenCanvas.width = img.width;
+        offscreenCanvas.height = img.height;
+        const offscreenCtx = offscreenCanvas.getContext("2d");
+
+        // Flip the offscreen canvas horizontally
+        if (flip) {
+          offscreenCtx.translate(img.width, 0);
+          offscreenCtx.scale(-1, 1);
+        }
+        offscreenCtx.drawImage(img, 0, 0, img.width, img.height);
+
+        if (flip) {
+          console.log("Image flipped");
+        }
+
+        // Draw the flipped image from the offscreen canvas to the main canvas
+        return offscreenCanvas;
+      }
+
+      function drawLogo(logo_name) {
+        // Make logos visible
+        let logo_container = document.getElementById("svg-container");
+        logo_container.style.display = "inline";
+
+        // Get original size
+        let svgElement = document.getElementById(logo_name);
+        let { width, height } = svgElement.getBBox();
+
+        // Update colors
+        svgElement.getElementById("Bar").style.fill = canvasContent.color_font;
+        svgElement.getElementById("Wordmark").style.fill =
+          canvasContent.color_wordmark;
+        let name = svgElement.getElementById("Name");
+        if (name != null) {
+          name.style.fill = canvasContent.color_font;
+        }
+
+        // Hide all SVGs
+        logo_container.style.display = "none";
+
+        // Clone the SVG
+        let clonedSvgElement = svgElement.cloneNode(true);
+        let outerHTML = clonedSvgElement.outerHTML,
+          blob = new Blob([outerHTML], { type: "image/svg+xml;charset=utf-8" });
+
+        let URL = window.URL || window.webkitURL || window;
+        let blobURL = URL.createObjectURL(blob);
+
+        // Logo scale
+        let logo_scale = 1;
+        width = width * logo_scale;
+        height = height * logo_scale;
+
+        // Default bottom left
+        var position = [
+          canvasContent.marginLeft,
+          canvasContent.marginBottom - height,
+        ];
+
+        if ("logo_position" in canvasContent) {
+          var logo_positon = canvasContent.logo_position;
+          if (logo_positon == "top_left") {
+            position = [canvasContent.marginLeft, canvasContent.marginTop];
+          }
+          if (logo_positon == "top_right") {
+            position = [
+              canvasContent.marginRight - width,
+              canvasContent.marginTop,
+            ];
+          }
+          if (logo_positon == "bottom_right") {
+            position = [
+              canvasContent.marginRight - width,
+              canvasContent.marginBottom - height,
+            ];
+          }
+        }
+
+        // Load as an image
+        let image = new Image();
+        image.onload = () => {
+          ctx.drawImage(image, position[0], position[1], width, height);
+        };
+        image.src = blobURL;
+      }
+
+      // Margins
+      function calculateGrid(show_guides) {
+        const width = canvas.width;
+        const height = canvas.height;
+
+        // Determine the shortest side of the canvas
+        const shortestSide = Math.min(width, height);
+        canvasContent.shortestSide = "height";
+        if (shortestSide == width) {
+          canvasContent.shortestSide = "width";
+        }
+
+        // Calculate 8% of the shortest side
+        var margin = Math.floor((shortestSide * 0.08) / 16) * 16; // Factors of 16
+        margin = Math.max(margin, 16); // Minimum of 16px
+        margin = Math.min(margin, 96); // Maximum of 96px
+
+        canvasContent.margin = margin;
+
+        // Margins at 100% of the Canvas
+        canvasContent.marginTop = canvasContent.margin;
+        canvasContent.marginLeft = canvasContent.margin;
+        canvasContent.marginBottom = height - canvasContent.margin;
+        canvasContent.marginRight = width - canvasContent.margin;
+
+        // Update margins if there are PORTALS
+        if (
+          canvasContent.portal_count > 0 &&
+          canvasContent.portal_size_percent != 100 &&
+          canvasContent.portal_size_percent != 0
+        ) {
+          if (canvasContent.portal_side == "right") {
+            canvasContent.marginRight -= canvasContent.portal_width;
+          }
+          if (canvasContent.portal_side == "left") {
+            canvasContent.marginLeft += canvasContent.portal_width;
+          }
+          if (canvasContent.portal_side == "top") {
+            canvasContent.marginTop += canvasContent.portal_height;
+          }
+          if (canvasContent.portal_side == "bottom") {
+            canvasContent.marginBottom -= canvasContent.portal_height;
+          }
+          console.log("Portal side: " + canvasContent.portal_side);
+        }
+
+        // Add top and bottom margins if the PORTAL has margins and is FULL CANVAS
+        if (
+          canvasContent.portal_count > 0 &&
+          canvasContent.portal_size_percent == 100
+        ) {
+          if (
+            canvasContent.portal_margins ||
+            canvasContent.portal_override_margins
+          ) {
+            canvasContent.marginTop += margin;
+            canvasContent.marginBottom -= margin;
+          }
+        }
+
+        // Margin update
+        canvasContent.marginWidth =
+          canvasContent.marginRight - canvasContent.marginLeft;
+        canvasContent.marginHeight =
+          canvasContent.marginBottom - canvasContent.marginTop;
+
+        if (show_guides) {
+          // Set the stroke color and style
+          ctx.strokeStyle = "#92BFF5";
+          ctx.lineWidth = 1;
+
+          // Draw the blue rectangle outline
+          setTimeout(function () {
+            ctx.strokeRect(
+              canvasContent.marginLeft,
+              canvasContent.marginTop,
+              canvasContent.marginWidth,
+              canvasContent.marginHeight
+            );
+          }, 100);
+        }
+      }
+
+      function updateCanvas() {
+        clearCanvas();
+
+        // Update color scheme
+        if ("background_color" in canvasContent) {
+          drawBackground();
+        }
+
+        // Add image
+        let userImageContainer = document.getElementById(
+          "user-image-container"
+        );
+
+        canvasContent.portal_margins = false;
+        canvasContent.portal_count = userImageContainer
+          ? userImageContainer.children.length
+          : 0;
+
+        // Create ONE Portal image on the canvas
+        if (
+          canvasContent.portal_count == 1 &&
+          canvasContent.portal_size_percent > 0
+        ) {
+          var portal_full = get_portal_specs(0);
+          let img = get_image(0);
+          addImageToCanvas(
+            img,
+            portal_full.x,
+            portal_full.y,
+            portal_full.width,
+            portal_full.height,
+            canvasContent.portal_image_flip[0]
+          );
+        }
+
+        // Create TWO Portal images on the canvas
+        if (
+          canvasContent.portal_count == 2 &&
+          canvasContent.portal_size_percent > 0
+        ) {
+          canvasContent.portal_margins = true;
+          var portal_large = get_portal_specs("large", "right");
+          var portal_small = get_portal_specs("small", "left");
+
+          let img_a = get_image(0);
+          addImageToCanvas(
+            img_a,
+            portal_large.x,
+            portal_large.y,
+            portal_large.width,
+            portal_large.height,
+            canvasContent.portal_image_flip[0]
+          );
+
+          let img_b = get_image(1);
+          addImageToCanvas(
+            img_b,
+            portal_small.x,
+            portal_small.y,
+            portal_small.width,
+            portal_small.height,
+            canvasContent.portal_image_flip[1]
+          );
+        }
+
+        // Grid system
+        calculateGrid(canvasContent.show_guides);
+
+        // Add logo
+        if ("logo" in canvasContent) {
+          drawLogo(canvasContent.logo);
+        }
+      }
+
+      function get_portal_specs(portal_size, portal_side) {
+        // portal_large: true / false
+        // portal_right: true / false
+        let canvas_side = canvasContent.portal_side; // top, bottom, left, right
+        let canvas_size = canvasContent.portal_size_percent; // 100%, 66%, 33%, 50%, 0%
+        let fit_margins = canvasContent.portal_margins; // true || false
+
+        // Track that we are using portals
+        canvasContent.portal = true;
+        // Always show margins if it is Double Portal or the margins have been overrided
+        if (portal_size || canvasContent.portal_override_margins) {
+          fit_margins = true;
+        }
+        // Max 100%
+        canvas_size = Math.min(100, canvas_size);
+        // Minimum 0%
+        canvas_size = Math.max(0, canvas_size);
+        // Convert to a percent of canvas
+        let canvas_percent = canvas_size / 100;
+
+        // Portal top left corner
+        let pos_x = 0;
+        let pos_y = 0;
+
+        // Portal size
+        let content_width = canvas.width; // Set to 100%
+        let content_height = canvas.height; // Set to 100%
+
+        // Portal height -- Vertical aligned
+        if (canvas_side == "top" || canvas_side == "bottom") {
+          content_height =
+            canvas.height * canvas_percent - canvasContent.margin * fit_margins;
+          pos_y = canvasContent.margin * fit_margins;
+          // Remove bottom margins too
+          if (canvasContent.portal_size_percent == 100) {
+            content_height =
+              canvas.height * canvas_percent -
+              canvasContent.margin * (fit_margins * 2);
+          }
+        }
+        //Portal position
+        if (canvas_side == "bottom") {
+          pos_y =
+            canvas.height - content_height - canvasContent.margin * fit_margins;
+        }
+
+        // Portal width -- Horizontal aligned
+        if (canvas_side == "left" || canvas_side == "right") {
+          content_width = canvas.width * canvas_percent;
+          content_height =
+            content_height - canvasContent.margin * 2 * fit_margins;
+          pos_y = pos_y + canvasContent.margin * fit_margins;
+        }
+
+        //Portal position
+        if (canvas_side == "right") {
+          pos_x = canvas.width - content_width;
+        }
+
+        // Store portal count and side
+        canvasContent.portal_count = 1;
+        // Store portal total RECT size
+        canvasContent.portal_width = canvas.width * canvas_percent;
+        canvasContent.portal_height = canvas.height * canvas_percent;
+        // Store portal TOP LEFT Corner
+        canvasContent.portal_x = 0;
+        canvasContent.portal_y = 0;
+        if (canvas_side == "right") {
+          canvasContent.portal_x = canvas.width - canvasContent.portal_width;
+        }
+        if (canvas_side == "bottom") {
+          canvasContent.portal_y = canvas.height - canvasContent.portal_height;
+        }
+
+        // If we are using TWO portals
+        if (portal_size) {
+          // Two Portals
+          canvasContent.portal_count = 2;
+          // Default left aligned large PORTAL
+          let portal_width = content_width * 0.65; // 65%
+
+          // Small portal
+          if (portal_size == "small") {
+            portal_width = content_width * 0.35; // 35%
+          }
+
+          // If portal is on the right side
+          if (portal_side == "right") {
+            pos_x = pos_x + content_width - portal_width;
+          } else {
+            // Portal divider position is the RIGHT SIDE of the LEFT PORTAL
+            canvasContent.portal_divider_x = pos_x + portal_width;
+            canvasContent.portal_divider_y = pos_y;
+            canvasContent.portal_divider_height = content_height;
+          }
+
+          content_width = portal_width;
+        }
+
+        return {
+          x: pos_x,
+          y: pos_y,
+          width: content_width,
+          height: content_height,
+        };
+      }
+
+      function get_canvas_type() {
+        // Get ratio of canvas
+        const shortestCanvasSide = Math.min(canvas.width, canvas.height);
+        canvasContent.orientation = "horizontal";
+        // Vertical Canvas
+        if (shortestCanvasSide == canvas.width) {
+          canvasContent.orientation = "vertical";
+          // Square Canvas
+          if (canvas.width == canvas.height) {
+            canvasContent.orientation = "square";
+          }
+        }
+        console.log("Canvas shape: " + canvasContent.orientation);
+      }
+
+      // Clear canvas
+      function clearCanvas() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+      }
+
+      // Set the background color
+      function drawBackground() {
+        const width = canvas.width;
+        const height = canvas.height;
+
+        ctx.fillStyle = canvasContent.background_color;
+        ctx.fillRect(0, 0, width, height);
+      }
+
+      // Draw portal line
+      function drawDivider(pos_x, pos_y, height) {
+        let width = Math.max(4, canvas.width * 0.004);
+        // Default is bwhite
+        let fill_color = "#ffffff";
+        if (canvasContent.background_color == spglobal_colors.black) {
+          fill_color = "#000000";
+        }
+        ctx.fillStyle = fill_color;
+        ctx.fillRect(pos_x - width * 0.5, pos_y, width, height);
+      }
+
+      // ------------
+      // Portal Image Focal Point Setter
+      function createImagePreviewWithFocalPoint(image, img_number) {
+        const insideToolsContainer = document.querySelector(
+          ".inside_tools_container"
+        );
+
+        // Find portal canvas
+        let portal_canvas_id = "portal_" + img_number;
+        let portal_canvas = document.getElementById(portal_canvas_id);
+        let portal_exists = true;
+
+        // Create one if it doesnt exist
+        if (!portal_canvas) {
+          portal_exists = false;
+
+          // Add
+          portal_canvas = document.createElement("canvas");
+          portal_canvas.id = portal_canvas_id;
+          portal_canvas.classList.add("focal_point_canvas");
+        }
+
+        // Update portal canvas
+        let portal_ctx = portal_canvas.getContext("2d");
+        let focalPoint = { x: 0, y: 0, size: 20, dragging: false };
+
+        function drawFocalPoint() {
+          portal_ctx.beginPath();
+          portal_ctx.arc(
+            focalPoint.x,
+            focalPoint.y,
+            focalPoint.size / 2,
+            0,
+            2 * Math.PI
+          );
+          portal_ctx.fillStyle = focalPoint.dragging
+            ? "rgba(214, 0, 42, 1.0)"
+            : "rgba(214, 0, 42, 0.5)";
+          portal_ctx.fill();
+        }
+
+        function drawImageAndFocalPoint() {
+          portal_ctx.fillStyle = "#E7F0F5"; // Canvas color
+          portal_ctx.fillRect(0, 0, portal_canvas.width, portal_canvas.height);
+
+          const scaleFactor = Math.min(
+            portal_canvas.width / img.width,
+            portal_canvas.height / img.height
+          );
+          const width = img.width * scaleFactor;
+          const height = img.height * scaleFactor;
+
+          portal_ctx.drawImage(
+            img,
+            (portal_canvas.width - width) / 2,
+            (portal_canvas.height - height) / 2,
+            width,
+            height
+          );
+          drawFocalPoint();
+        }
+
+        const img = new Image();
+        img.src = image.src;
+        img.onload = function () {
+          portal_canvas.width = insideToolsContainer.clientWidth;
+          portal_canvas.height = portal_canvas.width * 0.66;
+
+          focalPoint.x = portal_canvas.width / 2;
+          focalPoint.y = portal_canvas.height / 2;
+
+          // Clear the canvas
+          portal_ctx.clearRect(0, 0, portal_canvas.width, portal_canvas.height);
+
+          drawImageAndFocalPoint();
+        };
+
+        portal_canvas.addEventListener("mousedown", (event) => {
+          const rect = portal_canvas.getBoundingClientRect();
+
+          // Move focal point to mouse but constrain inside the image
+          const x = event.clientX - rect.left;
+          const y = event.clientY - rect.top;
+
+          const scaleFactor = Math.min(
+            portal_canvas.width / img.width,
+            portal_canvas.height / img.height
+          );
+          const width = img.width * scaleFactor;
+          const height = img.height * scaleFactor;
+          const imgX = (portal_canvas.width - width) / 2;
+          const imgY = (portal_canvas.height - height) / 2;
+
+          focalPoint.x = Math.max(imgX, Math.min(x, imgX + width));
+          focalPoint.y = Math.max(imgY, Math.min(y, imgY + height));
+          focalPoint.dragging = true;
+        });
+
+        portal_canvas.addEventListener("mousemove", (event) => {
+          if (focalPoint.dragging) {
+            const rect = portal_canvas.getBoundingClientRect();
+
+            // Move focal point to mouse but constrain inside the image
+            const x = event.clientX - rect.left;
+            const y = event.clientY - rect.top;
+
+            const scaleFactor = Math.min(
+              portal_canvas.width / img.width,
+              portal_canvas.height / img.height
+            );
+            const width = img.width * scaleFactor;
+            const height = img.height * scaleFactor;
+            const imgX = (portal_canvas.width - width) / 2;
+            const imgY = (portal_canvas.height - height) / 2;
+
+            focalPoint.x = Math.max(imgX, Math.min(x, imgX + width));
+            focalPoint.y = Math.max(imgY, Math.min(y, imgY + height));
+
+            drawImageAndFocalPoint();
+          }
+        });
+
+        portal_canvas.addEventListener("mouseup", () => {
+          if (focalPoint.dragging) {
+            focalPoint.dragging = false;
+            drawImageAndFocalPoint();
+
+            // Calculate the relative position of the focal point within the image
+            const scaleFactor = Math.min(
+              portal_canvas.width / img.width,
+              portal_canvas.height / img.height
+            );
+            const width = img.width * scaleFactor;
+            const height = img.height * scaleFactor;
+            const imgX = (portal_canvas.width - width) / 2;
+            const imgY = (portal_canvas.height - height) / 2;
+
+            const relativeX = (focalPoint.x - imgX) / width;
+            const relativeY = (focalPoint.y - imgY) / height;
+            console.log("Relative position:", { x: relativeX, y: relativeY });
+          }
+        });
+
+        // End dragging if mouse is released outside the canvas
+        document.addEventListener("mouseup", () => {
+          if (focalPoint.dragging) {
+            focalPoint.dragging = false;
+            drawImageAndFocalPoint();
+
+            // Calculate the relative position of the focal point within the image
+            const scaleFactor = Math.min(
+              portal_canvas.width / img.width,
+              portal_canvas.height / img.height
+            );
+            const width = img.width * scaleFactor;
+            const height = img.height * scaleFactor;
+            const imgX = (portal_canvas.width - width) / 2;
+            const imgY = (portal_canvas.height - height) / 2;
+
+            const relativeX = (focalPoint.x - imgX) / width;
+            const relativeY = (focalPoint.y - imgY) / height;
+            console.log("Relative position:", { x: relativeX, y: relativeY });
+          }
+        });
+
+        if (!portal_exists) {
+          // Add to canvas
+          insideToolsContainer.appendChild(portal_canvas);
+        }
+      }
+    </script>
+
+    <!-- Baked SVGs -->
+    <div id="svg-container">
+      <!-- Corporate -->
+      <svg
+        id="spg_corporate"
+        xmlns="http://www.w3.org/2000/svg"
+        width="163.787"
+        height="35.446"
+        viewBox="0 0 163.787 35.446"
+      >
+        <path
+          id="Wordmark"
+          d="M65.924,86.532a6.734,6.734,0,0,1-1.936,4.856,10.005,10.005,0,0,1-6.958,2.489,10.405,10.405,0,0,1-7.348-2.391,7.36,7.36,0,0,1-2.428-5.414h4.331A4.086,4.086,0,0,0,52.8,88.928,5.482,5.482,0,0,0,56.8,90.174a5.449,5.449,0,0,0,3.935-1.246c1.052-1.138,1.4-3.152.017-4.2-1.447-1.092-3.513-1.018-5.232-1.181a10.277,10.277,0,0,1-5.127-1.54,6.114,6.114,0,0,1-2.51-4.35,6.566,6.566,0,0,1,1.991-5.432,9.574,9.574,0,0,1,6.531-2.457,9.593,9.593,0,0,1,6.791,2.26,7.07,7.07,0,0,1,2.362,4.955H61.232a3.765,3.765,0,0,0-1.017-2.3,5.061,5.061,0,0,0-3.633-1.246A5.063,5.063,0,0,0,52.9,74.72a2.638,2.638,0,0,0,.484,4.153,7.532,7.532,0,0,0,2.641.54c.971.107,1.944.188,2.914.313A8.8,8.8,0,0,1,63.975,81.8,6.427,6.427,0,0,1,65.924,86.532Zm18.319,6.956L82.6,91.651A9.784,9.784,0,0,1,72.332,93.3a6.91,6.91,0,0,1-3.651-8.587,8.645,8.645,0,0,1,3.749-4.084c-1.572-1.663-2.73-3.477-2.448-5.853a5.674,5.674,0,0,1,3.6-4.591,7.649,7.649,0,0,1,6.55.529A5.576,5.576,0,0,1,82.713,76c-.2,2.662-2.213,4.407-4.377,5.675l4.036,4.4a7.326,7.326,0,0,0,.591-2.855c.077-.951.066-1.9.066-2.855h6v3.249H86.343a10.283,10.283,0,0,1-1.411,5.217l4.3,4.659Zm-9.418-10.3c-1.1.671-2.272,1.37-2.636,2.694a3.6,3.6,0,0,0,.843,3.431c1.744,1.783,5.479,1.591,7.109-.252Zm4.069-7.58a2.38,2.38,0,0,0-1.362-2.278,3.019,3.019,0,0,0-2.969.31,2.415,2.415,0,0,0-.733,2.669,7.26,7.26,0,0,0,2.077,2.777C77.325,78.287,78.895,77.452,78.895,75.606ZM109.65,77.64a7.276,7.276,0,0,1-2.319,5.627,8.946,8.946,0,0,1-5.883,1.854H96.526v8.334h-4.2V70.192h9.121a9.035,9.035,0,0,1,5.883,1.841A7.194,7.194,0,0,1,109.65,77.64Zm-4.265.033a3.818,3.818,0,0,0-1.164-2.9,4.381,4.381,0,0,0-2.937-.875H96.526v7.514h4.757a4.42,4.42,0,0,0,2.937-.862A3.763,3.763,0,0,0,105.385,77.673ZM134.49,93.456,134,90.9c-1.153,2.155-3.934,3.041-6.226,2.981a8.938,8.938,0,0,1-6.539-2.587c-2.459-2.547-3.017-6.04-3.019-9.45s.5-6.833,3.019-9.352c3.559-3.559,10.255-3.723,13.814-.066a7.368,7.368,0,0,1,2.133,4.692h-4.331a4.082,4.082,0,0,0-1.017-2.133c-1.806-2.1-5.731-1.787-7.514.164-1.666,1.758-1.814,4.487-1.8,6.773.01,2.245.207,4.994,1.837,6.713a5.3,5.3,0,0,0,7.252.131,6.16,6.16,0,0,0,1.509-4.528h-5.545V80.725h9.647V93.456Zm12.99-.033a6.408,6.408,0,0,1-4.589-.433,4.233,4.233,0,0,1-1.875-3.931V69.732h4.135V88.37a1.574,1.574,0,0,0,.61,1.461,3.568,3.568,0,0,0,1.719.147v3.445Zm17.41-8.5a9.9,9.9,0,0,1-2,6.3,8.037,8.037,0,0,1-11.944,0,10.667,10.667,0,0,1,0-12.6,8.037,8.037,0,0,1,11.944,0A9.9,9.9,0,0,1,164.89,84.925Zm-4.167,0a6.2,6.2,0,0,0-1.214-4.3,3.643,3.643,0,0,0-5.184,0,6.19,6.19,0,0,0-1.214,4.3,6.193,6.193,0,0,0,1.214,4.3,3.642,3.642,0,0,0,5.184,0A6.2,6.2,0,0,0,160.723,84.925Zm23.093.033a9.3,9.3,0,0,1-3.052,7.449c-2.453,2.047-7.074,2.078-8.925-.82l-.263,1.87h-3.543V69.765h4.1V77.64a5.566,5.566,0,0,1,4.083-1.666,6.585,6.585,0,0,1,4.547,1.371Q183.816,79.872,183.816,84.958Zm-4.167-.066a6.687,6.687,0,0,0-1.083-4.134,3.644,3.644,0,0,0-3.46-1.3,3.471,3.471,0,0,0-2.689,2.3,9.246,9.246,0,0,0-.426,4.194,5.39,5.39,0,0,0,1.423,3.6,3.619,3.619,0,0,0,5.152-.492A6.75,6.75,0,0,0,179.649,84.892Zm22.378,8.367c-1.865.815-4.663.584-4.922-1.936-1.516,2.695-5.6,3.138-8.2,1.984a5.193,5.193,0,0,1-2.08-7.959,6.584,6.584,0,0,1,4.7-2.162l5.02-.361v-1.05a2.815,2.815,0,0,0-.785-2.167,3.131,3.131,0,0,0-1.923-.522c-1.609-.039-3.2.613-3.3,2.426h-3.97a5.53,5.53,0,0,1,1.934-4.017A7.6,7.6,0,0,1,192.719,76c2.876-.227,6.187.485,7.339,3.442a9.234,9.234,0,0,1,.493,3.445v6.333c0,.751.489,1.326,1.313,1.05a.363.363,0,0,0,.164-.033Zm-5.48-7.383-4.331.328a2.43,2.43,0,0,0-2.45,2,2.2,2.2,0,0,0,2.078,2.349,4.834,4.834,0,0,0,3.372-.889,3.636,3.636,0,0,0,1.331-3Zm14.493,7.547a6.36,6.36,0,0,1-4.652-.471,4.249,4.249,0,0,1-1.813-3.893V69.732h4.135V88.37a1.574,1.574,0,0,0,.61,1.461,3.57,3.57,0,0,0,1.72.147Z"
+          transform="translate(-47.255 -58.643)"
+          fill="#d6002a"
+        />
+        <rect
+          id="Bar"
+          width="163.787"
+          height="4.2"
+          transform="translate(-0.001 0)"
+        />
+      </svg>
+      <!-- Ratings -->
+      <svg
+        id="spg_ratings"
+        xmlns="http://www.w3.org/2000/svg"
+        width="163.037"
+        height="78.161"
+        viewBox="0 0 163.037 78.161"
+      >
+        <path
+          id="Name"
+          d="M19.563,105.612a6.293,6.293,0,0,1-1.323,4.018,6.444,6.444,0,0,1-3.577,2.3l4.8,10.487H17.554l-4.606-10.046H4.715V122.42H3V98.8h8.625a10.543,10.543,0,0,1,3.43.49,7.662,7.662,0,0,1,2.5,1.372,5.58,5.58,0,0,1,1.519,2.156A7.272,7.272,0,0,1,19.563,105.612Zm-1.764,0a4.755,4.755,0,0,0-1.617-3.871,7.014,7.014,0,0,0-4.557-1.323H4.715v10.34h6.91a7.015,7.015,0,0,0,4.557-1.323A4.654,4.654,0,0,0,17.8,105.612ZM38.332,122.42c-.2.049-.343.049-.392.1h-.392a3.278,3.278,0,0,1-1.274-.245,2.021,2.021,0,0,1-.833-.735,2.377,2.377,0,0,1-.392-1.029,4.972,4.972,0,0,1-.1-1.225,5.538,5.538,0,0,1-.931,1.568,5.348,5.348,0,0,1-1.421,1.127,7.381,7.381,0,0,1-1.715.686,8.513,8.513,0,0,1-1.911.245,6.789,6.789,0,0,1-2.254-.343,5.468,5.468,0,0,1-1.813-1.029,4.433,4.433,0,0,1-1.225-1.617,5.14,5.14,0,0,1-.441-2.156,4.433,4.433,0,0,1,1.568-3.528,7.369,7.369,0,0,1,4.067-1.47L35,112.325v-1.617a3.335,3.335,0,0,0-1.225-2.94,5.272,5.272,0,0,0-3.136-.882,5.921,5.921,0,0,0-3.332.882,3.437,3.437,0,0,0-1.47,2.744H24.072a5.722,5.722,0,0,1,.637-2.254,4.839,4.839,0,0,1,1.372-1.617,6.8,6.8,0,0,1,1.96-1.029,7.907,7.907,0,0,1,2.5-.343,10.579,10.579,0,0,1,1.715.147,5.711,5.711,0,0,1,1.617.539,5.221,5.221,0,0,1,1.372.931,4.443,4.443,0,0,1,.931,1.47,4.291,4.291,0,0,1,.343,1.568c.049.539.049,1.078.049,1.617v7.6a3.128,3.128,0,0,0,.2,1.323,1.1,1.1,0,0,0,1.078.49,1.511,1.511,0,0,0,.49-.049Zm-3.43-8.576-5.978.343a5.136,5.136,0,0,0-2.94,1.029,2.966,2.966,0,0,0-1.078,2.45,3.192,3.192,0,0,0,1.176,2.7,4.813,4.813,0,0,0,2.989.882,5.758,5.758,0,0,0,2.7-.588,5.02,5.02,0,0,0,1.813-1.519,5.638,5.638,0,0,0,1.029-2.107,7.907,7.907,0,0,0,.343-2.4l-.049-.784Zm16.22,8.429c-.49.1-.931.2-1.372.294a6.471,6.471,0,0,1-1.372.1,3.812,3.812,0,0,1-3.332-1.372,5.9,5.9,0,0,1-.98-3.528V107.278H40.733v-1.519h3.332v-4.606l1.666-.392v5h5.145v1.519H45.732v10.438a12.047,12.047,0,0,0,.1,1.372,3.558,3.558,0,0,0,.441,1.078,1.914,1.914,0,0,0,.833.686,3.619,3.619,0,0,0,1.372.245A12.015,12.015,0,0,0,49.8,121c.441-.049.882-.147,1.323-.2C51.122,120.8,51.122,122.273,51.122,122.273Zm4.312-21.121V98.8h2.352v2.352Zm.294,21.268V105.759h1.764V122.42Zm19.994,0V111.541a5.245,5.245,0,0,0-.98-3.381,4.124,4.124,0,0,0-3.283-1.176,4.751,4.751,0,0,0-2.6.637,4.534,4.534,0,0,0-1.715,1.617,6.894,6.894,0,0,0-.931,2.3,11.407,11.407,0,0,0-.294,2.6v8.331H64.255V105.808h1.47l.2,3.038a4.764,4.764,0,0,1,.931-1.421,4.955,4.955,0,0,1,1.372-1.078,5.956,5.956,0,0,1,1.617-.686,7.238,7.238,0,0,1,1.715-.245,5.623,5.623,0,0,1,4.361,1.617,6.44,6.44,0,0,1,1.47,4.459V122.42Zm21.758,2.5a4.2,4.2,0,0,1-.343,1.764,4.525,4.525,0,0,1-.931,1.372,5.9,5.9,0,0,1-2.842,1.519,15.614,15.614,0,0,1-3.773.441,13.379,13.379,0,0,1-3.528-.441,5.875,5.875,0,0,1-2.7-1.519,3.916,3.916,0,0,1-.882-1.323,4.66,4.66,0,0,1-.294-1.715,4.192,4.192,0,0,1,.686-2.254,4.121,4.121,0,0,1,1.813-1.617,2.9,2.9,0,0,1-1.47-1.078,2.832,2.832,0,0,1-.637-1.666,3.058,3.058,0,0,1,.539-1.813,4.872,4.872,0,0,1,1.47-1.323,6.326,6.326,0,0,1-1.225-1.764,5.848,5.848,0,0,1-.441-2.3,5.4,5.4,0,0,1,.49-2.4,6.414,6.414,0,0,1,1.323-1.862,6.524,6.524,0,0,1,1.96-1.176,8.018,8.018,0,0,1,2.45-.392,7.188,7.188,0,0,1,3.92,1.127,3.085,3.085,0,0,1,1.274-1.666,3.857,3.857,0,0,1,2.058-.588.622.622,0,0,1,.294.049.622.622,0,0,0,.294.049v1.421a.622.622,0,0,1-.294-.049c-.1,0-.2-.049-.294-.049a2.266,2.266,0,0,0-1.519.49,2.028,2.028,0,0,0-.784,1.323,5.16,5.16,0,0,1,.98,1.666,5.675,5.675,0,0,1,.343,2.058,5.615,5.615,0,0,1-.49,2.45,5.084,5.084,0,0,1-1.372,1.813,5.77,5.77,0,0,1-2.009,1.127,8.019,8.019,0,0,1-2.45.392,6.83,6.83,0,0,1-3.332-.784,3.8,3.8,0,0,0-1.176.784,1.735,1.735,0,0,0-.49,1.274,1.335,1.335,0,0,0,.343.98,2.562,2.562,0,0,0,.833.588,3.581,3.581,0,0,0,1.127.2,9.457,9.457,0,0,0,1.127.049h3.626A9.957,9.957,0,0,1,94,120.46a4.816,4.816,0,0,1,2.058,1.225,4.659,4.659,0,0,1,.98,1.372A3.612,3.612,0,0,1,97.48,124.919Zm-1.666,0a2.677,2.677,0,0,0-.2-1.176,2.781,2.781,0,0,0-.588-.882c-.784-.833-2.107-1.225-4.018-1.225H86.6a3.834,3.834,0,0,0-1.911,1.127,3.035,3.035,0,0,0-.833,2.3,2.961,2.961,0,0,0,.245,1.176,3.271,3.271,0,0,0,1.666,1.568,11.82,11.82,0,0,0,1.225.392,12.306,12.306,0,0,0,1.323.2,11.943,11.943,0,0,0,1.323.049,13.307,13.307,0,0,0,1.372-.049c.49-.049.98-.1,1.47-.2a6.413,6.413,0,0,0,1.372-.441,3.59,3.59,0,0,0,1.127-.784,4.077,4.077,0,0,0,.637-.882A4.212,4.212,0,0,0,95.814,124.919Zm-1.96-13.77a4.278,4.278,0,0,0-.343-1.813,4.659,4.659,0,0,0-.98-1.372,3.691,3.691,0,0,0-1.47-.882,5.737,5.737,0,0,0-3.626,0,3.691,3.691,0,0,0-1.47.882,4.659,4.659,0,0,0-.98,1.372,4.963,4.963,0,0,0,0,3.626,3.915,3.915,0,0,0,.98,1.372,4.273,4.273,0,0,0,1.47.833,5.737,5.737,0,0,0,3.626,0,4.273,4.273,0,0,0,1.47-.833,4.1,4.1,0,0,0,.98-1.372A5.192,5.192,0,0,0,93.854,111.149Zm19.406,6.665a4.7,4.7,0,0,1-1.127,3.087,5.425,5.425,0,0,1-2.3,1.519,9.52,9.52,0,0,1-6.175-.049,5.639,5.639,0,0,1-2.352-1.617,6.591,6.591,0,0,1-1.029-1.568,6.206,6.206,0,0,1-.392-1.813H101.6a4.044,4.044,0,0,0,1.225,2.548,4.72,4.72,0,0,0,1.715,1.029,8,8,0,0,0,2.205.294,8.213,8.213,0,0,0,2.3-.294,3.291,3.291,0,0,0,1.617-.931,3.777,3.777,0,0,0,.686-.931,2.817,2.817,0,0,0,.2-1.176,2.7,2.7,0,0,0-.784-1.96,3.382,3.382,0,0,0-2.3-1.029l-3.234-.441a10.458,10.458,0,0,1-2.058-.49,4.146,4.146,0,0,1-1.715-1.176,3.885,3.885,0,0,1-.931-2.646,4.285,4.285,0,0,1,.392-1.813,4.235,4.235,0,0,1,1.029-1.421A5.379,5.379,0,0,1,104,105.759a8.329,8.329,0,0,1,2.5-.343,7.883,7.883,0,0,1,2.842.49,5.816,5.816,0,0,1,2.205,1.47,4.525,4.525,0,0,1,.882,1.47,3.843,3.843,0,0,1,.343,1.617H111.1c-.049-.245-.147-.588-.245-.98a2.181,2.181,0,0,0-.588-1.029,4.46,4.46,0,0,0-1.519-1.078,6.382,6.382,0,0,0-2.254-.392,4.823,4.823,0,0,0-2.989.784,2.745,2.745,0,0,0-1.323,2.3,2.6,2.6,0,0,0,.686,1.813,4.134,4.134,0,0,0,2.548.98l3.185.441a4.857,4.857,0,0,1,2.009.637,4.041,4.041,0,0,1,1.421,1.078,4.483,4.483,0,0,1,.833,1.372A2.027,2.027,0,0,1,113.259,117.814Z"
+          transform="translate(-3 -51.854)"
+        />
+        <path
+          id="Wordmark"
+          d="M21.573,42.21a6.9,6.9,0,0,1-1.911,4.851c-1.813,1.813-4.459,2.4-6.91,2.5A10.774,10.774,0,0,1,5.4,47.111,7.276,7.276,0,0,1,3,41.72H7.312a3.892,3.892,0,0,0,1.225,2.842,5.3,5.3,0,0,0,3.969,1.225,5.388,5.388,0,0,0,3.92-1.225c1.029-1.127,1.421-3.136,0-4.165-1.421-1.078-3.479-1.029-5.194-1.176a10.318,10.318,0,0,1-5.1-1.519,6.161,6.161,0,0,1-2.5-4.312A6.637,6.637,0,0,1,5.6,28a9.536,9.536,0,0,1,6.518-2.45A9.605,9.605,0,0,1,18.877,27.8a7.092,7.092,0,0,1,2.352,4.949H16.917a3.814,3.814,0,0,0-1.029-2.3,4.9,4.9,0,0,0-3.626-1.225A4.981,4.981,0,0,0,8.586,30.5a2.61,2.61,0,0,0,.49,4.116,7.958,7.958,0,0,0,2.646.539c.98.1,1.911.2,2.891.294a8.91,8.91,0,0,1,5,2.058A6.179,6.179,0,0,1,21.573,42.21ZM39.8,49.12l-1.617-1.862a9.668,9.668,0,0,1-10.242,1.617,6.876,6.876,0,0,1-3.626-8.527,8.563,8.563,0,0,1,3.724-4.067c-1.568-1.666-2.7-3.479-2.45-5.831a5.658,5.658,0,0,1,3.577-4.557,7.621,7.621,0,0,1,6.518.539,5.4,5.4,0,0,1,2.548,5.243c-.2,2.646-2.205,4.41-4.361,5.635l4.018,4.361a7.959,7.959,0,0,0,.588-2.842,27.506,27.506,0,0,0,.049-2.842h5.978v3.234h-2.7a10.091,10.091,0,0,1-1.421,5.194l4.263,4.655L39.8,49.12Zm-9.36-10.242c-1.078.686-2.254,1.372-2.646,2.7A3.533,3.533,0,0,0,28.629,45c1.715,1.764,5.439,1.568,7.057-.245Zm4.067-7.547a2.315,2.315,0,0,0-1.372-2.254,3.009,3.009,0,0,0-2.94.294,2.355,2.355,0,0,0-.735,2.646,7.126,7.126,0,0,0,2.058,2.744C32.941,33.978,34.51,33.145,34.51,31.331Zm30.579,2.009a7.189,7.189,0,0,1-2.3,5.586,8.983,8.983,0,0,1-5.88,1.862H52v8.282H47.839V25.941H56.9a9.314,9.314,0,0,1,5.88,1.813A7.027,7.027,0,0,1,65.088,33.341Zm-4.214.049A3.774,3.774,0,0,0,59.7,30.5a4.453,4.453,0,0,0-2.94-.882H52v7.5h4.753a4.2,4.2,0,0,0,2.94-.882A3.74,3.74,0,0,0,60.874,33.39ZM89.835,49.071l-.49-2.548c-1.127,2.156-3.92,3.038-6.175,2.989a8.753,8.753,0,0,1-6.518-2.6c-2.45-2.548-2.989-6.028-2.989-9.409s.49-6.812,2.989-9.311c3.528-3.528,10.193-3.724,13.77-.049A7.313,7.313,0,0,1,92.53,32.8H88.218a3.891,3.891,0,0,0-1.029-2.107c-1.813-2.107-5.684-1.764-7.5.147-1.666,1.764-1.813,4.459-1.813,6.763,0,2.254.2,4.949,1.813,6.665a5.294,5.294,0,0,0,7.2.147,6.039,6.039,0,0,0,1.519-4.508H82.877V36.428h9.6V49.12l-2.646-.049Zm12.937-.049a6.12,6.12,0,0,1-4.557-.441,4.226,4.226,0,0,1-1.862-3.92V25.451h4.116V44.024a1.632,1.632,0,0,0,.588,1.47,3.38,3.38,0,0,0,1.715.147v3.381Zm17.3-8.429a9.623,9.623,0,0,1-2.009,6.273,8.021,8.021,0,0,1-11.908,0,10.587,10.587,0,0,1,0-12.545,8.021,8.021,0,0,1,11.908,0A9.622,9.622,0,0,1,120.071,40.593Zm-4.116,0a6.012,6.012,0,0,0-1.225-4.263,3.638,3.638,0,0,0-5.145,0,6.255,6.255,0,0,0-1.225,4.263,6.012,6.012,0,0,0,1.225,4.263,3.638,3.638,0,0,0,5.145,0A6.012,6.012,0,0,0,115.954,40.593Zm22.983.049c0,2.793-.833,5.635-3.038,7.4-2.45,2.058-7.057,2.058-8.87-.833l-.245,1.862h-3.528V25.5h4.067v7.841a5.471,5.471,0,0,1,4.067-1.666,6.432,6.432,0,0,1,4.508,1.372C137.908,34.713,138.937,37.261,138.937,40.642Zm-4.165-.1a6.765,6.765,0,0,0-1.078-4.116,3.672,3.672,0,0,0-3.43-1.274,3.575,3.575,0,0,0-2.7,2.3,9.938,9.938,0,0,0-.441,4.165,5.3,5.3,0,0,0,1.421,3.577,3.617,3.617,0,0,0,5.145-.49A6.59,6.59,0,0,0,134.772,40.544Zm22.3,8.331c-1.862.833-4.655.588-4.9-1.911-1.519,2.7-5.586,3.136-8.135,1.96a5.206,5.206,0,0,1-2.058-7.939,6.516,6.516,0,0,1,4.655-2.156l5-.343V37.457a2.876,2.876,0,0,0-.784-2.156,3.33,3.33,0,0,0-1.911-.539c-1.617-.049-3.185.588-3.283,2.4h-3.969a5.6,5.6,0,0,1,1.911-4.018,7.55,7.55,0,0,1,4.214-1.47c2.842-.245,6.175.49,7.3,3.43a8.969,8.969,0,0,1,.49,3.43v6.322c0,.735.49,1.323,1.323,1.029a.18.18,0,0,0,.147-.049Zm-5.439-7.351-4.312.343a2.473,2.473,0,0,0-2.45,2.009,2.2,2.2,0,0,0,2.058,2.352,4.725,4.725,0,0,0,3.332-.882,3.652,3.652,0,0,0,1.323-2.989l.049-.833Zm14.407,7.5a6,6,0,0,1-4.606-.49,4.26,4.26,0,0,1-1.813-3.871V25.451h4.116V44.024a1.632,1.632,0,0,0,.588,1.47,3.426,3.426,0,0,0,1.715.147Z"
+          transform="translate(-3 -14.425)"
+          fill="#d6002a"
+        />
+        <rect
+          id="Bar"
+          width="163.037"
+          height="4.165"
+          transform="translate(0 0)"
+        />
+      </svg>
+      <!-- Commodity Insights -->
+      <svg
+        id="spg_commodity_insights"
+        xmlns="http://www.w3.org/2000/svg"
+        width="291.084"
+        height="78.161"
+        viewBox="0 0 291.084 78.161"
+      >
+        <path
+          id="Wordmark"
+          d="M22.622,42.161a6.9,6.9,0,0,1-1.911,4.851c-1.813,1.813-4.459,2.4-6.91,2.5a10.348,10.348,0,0,1-7.351-2.4A7.324,7.324,0,0,1,4,41.72H8.312a3.892,3.892,0,0,0,1.225,2.842,5.3,5.3,0,0,0,3.969,1.225,5.388,5.388,0,0,0,3.92-1.225c1.029-1.127,1.421-3.136,0-4.165-1.421-1.078-3.479-1.029-5.194-1.176a10.318,10.318,0,0,1-5.1-1.519,6.161,6.161,0,0,1-2.5-4.312A6.637,6.637,0,0,1,6.6,28a9.536,9.536,0,0,1,6.518-2.45A9.605,9.605,0,0,1,19.877,27.8a7.092,7.092,0,0,1,2.352,4.949H17.917a3.814,3.814,0,0,0-1.029-2.3,4.9,4.9,0,0,0-3.626-1.225A4.981,4.981,0,0,0,9.586,30.5a2.61,2.61,0,0,0,.49,4.116,7.958,7.958,0,0,0,2.646.539c.98.1,1.911.2,2.891.294a8.91,8.91,0,0,1,5,2.058A6.021,6.021,0,0,1,22.622,42.161Zm18.23,6.959-1.666-1.862a9.668,9.668,0,0,1-10.242,1.617,6.876,6.876,0,0,1-3.626-8.527,8.563,8.563,0,0,1,3.724-4.067c-1.568-1.666-2.7-3.479-2.45-5.831a5.658,5.658,0,0,1,3.577-4.557,7.621,7.621,0,0,1,6.518.539,5.4,5.4,0,0,1,2.548,5.243c-.2,2.646-2.205,4.41-4.361,5.635l4.018,4.361a7.959,7.959,0,0,0,.588-2.842,27.506,27.506,0,0,0,.049-2.842h5.978v3.234h-2.7a10.091,10.091,0,0,1-1.421,5.194l4.263,4.655-4.8.049ZM31.442,38.878c-1.078.686-2.254,1.372-2.646,2.7A3.533,3.533,0,0,0,29.629,45c1.715,1.764,5.439,1.568,7.057-.245Zm4.067-7.547a2.315,2.315,0,0,0-1.372-2.254,3.009,3.009,0,0,0-2.94.294,2.355,2.355,0,0,0-.735,2.646,7.126,7.126,0,0,0,2.058,2.744C33.941,33.978,35.51,33.145,35.51,31.331Zm30.628,2.009a7.189,7.189,0,0,1-2.3,5.586A8.937,8.937,0,0,1,58,40.789H53.1v8.282H48.937V25.941H58a9.087,9.087,0,0,1,5.831,1.813A7.189,7.189,0,0,1,66.137,33.341Zm-4.263.049A3.774,3.774,0,0,0,60.7,30.5a4.453,4.453,0,0,0-2.94-.882H53v7.5h4.753a4.2,4.2,0,0,0,2.94-.882A3.74,3.74,0,0,0,61.874,33.39ZM90.835,49.071l-.49-2.548c-1.127,2.156-3.92,3.038-6.175,2.989a8.753,8.753,0,0,1-6.518-2.6c-2.45-2.548-2.989-6.028-2.989-9.409s.49-6.812,2.989-9.311c3.528-3.528,10.193-3.724,13.77-.049A7.313,7.313,0,0,1,93.53,32.8H89.218a3.891,3.891,0,0,0-1.029-2.107c-1.813-2.107-5.684-1.764-7.5.147-1.666,1.764-1.813,4.459-1.813,6.763,0,2.254.2,4.949,1.813,6.665a5.294,5.294,0,0,0,7.2.147,6.039,6.039,0,0,0,1.519-4.508H83.877V36.428h9.6V49.12C93.579,49.071,90.835,49.071,90.835,49.071Zm12.937-.049a6.12,6.12,0,0,1-4.557-.441,4.226,4.226,0,0,1-1.862-3.92V25.451h4.116V44.024a1.632,1.632,0,0,0,.588,1.47,3.426,3.426,0,0,0,1.715.147v3.381Zm17.347-8.429a9.623,9.623,0,0,1-2.009,6.273,8.021,8.021,0,0,1-11.908,0,10.587,10.587,0,0,1,0-12.545,8.021,8.021,0,0,1,11.908,0A9.9,9.9,0,0,1,121.12,40.593Zm-4.165,0a6.012,6.012,0,0,0-1.225-4.263,3.638,3.638,0,0,0-5.145,0,6.255,6.255,0,0,0-1.225,4.263,6.012,6.012,0,0,0,1.225,4.263,3.638,3.638,0,0,0,5.145,0A6.012,6.012,0,0,0,116.954,40.593Zm22.983.049c0,2.793-.784,5.635-3.038,7.4-2.45,2.058-7.057,2.058-8.87-.833l-.245,1.862h-3.528V25.5h4.067v7.841a5.471,5.471,0,0,1,4.067-1.666,6.5,6.5,0,0,1,4.508,1.372C138.957,34.713,139.937,37.261,139.937,40.642Zm-4.116-.1a6.765,6.765,0,0,0-1.078-4.116,3.672,3.672,0,0,0-3.43-1.274,3.575,3.575,0,0,0-2.7,2.3,9.939,9.939,0,0,0-.441,4.165A5.3,5.3,0,0,0,129.6,45.2a3.617,3.617,0,0,0,5.145-.49A6.913,6.913,0,0,0,135.821,40.544Zm22.248,8.331c-1.862.833-4.655.588-4.9-1.911-1.519,2.7-5.586,3.136-8.135,1.96a5.206,5.206,0,0,1-2.058-7.939,6.516,6.516,0,0,1,4.655-2.156l5-.343V37.457a2.876,2.876,0,0,0-.784-2.156,3.33,3.33,0,0,0-1.911-.539c-1.617-.049-3.185.588-3.283,2.4h-3.969a5.6,5.6,0,0,1,1.911-4.018,7.55,7.55,0,0,1,4.214-1.47c2.842-.245,6.175.49,7.3,3.43a8.969,8.969,0,0,1,.49,3.43v6.322c0,.735.49,1.323,1.323,1.029a.18.18,0,0,0,.147-.049v3.038Zm-5.439-7.351-4.312.343a2.473,2.473,0,0,0-2.45,2.009,2.2,2.2,0,0,0,2.058,2.352,4.918,4.918,0,0,0,3.381-.882,3.652,3.652,0,0,0,1.323-2.989v-.833Zm14.407,7.5a6.005,6.005,0,0,1-4.606-.49,4.26,4.26,0,0,1-1.813-3.871V25.451h4.116V44.024a1.632,1.632,0,0,0,.588,1.47,3.426,3.426,0,0,0,1.715.147v3.381Z"
+          transform="translate(-3.51 -14.425)"
+          fill="#d6002a"
+        />
+        <rect
+          id="Bar"
+          width="163.037"
+          height="4.165"
+          transform="translate(0.49 0)"
+        />
+        <g id="Name" data-name="Group 19187" transform="translate(0 46.505)">
+          <path
+            id="Path_1"
+            data-name="Path 1"
+            d="M20.4,114.708a8.965,8.965,0,0,1-.784,3.038,8.03,8.03,0,0,1-1.764,2.45,8.3,8.3,0,0,1-2.6,1.617,8.633,8.633,0,0,1-3.234.588,8.814,8.814,0,0,1-3.332-.686A8.75,8.75,0,0,1,5.793,119.8a8.19,8.19,0,0,1-1.519-2.156,13.925,13.925,0,0,1-.833-2.4A14.5,14.5,0,0,1,3.1,112.7c-.049-.882-.1-1.715-.1-2.6s.049-1.715.1-2.548a21.274,21.274,0,0,1,.343-2.548,9.948,9.948,0,0,1,.833-2.4A8.829,8.829,0,0,1,5.793,100.5a8.276,8.276,0,0,1,2.891-1.911,8.814,8.814,0,0,1,3.332-.686,8.633,8.633,0,0,1,3.234.588,8.3,8.3,0,0,1,2.6,1.617,8.03,8.03,0,0,1,1.764,2.45,8.964,8.964,0,0,1,.784,3.038H18.583a6.449,6.449,0,0,0-.637-2.4,6.8,6.8,0,0,0-1.372-1.911,5.988,5.988,0,0,0-2.009-1.225,7.136,7.136,0,0,0-2.548-.441,6.923,6.923,0,0,0-2.793.539,6.417,6.417,0,0,0-2.156,1.519,5.855,5.855,0,0,0-1.225,1.862,11.043,11.043,0,0,0-.686,2.156,11.753,11.753,0,0,0-.245,2.254c-.049.784-.049,1.519-.049,2.205,0,.735,0,1.47.049,2.205a18.5,18.5,0,0,0,.294,2.3,11.043,11.043,0,0,0,.686,2.156,6.818,6.818,0,0,0,1.225,1.862,6.5,6.5,0,0,0,4.949,2.009,7.136,7.136,0,0,0,2.548-.441,5.541,5.541,0,0,0,2.009-1.225A6.8,6.8,0,0,0,18,117.11a6.449,6.449,0,0,0,.637-2.4Z"
+            transform="translate(-3 -97.9)"
+          />
+          <path
+            id="Path_2"
+            data-name="Path 2"
+            d="M60.607,120.821a13.088,13.088,0,0,1-.539,3.822,7.563,7.563,0,0,1-1.813,2.989,6.721,6.721,0,0,1-2.058,1.421,6.928,6.928,0,0,1-5.586,0,6.4,6.4,0,0,1-2.058-1.421,7.038,7.038,0,0,1-1.813-2.989,13.821,13.821,0,0,1,0-7.645,7.563,7.563,0,0,1,1.813-2.989,6.721,6.721,0,0,1,2.058-1.421,6.928,6.928,0,0,1,5.586,0,6.4,6.4,0,0,1,2.058,1.421A7.038,7.038,0,0,1,60.068,117,13.089,13.089,0,0,1,60.607,120.821Zm-1.715,0a12.689,12.689,0,0,0-.343-3.087,5.451,5.451,0,0,0-1.519-2.6,5.941,5.941,0,0,0-1.568-1.078,4.763,4.763,0,0,0-2.107-.392,5.571,5.571,0,0,0-2.107.392,4.976,4.976,0,0,0-1.568,1.078,6.157,6.157,0,0,0-1.519,2.6,12.159,12.159,0,0,0-.343,3.087,12.69,12.69,0,0,0,.343,3.087,5.687,5.687,0,0,0,1.519,2.6,5.942,5.942,0,0,0,1.568,1.078,5.859,5.859,0,0,0,4.214,0,4.977,4.977,0,0,0,1.568-1.078,6.157,6.157,0,0,0,1.519-2.6A15.674,15.674,0,0,0,58.892,120.821Z"
+            transform="translate(-25.03 -105.09)"
+          />
+          <path
+            id="Path_3"
+            data-name="Path 3"
+            d="M105.319,129.151V118.273a5.661,5.661,0,0,0-.882-3.381,3.511,3.511,0,0,0-3.087-1.225,4.224,4.224,0,0,0-1.666.294,4.405,4.405,0,0,0-1.274.833A6.692,6.692,0,0,0,96.939,117a7.19,7.19,0,0,0-.49,2.744v9.409H94.734V118.273a5.336,5.336,0,0,0-.931-3.381,3.511,3.511,0,0,0-3.087-1.225,4.224,4.224,0,0,0-1.666.294,4.4,4.4,0,0,0-1.274.833,6.057,6.057,0,0,0-1.568,2.646,12.8,12.8,0,0,0-.441,3.381v8.331H84.1V112.49h1.47l.2,2.842a5.7,5.7,0,0,1,1.96-2.352,5.116,5.116,0,0,1,3.087-.931,5.645,5.645,0,0,1,3.479.98,4.866,4.866,0,0,1,1.764,2.6,6.89,6.89,0,0,1,1.96-2.6A5.345,5.345,0,0,1,101.4,112a6.336,6.336,0,0,1,2.5.441,4.5,4.5,0,0,1,1.715,1.274,5.056,5.056,0,0,1,.98,1.911,9.6,9.6,0,0,1,.294,2.45v11.075Z"
+            transform="translate(-44.358 -105.09)"
+          />
+          <path
+            id="Path_4"
+            data-name="Path 4"
+            d="M162.519,129.151V118.273a5.661,5.661,0,0,0-.882-3.381,3.511,3.511,0,0,0-3.087-1.225,4.224,4.224,0,0,0-1.666.294,4.405,4.405,0,0,0-1.274.833,6.692,6.692,0,0,0-1.47,2.205,7.19,7.19,0,0,0-.49,2.744v9.409h-1.715V118.273a5.336,5.336,0,0,0-.931-3.381,3.511,3.511,0,0,0-3.087-1.225,4.224,4.224,0,0,0-1.666.294,4.405,4.405,0,0,0-1.274.833,6.057,6.057,0,0,0-1.568,2.646,12.8,12.8,0,0,0-.441,3.381v8.331H141.3V112.49h1.47l.2,2.842a5.7,5.7,0,0,1,1.96-2.352,5.116,5.116,0,0,1,3.087-.931,5.645,5.645,0,0,1,3.479.98,4.866,4.866,0,0,1,1.764,2.6,6.89,6.89,0,0,1,1.96-2.6A5.345,5.345,0,0,1,158.6,112a6.336,6.336,0,0,1,2.5.441,4.5,4.5,0,0,1,1.715,1.274,5.057,5.057,0,0,1,.98,1.911,9.6,9.6,0,0,1,.294,2.45v11.075Z"
+            transform="translate(-73.527 -105.09)"
+          />
+          <path
+            id="Path_5"
+            data-name="Path 5"
+            d="M210.807,120.821a13.089,13.089,0,0,1-.539,3.822,7.563,7.563,0,0,1-1.813,2.989,6.721,6.721,0,0,1-2.058,1.421,6.327,6.327,0,0,1-2.793.588,6.48,6.48,0,0,1-2.793-.588,6.4,6.4,0,0,1-2.058-1.421,7.038,7.038,0,0,1-1.813-2.989,13.821,13.821,0,0,1,0-7.645,7.563,7.563,0,0,1,1.813-2.989,6.721,6.721,0,0,1,2.058-1.421A6.327,6.327,0,0,1,203.6,112a6.48,6.48,0,0,1,2.793.588,6.4,6.4,0,0,1,2.058,1.421A7.039,7.039,0,0,1,210.268,117,11.627,11.627,0,0,1,210.807,120.821Zm-1.666,0a12.691,12.691,0,0,0-.343-3.087,5.688,5.688,0,0,0-1.519-2.6,5.941,5.941,0,0,0-1.568-1.078,4.763,4.763,0,0,0-2.107-.392,5.57,5.57,0,0,0-2.107.392,4.976,4.976,0,0,0-1.568,1.078,6.157,6.157,0,0,0-1.519,2.6,12.16,12.16,0,0,0-.343,3.087,12.69,12.69,0,0,0,.343,3.087,5.688,5.688,0,0,0,1.519,2.6,5.942,5.942,0,0,0,1.568,1.078,5.859,5.859,0,0,0,4.214,0,4.977,4.977,0,0,0,1.568-1.078,6.157,6.157,0,0,0,1.519-2.6A15.674,15.674,0,0,0,209.141,120.821Z"
+            transform="translate(-101.626 -105.09)"
+          />
+          <path
+            id="Path_6"
+            data-name="Path 6"
+            d="M246.039,121.961l-.2-2.94a6.449,6.449,0,0,1-.931,1.421,5.553,5.553,0,0,1-1.323,1.078,8.943,8.943,0,0,1-1.568.686,6.853,6.853,0,0,1-1.666.245,6.506,6.506,0,0,1-2.5-.441,6.161,6.161,0,0,1-1.911-1.127,7.318,7.318,0,0,1-2.058-3.136,12.214,12.214,0,0,1-.686-4.067,11.542,11.542,0,0,1,.637-3.92,7.943,7.943,0,0,1,1.96-3.136,6.767,6.767,0,0,1,1.96-1.274,7.008,7.008,0,0,1,2.6-.49,7.289,7.289,0,0,1,1.764.245,5.645,5.645,0,0,1,1.568.686,6.835,6.835,0,0,1,1.323,1.029,4.973,4.973,0,0,1,.931,1.323V97.9h1.666v24.061Zm-.147-8.331a10.136,10.136,0,0,0-.49-3.332,5.279,5.279,0,0,0-1.617-2.5,4.67,4.67,0,0,0-1.47-.931,5.08,5.08,0,0,0-2.009-.343,4.89,4.89,0,0,0-2.009.392,4.768,4.768,0,0,0-1.519,1.078,6.852,6.852,0,0,0-1.421,2.548,10.688,10.688,0,0,0-.441,3.087,11.1,11.1,0,0,0,.539,3.381,5.807,5.807,0,0,0,1.666,2.6,4.313,4.313,0,0,0,1.421.882,5.5,5.5,0,0,0,1.862.294,4.594,4.594,0,0,0,1.911-.343,5.922,5.922,0,0,0,1.47-.98,6.286,6.286,0,0,0,1.617-2.6A11.458,11.458,0,0,0,245.892,113.63Z"
+            transform="translate(-120.393 -97.9)"
+          />
+          <path
+            id="Path_7"
+            data-name="Path 7"
+            d="M273.8,101.152V98.8h2.352v2.352Zm.294,21.268V105.759h1.764V122.42Z"
+            transform="translate(-141.097 -98.359)"
+          />
+          <path
+            id="Path_8"
+            data-name="Path 8"
+            d="M296.289,124.313c-.49.1-.931.2-1.372.294a6.471,6.471,0,0,1-1.372.1,3.812,3.812,0,0,1-3.332-1.372,5.9,5.9,0,0,1-.98-3.528V109.318H285.9V107.8h3.332v-4.606l1.666-.392v5h5.145v1.519H290.9v10.438a12.045,12.045,0,0,0,.1,1.372,3.558,3.558,0,0,0,.441,1.078,1.914,1.914,0,0,0,.833.686,3.619,3.619,0,0,0,1.372.245,12.016,12.016,0,0,0,1.323-.1c.441-.049.882-.147,1.323-.2v1.47Z"
+            transform="translate(-147.268 -100.399)"
+          />
+          <path
+            id="Path_9"
+            data-name="Path 9"
+            d="M320.1,133.239a5.971,5.971,0,0,1-1.715,2.5,4.33,4.33,0,0,1-2.793.882,4.765,4.765,0,0,1-.882-.049c-.245-.049-.49-.049-.686-.1a3.974,3.974,0,0,1-.539-.147V134.9a3.309,3.309,0,0,0,.686.1,10.436,10.436,0,0,0,1.323.1,2.763,2.763,0,0,0,1.911-.686,5.444,5.444,0,0,0,1.127-1.764l1.078-2.744L312.8,113h1.813l5.831,14.8,5.586-14.8h1.813Z"
+            transform="translate(-160.985 -105.6)"
+          />
+          <path
+            id="Path_10"
+            data-name="Path 10"
+            d="M369,122.42V98.8h1.764v23.62H369Z"
+            transform="translate(-189.645 -98.359)"
+          />
+          <path
+            id="Path_11"
+            data-name="Path 11"
+            d="M396.367,129.3V118.426a5.245,5.245,0,0,0-.98-3.381,4.124,4.124,0,0,0-3.283-1.176,4.751,4.751,0,0,0-2.6.637,4.534,4.534,0,0,0-1.715,1.617,6.894,6.894,0,0,0-.931,2.3,11.4,11.4,0,0,0-.294,2.6v8.331H384.9V112.692h1.47l.2,3.038a4.763,4.763,0,0,1,.931-1.421,4.954,4.954,0,0,1,1.372-1.078,5.956,5.956,0,0,1,1.617-.686,7.239,7.239,0,0,1,1.715-.245,5.623,5.623,0,0,1,4.361,1.617,6.44,6.44,0,0,1,1.47,4.459V129.3Z"
+            transform="translate(-197.753 -105.243)"
+          />
+          <path
+            id="Path_12"
+            data-name="Path 12"
+            d="M434.078,124.7a4.7,4.7,0,0,1-1.127,3.087,5.425,5.425,0,0,1-2.3,1.519,9.52,9.52,0,0,1-6.175-.049,5.639,5.639,0,0,1-2.352-1.617,6.59,6.59,0,0,1-1.029-1.568,6.2,6.2,0,0,1-.392-1.813h1.715a4.044,4.044,0,0,0,1.225,2.548,4.72,4.72,0,0,0,1.715,1.029,7.994,7.994,0,0,0,2.205.294,8.213,8.213,0,0,0,2.3-.294,3.291,3.291,0,0,0,1.617-.931,3.777,3.777,0,0,0,.686-.931,3.074,3.074,0,0,0-.588-3.136,3.382,3.382,0,0,0-2.3-1.029l-3.234-.441a10.458,10.458,0,0,1-2.058-.49,4.147,4.147,0,0,1-1.715-1.176,3.885,3.885,0,0,1-.931-2.646,4.284,4.284,0,0,1,.392-1.813,4.235,4.235,0,0,1,1.029-1.421,5.379,5.379,0,0,1,2.058-1.176,8.33,8.33,0,0,1,2.5-.343,7.883,7.883,0,0,1,2.842.49,5.816,5.816,0,0,1,2.205,1.47,4.525,4.525,0,0,1,.882,1.47,3.844,3.844,0,0,1,.343,1.617h-1.666c-.049-.245-.147-.588-.245-.98a2.181,2.181,0,0,0-.588-1.029,4.46,4.46,0,0,0-1.519-1.078,6.382,6.382,0,0,0-2.254-.392,4.823,4.823,0,0,0-2.989.784,2.745,2.745,0,0,0-1.323,2.3,2.6,2.6,0,0,0,.686,1.813,4.134,4.134,0,0,0,2.548.98l3.185.441a4.856,4.856,0,0,1,2.009.637,4.716,4.716,0,0,1,1.421,1.078,4.485,4.485,0,0,1,.833,1.372A2.3,2.3,0,0,1,434.078,124.7Z"
+            transform="translate(-216.01 -105.243)"
+          />
+          <path
+            id="Path_13"
+            data-name="Path 13"
+            d="M456.8,101.152V98.8h2.352v2.352Zm.294,21.268V105.759h1.764V122.42Z"
+            transform="translate(-234.419 -98.359)"
+          />
+          <path
+            id="Path_14"
+            data-name="Path 14"
+            d="M485.689,130.58a4.2,4.2,0,0,1-.343,1.764,4.525,4.525,0,0,1-.931,1.372,5.9,5.9,0,0,1-2.842,1.519,15.615,15.615,0,0,1-3.773.441,13.38,13.38,0,0,1-3.528-.441,5.875,5.875,0,0,1-2.7-1.519,3.916,3.916,0,0,1-.882-1.323,4.66,4.66,0,0,1-.294-1.715,4.192,4.192,0,0,1,.686-2.254,4.44,4.44,0,0,1,1.813-1.617,2.9,2.9,0,0,1-1.47-1.078,2.832,2.832,0,0,1-.637-1.666,3.169,3.169,0,0,1,.539-1.813,4.874,4.874,0,0,1,1.47-1.323,6.327,6.327,0,0,1-1.225-1.764,5.68,5.68,0,0,1-.441-2.3,5.4,5.4,0,0,1,.49-2.4,6.412,6.412,0,0,1,1.323-1.862,6.523,6.523,0,0,1,1.96-1.176,6.6,6.6,0,0,1,2.45-.392,7.188,7.188,0,0,1,3.92,1.127,3.085,3.085,0,0,1,1.274-1.666,3.857,3.857,0,0,1,2.058-.588.622.622,0,0,1,.294.049c.1,0,.2.049.294.049v1.421a.622.622,0,0,1-.294-.049c-.1,0-.2-.049-.294-.049a2.266,2.266,0,0,0-1.519.49,2.028,2.028,0,0,0-.784,1.323,5.159,5.159,0,0,1,.98,1.666,5.675,5.675,0,0,1,.343,2.058,5.615,5.615,0,0,1-.49,2.45,5.083,5.083,0,0,1-1.372,1.813,5.77,5.77,0,0,1-2.009,1.127,8.018,8.018,0,0,1-2.45.392,6.83,6.83,0,0,1-3.332-.784,3.8,3.8,0,0,0-1.176.784,1.735,1.735,0,0,0-.49,1.274,1.335,1.335,0,0,0,.343.98,2.562,2.562,0,0,0,.833.588,3.581,3.581,0,0,0,1.127.2,9.457,9.457,0,0,0,1.127.049h3.626a9.957,9.957,0,0,1,2.842.392,4.815,4.815,0,0,1,2.058,1.225,4.658,4.658,0,0,1,.98,1.372A3.19,3.19,0,0,1,485.689,130.58Zm-1.666,0a2.677,2.677,0,0,0-.2-1.176,2.78,2.78,0,0,0-.588-.882c-.784-.833-2.107-1.225-4.018-1.225h-4.41a3.835,3.835,0,0,0-1.911,1.127,3.035,3.035,0,0,0-.833,2.3,2.961,2.961,0,0,0,.245,1.176,3.271,3.271,0,0,0,1.666,1.568,9.684,9.684,0,0,0,1.274.392,12.306,12.306,0,0,0,1.323.2,11.936,11.936,0,0,0,1.323.049,13.3,13.3,0,0,0,1.372-.049c.49-.049.98-.1,1.47-.2a6.413,6.413,0,0,0,1.372-.441,3.59,3.59,0,0,0,1.127-.784,4.08,4.08,0,0,0,.637-.882A7.69,7.69,0,0,0,484.023,130.58Zm-1.96-13.77A4.278,4.278,0,0,0,481.72,115a4.658,4.658,0,0,0-.98-1.372,3.69,3.69,0,0,0-1.47-.882,5.738,5.738,0,0,0-3.626,0,3.69,3.69,0,0,0-1.47.882,4.659,4.659,0,0,0-.98,1.372,4.963,4.963,0,0,0,0,3.626,3.915,3.915,0,0,0,.98,1.372,3.96,3.96,0,0,0,1.47.833,5.738,5.738,0,0,0,3.626,0,4.273,4.273,0,0,0,1.47-.833,4.1,4.1,0,0,0,.98-1.372A4.278,4.278,0,0,0,482.063,116.81Z"
+            transform="translate(-241.355 -104.02)"
+          />
+          <path
+            id="Path_15"
+            data-name="Path 15"
+            d="M520.667,121.961V111.082a5.491,5.491,0,0,0-.98-3.43,3.983,3.983,0,0,0-3.283-1.225,4.751,4.751,0,0,0-2.6.637,4.534,4.534,0,0,0-1.715,1.617,7.339,7.339,0,0,0-.931,2.3,12.162,12.162,0,0,0-.294,2.646v8.331H509.2V97.9h1.666v10.487a5.746,5.746,0,0,1,.931-1.47,4.957,4.957,0,0,1,1.372-1.078,5.957,5.957,0,0,1,1.617-.686,7.238,7.238,0,0,1,1.715-.245,5.623,5.623,0,0,1,4.361,1.617,6.44,6.44,0,0,1,1.47,4.459v10.977Z"
+            transform="translate(-261.141 -97.9)"
+          />
+          <path
+            id="Path_16"
+            data-name="Path 16"
+            d="M553.389,124.313c-.49.1-.931.2-1.372.294a6.471,6.471,0,0,1-1.372.1,3.812,3.812,0,0,1-3.332-1.372,5.9,5.9,0,0,1-.98-3.528V109.318H543V107.8h3.332v-4.606L548,102.8v5h5.145v1.519H548v10.438a12.046,12.046,0,0,0,.1,1.372,3.559,3.559,0,0,0,.441,1.078,1.915,1.915,0,0,0,.833.686,3.619,3.619,0,0,0,1.372.245,12.013,12.013,0,0,0,1.323-.1c.441-.049.882-.147,1.323-.2v1.47Z"
+            transform="translate(-278.378 -100.399)"
+          />
+          <path
+            id="Path_17"
+            data-name="Path 17"
+            d="M583.078,124.7a4.7,4.7,0,0,1-1.127,3.087,5.425,5.425,0,0,1-2.3,1.519,9.52,9.52,0,0,1-6.175-.049,5.639,5.639,0,0,1-2.352-1.617,6.586,6.586,0,0,1-1.029-1.568,6.2,6.2,0,0,1-.392-1.813h1.715a4.043,4.043,0,0,0,1.225,2.548,4.72,4.72,0,0,0,1.715,1.029,8,8,0,0,0,2.205.294,8.213,8.213,0,0,0,2.3-.294,3.291,3.291,0,0,0,1.617-.931,3.78,3.78,0,0,0,.686-.931,3.074,3.074,0,0,0-.588-3.136,3.382,3.382,0,0,0-2.3-1.029l-3.234-.441a10.458,10.458,0,0,1-2.058-.49,4.147,4.147,0,0,1-1.715-1.176,3.885,3.885,0,0,1-.931-2.646,4.285,4.285,0,0,1,.392-1.813,4.234,4.234,0,0,1,1.029-1.421,5.379,5.379,0,0,1,2.058-1.176,8.329,8.329,0,0,1,2.5-.343,7.883,7.883,0,0,1,2.842.49,5.816,5.816,0,0,1,2.205,1.47,4.524,4.524,0,0,1,.882,1.47,3.842,3.842,0,0,1,.343,1.617h-1.666c-.049-.245-.147-.588-.245-.98a2.181,2.181,0,0,0-.588-1.029,4.46,4.46,0,0,0-1.519-1.078,6.382,6.382,0,0,0-2.254-.392,4.823,4.823,0,0,0-2.989.784,2.745,2.745,0,0,0-1.323,2.3,2.6,2.6,0,0,0,.686,1.813,4.133,4.133,0,0,0,2.548.98l3.185.441a4.856,4.856,0,0,1,2.009.637,4.718,4.718,0,0,1,1.421,1.078,4.482,4.482,0,0,1,.833,1.372A2.3,2.3,0,0,1,583.078,124.7Z"
+            transform="translate(-291.994 -105.243)"
+          />
+        </g>
+      </svg>
+      <!-- Dow Jones Indices -->
+      <svg
+        id="spg_dow_jones_indices"
+        xmlns="http://www.w3.org/2000/svg"
+        width="199.006"
+        height="78.406"
+        viewBox="0 0 199.006 78.406"
+      >
+        <g id="Name" data-name="Group 19201">
+          <path
+            id="Path_38"
+            data-name="Path 38"
+            d="M17.358,21.673a8.865,8.865,0,0,1-6.322,2.156,8.649,8.649,0,0,1-5.978-2.058A6.418,6.418,0,0,1,3,17.115H6.724a3.489,3.489,0,0,0,1.029,2.45,4.843,4.843,0,0,0,3.381,1.078,4.944,4.944,0,0,0,3.479-1.078,2.482,2.482,0,0,0,.784-1.911c0-1.47-1.127-2.156-2.352-2.352-1.372-.245-3.087-.294-4.41-.539C5.842,14.322,3.49,12.509,3.49,9.177A5.533,5.533,0,0,1,5.254,5.207,8.667,8.667,0,0,1,11.135,3.1a8.254,8.254,0,0,1,5.586,1.96,6.214,6.214,0,0,1,2.058,4.263H15.055a3.019,3.019,0,0,0-.882-1.96,4.5,4.5,0,0,0-3.038-1.078A4.552,4.552,0,0,0,7.9,7.363a2.42,2.42,0,0,0-.686,1.666,2.122,2.122,0,0,0,2.058,2.156c1.274.2,3.038.343,4.361.49,2.989.441,5.488,2.352,5.488,5.782A5.9,5.9,0,0,1,17.358,21.673Z"
+            transform="translate(-3 -3.051)"
+          />
+          <path
+            id="Path_39"
+            data-name="Path 39"
+            d="M55.121,23.435,53.7,21.867a8.588,8.588,0,0,1-5.684,2.107c-3.528,0-6.616-2.3-6.616-6.077,0-2.5,1.421-4.214,3.528-5.488-1.274-1.372-2.156-2.5-2.156-4.361C42.772,4.911,45.222,3,48.261,3,51.152,3,53.8,4.813,53.8,7.949c0,2.6-1.568,4.067-3.773,5.341L53.5,17.064a6.052,6.052,0,0,0,.49-2.45c.049-.931.049-1.813.049-2.45h5.145v2.793h-2.3a9.155,9.155,0,0,1-1.225,4.508c1.274,1.372,2.45,2.7,3.675,4.018l-4.214-.049Zm-8.086-8.821c-1.323.784-2.352,1.47-2.352,3.136,0,2.058,1.666,3.136,3.577,3.136a4.6,4.6,0,0,0,3.381-1.225C50.025,17.946,48.6,16.28,47.035,14.614ZM48.31,5.891A2.029,2.029,0,0,0,46.1,8c0,1.274,1.078,2.205,1.911,3.087,1.225-.686,2.548-1.323,2.548-2.989A2.12,2.12,0,0,0,48.31,5.891Z"
+            transform="translate(-22.583 -3)"
+          />
+          <path
+            id="Path_40"
+            data-name="Path 40"
+            d="M92.941,16.739H88.726v7.155H85.1V3.9h7.841C97.547,3.9,100,6.448,100,10.32S97.547,16.739,92.941,16.739Zm-.147-9.654H88.726v6.469h4.067c2.4,0,3.528-1.323,3.528-3.234s-1.078-3.234-3.528-3.234Z"
+            transform="translate(-44.868 -3.459)"
+          />
+          <path
+            id="Path_41"
+            data-name="Path 41"
+            d="M145.578,21.737a7.687,7.687,0,0,1-5.586,2.156H132.2V3.9h7.792a7.607,7.607,0,0,1,5.586,2.156c2.058,2.107,2.352,5.1,2.352,7.841S147.636,19.63,145.578,21.737ZM142.785,8.261a4,4,0,0,0-2.842-1.127h-4.116V20.61h4.116a4.173,4.173,0,0,0,2.842-1.127c1.421-1.421,1.421-3.773,1.421-5.586s0-4.214-1.421-5.635Z"
+            transform="translate(-68.887 -3.459)"
+          />
+          <path
+            id="Path_42"
+            data-name="Path 42"
+            d="M181.206,27.184a6.779,6.779,0,0,1-5.145,2.254,6.861,6.861,0,0,1-5.145-2.254,8.067,8.067,0,0,1-1.715-5.39,8.067,8.067,0,0,1,1.715-5.39,6.949,6.949,0,0,1,10.291-.049,8.067,8.067,0,0,1,1.715,5.39A8.207,8.207,0,0,1,181.206,27.184Zm-2.891-9.115a3.151,3.151,0,0,0-4.41-.049l-.049.049a5.436,5.436,0,0,0-1.029,3.675,5.36,5.36,0,0,0,1.029,3.675,3.151,3.151,0,0,0,4.41.049l.049-.049a5.436,5.436,0,0,0,1.029-3.675A5.436,5.436,0,0,0,178.315,18.069Z"
+            transform="translate(-87.755 -8.66)"
+          />
+          <path
+            id="Path_43"
+            data-name="Path 43"
+            d="M217.506,29.4h-3.283l-3.332-9.9-3.283,9.9h-3.283L200.6,14.749h3.43l2.352,9.6,3.087-9.507h2.891l3.087,9.458,2.254-9.6h3.381Z"
+            transform="translate(-103.768 -8.967)"
+          />
+          <path
+            id="Path_44"
+            data-name="Path 44"
+            d="M260.228,24.286a5.756,5.756,0,0,1-4.263-1.617,6.838,6.838,0,0,1-1.764-5h3.528a3.886,3.886,0,0,0,.735,2.7,2.329,2.329,0,0,0,1.764.735c1.617,0,2.4-1.078,2.4-2.7V3.9h3.626V18.062C266.3,21.835,264.05,24.286,260.228,24.286Z"
+            transform="translate(-131.102 -3.459)"
+          />
+          <path
+            id="Path_45"
+            data-name="Path 45"
+            d="M296.906,27.235a6.779,6.779,0,0,1-5.145,2.254,6.861,6.861,0,0,1-5.145-2.254,8.066,8.066,0,0,1-1.715-5.39,8.066,8.066,0,0,1,1.715-5.39,6.779,6.779,0,0,1,5.145-2.254,6.861,6.861,0,0,1,5.145,2.254,8.067,8.067,0,0,1,1.715,5.39A8.067,8.067,0,0,1,296.906,27.235Zm-2.891-9.115a3.151,3.151,0,0,0-4.41-.049l-.049.049a5.436,5.436,0,0,0-1.029,3.675,5.36,5.36,0,0,0,1.029,3.675,3.151,3.151,0,0,0,4.41.049l.049-.049a5.436,5.436,0,0,0,1.029-3.675A5.436,5.436,0,0,0,294.015,18.12Z"
+            transform="translate(-146.757 -8.711)"
+          />
+          <path
+            id="Path_46"
+            data-name="Path 46"
+            d="M328.768,28.993V19.977c0-1.715-.539-2.793-2.4-2.793a2.79,2.79,0,0,0-2.548,1.862,10.66,10.66,0,0,0-.49,3.92v5.978H319.8v-14.7h2.94l.245,1.911A4.831,4.831,0,0,1,327.3,13.9c3.136,0,4.949,2.205,4.949,5.243V28.9l-3.479.1Z"
+            transform="translate(-164.555 -8.559)"
+          />
+          <path
+            id="Path_47"
+            data-name="Path 47"
+            d="M365.127,22.772h-9.8a3.734,3.734,0,0,0,1.078,2.891,3.318,3.318,0,0,0,2.156.931,2.859,2.859,0,0,0,2.156-.686,2.559,2.559,0,0,0,.686-1.225h3.381a5.9,5.9,0,0,1-1.225,2.7,6.279,6.279,0,0,1-4.949,2.058,6.388,6.388,0,0,1-4.655-1.813,7.979,7.979,0,0,1-2.254-5.88,8.247,8.247,0,0,1,2.107-5.88,6.371,6.371,0,0,1,4.7-1.862,6.236,6.236,0,0,1,5.341,2.7,8.276,8.276,0,0,1,1.274,5.1Zm-4.41-5.1a3.029,3.029,0,0,0-2.205-.833,2.941,2.941,0,0,0-2.45,1.127,3.79,3.79,0,0,0-.784,2.254H361.6a3.581,3.581,0,0,0-.882-2.548Z"
+            transform="translate(-180.823 -8.609)"
+          />
+          <path
+            id="Path_48"
+            data-name="Path 48"
+            d="M394.82,27.721a7.024,7.024,0,0,1-5,1.666,6.868,6.868,0,0,1-4.753-1.666,5.01,5.01,0,0,1-1.568-3.43h3.283a2.347,2.347,0,0,0,.784,1.715,3.289,3.289,0,0,0,2.205.637c1.176,0,2.989-.245,2.989-1.862a1.554,1.554,0,0,0-1.47-1.568c-1.323-.2-2.793-.294-4.067-.539a4.1,4.1,0,0,1-3.381-3.92,4.041,4.041,0,0,1,1.519-3.283A6.777,6.777,0,0,1,389.822,14a6.248,6.248,0,0,1,4.606,1.715,4.633,4.633,0,0,1,1.323,3.038H392.37a1.965,1.965,0,0,0-.588-1.372,2.762,2.762,0,0,0-1.911-.686,3.409,3.409,0,0,0-1.519.245,1.65,1.65,0,0,0-1.127,1.568c0,1.029.931,1.372,1.666,1.47,1.323.2,1.666.2,3.136.441,2.3.343,4.018,1.813,4.018,4.116A4.48,4.48,0,0,1,394.82,27.721Z"
+            transform="translate(-197.04 -8.609)"
+          />
+          <path
+            id="Path_49"
+            data-name="Path 49"
+            d="M4.8,81.494V61.5H8.475V81.494Z"
+            transform="translate(-3.918 -32.832)"
+          />
+          <path
+            id="Path_50"
+            data-name="Path 50"
+            d="M30.568,86.7V77.678c0-1.715-.539-2.793-2.4-2.793a2.79,2.79,0,0,0-2.548,1.862,10.66,10.66,0,0,0-.49,3.92v5.978H21.6v-14.6h2.94l.245,1.911A4.831,4.831,0,0,1,29.1,71.7c3.136,0,4.949,2.205,4.949,5.243v9.8Z"
+            transform="translate(-12.485 -38.033)"
+          />
+          <path
+            id="Path_51"
+            data-name="Path 51"
+            d="M64.036,81.086l-.245-1.617a4.747,4.747,0,0,1-4.116,1.96A5.851,5.851,0,0,1,56.1,80.2c-1.764-1.421-2.6-3.626-2.6-6.42,0-2.891.882-5.1,2.646-6.567a5.6,5.6,0,0,1,3.577-1.176,4.971,4.971,0,0,1,3.822,1.372V60.7h3.528V81.086ZM60.41,69.031a2.794,2.794,0,0,0-2.352,1.176,5.705,5.705,0,0,0-.931,3.528,5.854,5.854,0,0,0,.931,3.577,2.924,2.924,0,0,0,2.352,1.176c2.793,0,3.332-2.646,3.332-4.753s-.588-4.7-3.332-4.7Z"
+            transform="translate(-28.753 -32.424)"
+          />
+          <path
+            id="Path_52"
+            data-name="Path 52"
+            d="M90.1,64.426V60.8h3.773v3.626Zm.1,16.71V66.484h3.577V81.137Z"
+            transform="translate(-47.417 -32.475)"
+          />
+          <path
+            id="Path_53"
+            data-name="Path 53"
+            d="M116.312,84.684a6.37,6.37,0,0,1-5,2.3,6.779,6.779,0,0,1-5.1-2.3,8.552,8.552,0,0,1-1.617-5.341A8.26,8.26,0,0,1,106.217,74a6.779,6.779,0,0,1,5.1-2.3,6.3,6.3,0,0,1,5,2.3,5.839,5.839,0,0,1,1.127,3.185H113.96a3.472,3.472,0,0,0-.441-1.372,2.592,2.592,0,0,0-2.254-1.078,2.824,2.824,0,0,0-2.156.931,5.549,5.549,0,0,0-.98,3.724,5.341,5.341,0,0,0,.98,3.675,2.924,2.924,0,0,0,2.156.931,2.592,2.592,0,0,0,2.254-1.078,3.236,3.236,0,0,0,.441-1.372h3.479A5.685,5.685,0,0,1,116.312,84.684Z"
+            transform="translate(-54.812 -38.031)"
+          />
+          <path
+            id="Path_54"
+            data-name="Path 54"
+            d="M148.478,80.472h-9.8a3.734,3.734,0,0,0,1.078,2.891,3.318,3.318,0,0,0,2.156.931,2.859,2.859,0,0,0,2.156-.686,2.56,2.56,0,0,0,.686-1.225h3.381a5.9,5.9,0,0,1-1.225,2.7,6.279,6.279,0,0,1-4.949,2.058,6.191,6.191,0,0,1-4.606-1.813,7.979,7.979,0,0,1-2.254-5.88,8.247,8.247,0,0,1,2.107-5.88,6.371,6.371,0,0,1,4.7-1.862,6.236,6.236,0,0,1,5.341,2.7,8.275,8.275,0,0,1,1.274,5.1S148.478,80.178,148.478,80.472Zm-4.361-5.145a3.029,3.029,0,0,0-2.205-.833,2.941,2.941,0,0,0-2.45,1.127,3.825,3.825,0,0,0-.784,2.3h6.371a4.45,4.45,0,0,0-.931-2.6Z"
+            transform="translate(-70.366 -38.033)"
+          />
+          <path
+            id="Path_55"
+            data-name="Path 55"
+            d="M178.12,85.321a7.024,7.024,0,0,1-5,1.666,6.868,6.868,0,0,1-4.753-1.666,5.01,5.01,0,0,1-1.568-3.43h3.283a2.347,2.347,0,0,0,.784,1.715,3.289,3.289,0,0,0,2.205.637c1.176,0,2.989-.245,2.989-1.862a1.554,1.554,0,0,0-1.47-1.568c-1.323-.2-2.793-.294-4.067-.539a4.1,4.1,0,0,1-3.381-3.92,4.041,4.041,0,0,1,1.519-3.283,6.777,6.777,0,0,1,4.459-1.47,6.248,6.248,0,0,1,4.606,1.715,4.634,4.634,0,0,1,1.323,3.038h-3.332a1.965,1.965,0,0,0-.588-1.372,2.763,2.763,0,0,0-1.911-.686,3.409,3.409,0,0,0-1.519.245,1.649,1.649,0,0,0-1.127,1.568c0,1.029.931,1.372,1.666,1.47,1.323.2,1.666.2,3.136.441,2.3.343,4.018,1.813,4.018,4.116A4.232,4.232,0,0,1,178.12,85.321Z"
+            transform="translate(-86.531 -37.982)"
+          />
+          <path
+            id="Path_56"
+            data-name="Path 56"
+            d="M10.159,151.6l-.637-1.862H5.65L5.013,151.6H3.2l3.43-9.8H8.59l3.43,9.8Zm-2.6-7.6L6.14,148.122H8.982Z"
+            transform="translate(-3.102 -73.781)"
+          />
+          <path
+            id="Path_57"
+            data-name="Path 57"
+            d="M35.767,150.572a3.658,3.658,0,0,1-2.744,1.029H29.2v-9.8h3.822a3.658,3.658,0,0,1,2.744,1.029,5.365,5.365,0,0,1,1.127,3.822A5.613,5.613,0,0,1,35.767,150.572Zm-1.372-6.567a2.012,2.012,0,0,0-1.372-.539H31.013v6.567h2.009a2.012,2.012,0,0,0,1.372-.539,5.831,5.831,0,0,0,0-5.488Z"
+            transform="translate(-16.361 -73.781)"
+          />
+          <path
+            id="Path_58"
+            data-name="Path 58"
+            d="M48.3,143.364V141.6h1.862v1.764Zm.049,8.135v-7.155h1.764v7.2Z"
+            transform="translate(-26.101 -73.68)"
+          />
+          <path
+            id="Path_59"
+            data-name="Path 59"
+            d="M58.759,154.3H56.946L54.3,147.1h1.813l1.813,5.047,1.715-5.047h1.764Z"
+            transform="translate(-29.161 -76.484)"
+          />
+          <path
+            id="Path_60"
+            data-name="Path 60"
+            d="M70.8,143.364V141.6h1.862v1.764Zm.1,8.135v-7.155h1.764v7.2Z"
+            transform="translate(-37.575 -73.68)"
+          />
+          <path
+            id="Path_61"
+            data-name="Path 61"
+            d="M83.337,153.412a3.389,3.389,0,0,1-2.45.833,3.108,3.108,0,0,1-2.3-.833,2.662,2.662,0,0,1-.784-1.666h1.568a1.122,1.122,0,0,0,.392.833,1.49,1.49,0,0,0,1.078.294c.588,0,1.47-.147,1.47-.931a.832.832,0,0,0-.735-.784c-.637-.1-1.372-.147-2.009-.294a1.937,1.937,0,0,1-1.617-1.911,2.024,2.024,0,0,1,.735-1.617,3.4,3.4,0,0,1,2.205-.735,3.2,3.2,0,0,1,2.254.833,2.124,2.124,0,0,1,.637,1.47H82.161a.968.968,0,0,0-.294-.686,1.294,1.294,0,0,0-.931-.343,1.905,1.905,0,0,0-.735.1.813.813,0,0,0-.539.784c0,.49.441.686.833.735.637.1.833.1,1.519.2a2.084,2.084,0,0,1,1.96,2.058A2.333,2.333,0,0,1,83.337,153.412Z"
+            transform="translate(-41.145 -76.23)"
+          />
+          <path
+            id="Path_62"
+            data-name="Path 62"
+            d="M93.6,143.364V141.6h1.862v1.764Zm.049,8.135v-7.155h1.764v7.2Z"
+            transform="translate(-49.202 -73.68)"
+          />
+          <path
+            id="Path_63"
+            data-name="Path 63"
+            d="M106.531,153.227a3.348,3.348,0,0,1-4.753.245c-.1-.1-.2-.147-.245-.245a4.619,4.619,0,0,1,0-5.292,3.348,3.348,0,0,1,4.753-.245c.1.1.2.147.245.245a4.619,4.619,0,0,1,0,5.292Zm-1.372-4.459a1.538,1.538,0,0,0-2.156,0h0a3.6,3.6,0,0,0,0,3.626,1.538,1.538,0,0,0,2.156,0h0a2.734,2.734,0,0,0,.49-1.813,2.815,2.815,0,0,0-.49-1.813Z"
+            transform="translate(-52.823 -76.34)"
+          />
+          <path
+            id="Path_64"
+            data-name="Path 64"
+            d="M122.161,154.151v-4.41c0-.833-.294-1.372-1.176-1.372a1.358,1.358,0,0,0-1.225.931,5.137,5.137,0,0,0-.245,1.911v2.94H117.8v-7.2h1.47l.147.931a2.3,2.3,0,0,1,2.107-1.078,2.367,2.367,0,0,1,2.45,2.548v4.8Z"
+            transform="translate(-61.543 -76.332)"
+          />
+          <path
+            id="Path_65"
+            data-name="Path 65"
+            d="M146.032,153.227a3.348,3.348,0,0,1-4.753.245c-.1-.1-.2-.147-.245-.245a4.619,4.619,0,0,1,0-5.292,3.348,3.348,0,0,1,4.753-.245c.1.1.2.147.245.245a4.619,4.619,0,0,1,0,5.292Zm-1.421-4.459a1.538,1.538,0,0,0-2.156,0h0a3.6,3.6,0,0,0,0,3.626,1.538,1.538,0,0,0,2.156,0h0a2.734,2.734,0,0,0,.49-1.813,2.815,2.815,0,0,0-.49-1.813Z"
+            transform="translate(-72.966 -76.34)"
+          />
+          <path
+            id="Path_66"
+            data-name="Path 66"
+            d="M159.171,142.723a.815.815,0,0,0-.931.882v.686h1.911v1.421H158.24v5.782h-1.715v-5.733H155.3V144.34h1.225v-.686a2.193,2.193,0,0,1,2.45-2.254,6.53,6.53,0,0,1,1.372.147v1.372A3.294,3.294,0,0,0,159.171,142.723Z"
+            transform="translate(-80.667 -73.578)"
+          />
+        </g>
+        <g id="Wordmark" data-name="Group 19199">
+          <path
+            id="Path_67"
+            data-name="Path 67"
+            d="M181.357,151.266a4.368,4.368,0,0,1-3.087,1.029,4.625,4.625,0,0,1-2.94-.98,3.132,3.132,0,0,1-1.029-2.254h1.813a1.711,1.711,0,0,0,.49,1.176,2.843,2.843,0,0,0,3.332,0,1.339,1.339,0,0,0,.392-.931c0-.735-.539-1.029-1.176-1.176-.686-.147-1.519-.147-2.156-.245a2.7,2.7,0,0,1-2.5-2.744,2.439,2.439,0,0,1,.882-1.911,4.107,4.107,0,0,1,2.842-1.029,4.316,4.316,0,0,1,2.744.931,2.862,2.862,0,0,1,.98,2.107h-1.813a1.972,1.972,0,0,0-.441-.98,2.208,2.208,0,0,0-1.519-.539,2.268,2.268,0,0,0-1.568.539,1.148,1.148,0,0,0-.343.833,1.037,1.037,0,0,0,.98,1.078c.637.1,1.519.147,2.107.245a2.85,2.85,0,0,1,2.7,2.842A2.242,2.242,0,0,1,181.357,151.266Z"
+            transform="translate(-90.356 -73.986)"
+          />
+          <path
+            id="Path_68"
+            data-name="Path 68"
+            d="M199.914,152.1l-.686-.784a4.191,4.191,0,0,1-2.793,1.029,3.02,3.02,0,0,1-3.234-2.94,3.1,3.1,0,0,1,1.715-2.7,2.923,2.923,0,0,1-1.029-2.156,2.436,2.436,0,0,1,2.7-2.45,2.478,2.478,0,0,1,2.7,2.4,3.029,3.029,0,0,1-1.862,2.646l1.715,1.862a2.785,2.785,0,0,0,.245-1.176,10.69,10.69,0,0,0,.049-1.176h2.548v1.372h-1.127a4.769,4.769,0,0,1-.588,2.205c.637.686,1.176,1.323,1.813,1.96Zm-3.969-4.312c-.637.392-1.176.735-1.176,1.568a1.591,1.591,0,0,0,1.764,1.519,2.14,2.14,0,0,0,1.617-.588C197.414,149.4,196.679,148.618,195.944,147.784Zm.637-4.263a.989.989,0,0,0-1.078,1.029c0,.637.539,1.078.931,1.519.588-.343,1.274-.637,1.274-1.47a1.1,1.1,0,0,0-1.127-1.078Z"
+            transform="translate(-99.994 -73.936)"
+          />
+          <path
+            id="Path_69"
+            data-name="Path 69"
+            d="M218.422,148.722h-2.058V152.2H214.6v-9.8h3.822c2.254,0,3.43,1.274,3.43,3.136S220.676,148.722,218.422,148.722Zm-.049-4.7h-2.009V147.2h2.009c1.176,0,1.715-.637,1.715-1.568a1.5,1.5,0,0,0-1.715-1.617Z"
+            transform="translate(-110.907 -74.088)"
+          />
+          <path
+            id="Path_70"
+            data-name="Path 70"
+            d="M241.812,151.5l-.2-1.078a2.91,2.91,0,0,1-2.45,1.274,3.8,3.8,0,0,1-2.891-1.078A5.27,5.27,0,0,1,235,146.647a4.971,4.971,0,0,1,1.274-3.92,4.2,4.2,0,0,1,2.891-1.127,4.072,4.072,0,0,1,2.891,1.127,2.8,2.8,0,0,1,.882,1.96h-1.813a1.52,1.52,0,0,0-.441-.882,2,2,0,0,0-1.568-.588,2.306,2.306,0,0,0-1.617.686,5.544,5.544,0,0,0,0,5.684,2.36,2.36,0,0,0,1.568.637,2.075,2.075,0,0,0,1.47-.588,2.467,2.467,0,0,0,.637-1.911h-2.352v-1.47h4.067V151.6Z"
+            transform="translate(-121.311 -73.68)"
+          />
+          <path
+            id="Path_71"
+            data-name="Path 71"
+            d="M257.06,151.546a1.744,1.744,0,0,1-1.96-1.911V141.5h1.715v7.841c0,.392.1.686.686.686h.294v1.47A3.71,3.71,0,0,1,257.06,151.546Z"
+            transform="translate(-131.561 -73.629)"
+          />
+          <path
+            id="Path_72"
+            data-name="Path 72"
+            d="M268.431,153.227a3.348,3.348,0,0,1-4.753.245c-.1-.1-.2-.147-.245-.245a4.619,4.619,0,0,1,0-5.292,3.348,3.348,0,0,1,4.753-.245c.1.1.2.147.245.245a4.619,4.619,0,0,1,0,5.292Zm-1.421-4.459a1.538,1.538,0,0,0-2.156,0h0a3.6,3.6,0,0,0,0,3.626,1.538,1.538,0,0,0,2.156,0h0a2.734,2.734,0,0,0,.49-1.813,2.814,2.814,0,0,0-.49-1.813Z"
+            transform="translate(-135.385 -76.34)"
+          />
+          <path
+            id="Path_73"
+            data-name="Path 73"
+            d="M284.941,151.107a2.524,2.524,0,0,1-1.715.588,2.4,2.4,0,0,1-2.009-.931l-.1.784H279.6V141.6h1.715v3.332a2.51,2.51,0,0,1,1.862-.686,2.833,2.833,0,0,1,1.764.588,4.5,4.5,0,0,1,0,6.273Zm-.931-4.949a1.535,1.535,0,0,0-1.176-.588c-1.372,0-1.617,1.274-1.617,2.3a2.713,2.713,0,0,0,.637,1.96,1.545,1.545,0,0,0,2.156-.2v-.049a3.059,3.059,0,0,0,.441-1.764,2.454,2.454,0,0,0-.441-1.666Z"
+            transform="translate(-144.055 -73.68)"
+          />
+          <path
+            id="Path_74"
+            data-name="Path 74"
+            d="M301.228,154.4a1.155,1.155,0,0,1-1.225-.98A2.551,2.551,0,0,1,297.8,154.5a2.27,2.27,0,1,1-.147-4.508l2.107-.147V149.4c0-.686-.245-1.127-1.225-1.127-.784,0-1.274.343-1.323,1.029h-1.617c.1-1.617,1.372-2.3,2.989-2.3a2.621,2.621,0,0,1,2.7,1.47,3.573,3.573,0,0,1,.2,1.47v2.646c0,.343.1.441.392.441a.442.442,0,0,0,.245-.049v1.274A2.562,2.562,0,0,1,301.228,154.4Zm-1.421-3.332-1.813.147c-.539.049-1.029.343-1.029.931a.948.948,0,0,0,1.029.882,1.6,1.6,0,0,0,1.813-1.617v-.343Z"
+            transform="translate(-152.01 -76.434)"
+          />
+          <path
+            id="Path_75"
+            data-name="Path 75"
+            d="M314.26,151.546a1.744,1.744,0,0,1-1.96-1.911V141.5h1.715v7.841c0,.392.1.686.686.686H315v1.47A3.71,3.71,0,0,1,314.26,151.546Z"
+            transform="translate(-160.73 -73.629)"
+          />
+        </g>
+        <g id="Bar" data-name="Group 19200">
+          <rect
+            id="Rectangle_1366"
+            data-name="Rectangle 1366"
+            width="69.194"
+            height="1.666"
+            transform="translate(83.944 63.412)"
+          />
+        </g>
+      </svg>
+      <!-- Market Intelligence -->
+      <svg
+        id="spg_market_intelligence"
+        xmlns="http://www.w3.org/2000/svg"
+        width="285.988"
+        height="78.161"
+        viewBox="0 0 285.988 78.161"
+      >
+        <path
+          id="Name"
+          d="M23.484,121.961V100.84l-8.625,20.778H13.34L4.715,100.987v20.974H3V98.341H5.45l8.723,20.974,8.576-20.974H25.2v23.62Zm22.395,0c-.2.049-.343.049-.392.1h-.392a3.278,3.278,0,0,1-1.274-.245,2.021,2.021,0,0,1-.833-.735,2.377,2.377,0,0,1-.392-1.029,4.971,4.971,0,0,1-.1-1.225,5.538,5.538,0,0,1-.931,1.568,5.348,5.348,0,0,1-1.421,1.127,7.381,7.381,0,0,1-1.715.686,8.513,8.513,0,0,1-1.911.245,6.79,6.79,0,0,1-2.254-.343,5.468,5.468,0,0,1-1.813-1.029,4.433,4.433,0,0,1-1.225-1.617,5.14,5.14,0,0,1-.441-2.156,4.433,4.433,0,0,1,1.568-3.528,7.369,7.369,0,0,1,4.067-1.47l6.126-.441v-1.617a3.335,3.335,0,0,0-1.225-2.94,5.272,5.272,0,0,0-3.136-.882,5.921,5.921,0,0,0-3.332.882,3.437,3.437,0,0,0-1.47,2.744H31.716a5.723,5.723,0,0,1,.637-2.254,4.839,4.839,0,0,1,1.372-1.617,6.8,6.8,0,0,1,1.96-1.029,7.906,7.906,0,0,1,2.5-.343,10.579,10.579,0,0,1,1.715.147,5.711,5.711,0,0,1,1.617.539,5.22,5.22,0,0,1,1.372.931,4.443,4.443,0,0,1,.931,1.47,4.291,4.291,0,0,1,.343,1.568c.049.539.049,1.078.049,1.617v7.6a3.128,3.128,0,0,0,.2,1.323,1.1,1.1,0,0,0,1.078.49,1.511,1.511,0,0,0,.49-.049v1.519h-.1Zm-3.43-8.576-5.979.343a5.136,5.136,0,0,0-2.94,1.029,2.966,2.966,0,0,0-1.078,2.45,3.192,3.192,0,0,0,1.176,2.7,4.813,4.813,0,0,0,2.989.882,5.758,5.758,0,0,0,2.7-.588,5.02,5.02,0,0,0,1.813-1.519,5.638,5.638,0,0,0,1.029-2.107,7.907,7.907,0,0,0,.343-2.4l-.049-.784Zm16.906-6.469c-.245-.049-.539-.1-.833-.147-.294,0-.539-.049-.833-.049a4.522,4.522,0,0,0-4.214,2.3,7.051,7.051,0,0,0-.833,2.352,15.526,15.526,0,0,0-.245,2.6v7.988H50.73V105.3H52.2l.2,3.381a4.86,4.86,0,0,1,2.058-2.646,6.169,6.169,0,0,1,3.234-.882h.833a4.83,4.83,0,0,1,.833.1S59.355,106.917,59.355,106.917Zm16.024,15.044-5.88-8.87-4.361,4.753v4.116H63.422V97.9h1.715v17.543L74.5,105.3H76.6l-5.88,6.42,6.714,10.242Zm18.573-7.939H81.211a8.372,8.372,0,0,0,1.715,5,6.206,6.206,0,0,0,1.666,1.323,5.571,5.571,0,0,0,2.352.49,4.8,4.8,0,0,0,3.626-1.47,4.087,4.087,0,0,0,.784-1.029,5.288,5.288,0,0,0,.49-1.323H93.56a5.188,5.188,0,0,1-.686,1.96A7.715,7.715,0,0,1,91.7,120.54a6.723,6.723,0,0,1-4.753,1.96,6.677,6.677,0,0,1-3.087-.686,7.024,7.024,0,0,1-2.205-1.715,7.8,7.8,0,0,1-1.568-2.793,11.576,11.576,0,0,1-.539-3.528,12.689,12.689,0,0,1,.343-3.087,7.5,7.5,0,0,1,1.323-2.842,7.045,7.045,0,0,1,8.723-2.205,7.211,7.211,0,0,1,2.254,1.764,8.843,8.843,0,0,1,1.421,2.6,9.177,9.177,0,0,1,.49,3.038ZM92.285,112.5a7.331,7.331,0,0,0-.392-2.3,5.239,5.239,0,0,0-1.078-1.911,5.184,5.184,0,0,0-1.715-1.372,4.907,4.907,0,0,0-2.254-.49,5.184,5.184,0,0,0-2.352.49,5.957,5.957,0,0,0-1.764,1.323,6.161,6.161,0,0,0-1.127,1.911,7.4,7.4,0,0,0-.392,2.352Zm14.407,9.311c-.49.1-.931.2-1.372.294a6.471,6.471,0,0,1-1.372.1,3.812,3.812,0,0,1-3.332-1.372,5.9,5.9,0,0,1-.98-3.528V106.819H96.3V105.3h3.332v-4.606l1.666-.392v5h5.145v1.519H101.3v10.438a12.049,12.049,0,0,0,.1,1.372,3.558,3.558,0,0,0,.441,1.078,1.914,1.914,0,0,0,.833.686,3.619,3.619,0,0,0,1.372.245,12.017,12.017,0,0,0,1.323-.1c.441-.049.882-.147,1.323-.2v1.47Zm11.908.147V98.341h1.764v23.62Zm20.19,0V111.082a5.245,5.245,0,0,0-.98-3.381,4.057,4.057,0,0,0-3.283-1.176,4.751,4.751,0,0,0-2.6.637,4.534,4.534,0,0,0-1.715,1.617,6.894,6.894,0,0,0-.931,2.3,11.407,11.407,0,0,0-.294,2.6v8.331h-1.666V105.349h1.47l.2,3.038a4.764,4.764,0,0,1,.931-1.421,4.955,4.955,0,0,1,1.372-1.078,5.956,5.956,0,0,1,1.617-.686,7.238,7.238,0,0,1,1.715-.245,5.623,5.623,0,0,1,4.361,1.617,6.44,6.44,0,0,1,1.47,4.459v10.928Zm15.828-.147c-.49.1-.931.2-1.372.294a6.47,6.47,0,0,1-1.372.1,3.812,3.812,0,0,1-3.332-1.372,5.9,5.9,0,0,1-.98-3.528V106.819H144.23V105.3h3.332v-4.606l1.666-.392v5h5.145v1.519h-5.145v10.438a12.045,12.045,0,0,0,.1,1.372,3.558,3.558,0,0,0,.441,1.078,1.914,1.914,0,0,0,.833.686,3.619,3.619,0,0,0,1.372.245,12.017,12.017,0,0,0,1.323-.1c.441-.049.882-.147,1.323-.2v1.47Zm17.1-7.792H158.98a8.372,8.372,0,0,0,1.715,5,6.207,6.207,0,0,0,1.666,1.323,5.571,5.571,0,0,0,2.352.49,4.8,4.8,0,0,0,3.626-1.47,4.088,4.088,0,0,0,.784-1.029,5.288,5.288,0,0,0,.49-1.323h1.715a5.189,5.189,0,0,1-.686,1.96,7.715,7.715,0,0,1-1.176,1.568,6.723,6.723,0,0,1-4.753,1.96,6.677,6.677,0,0,1-3.087-.686,7.025,7.025,0,0,1-2.205-1.715,7.8,7.8,0,0,1-1.568-2.793,11.576,11.576,0,0,1-.539-3.528,12.689,12.689,0,0,1,.343-3.087,7.5,7.5,0,0,1,1.323-2.842,7.045,7.045,0,0,1,8.723-2.205,7.211,7.211,0,0,1,2.254,1.764,8.842,8.842,0,0,1,1.421,2.6,9.177,9.177,0,0,1,.49,3.038Zm-1.666-1.519a7.332,7.332,0,0,0-.392-2.3,5.239,5.239,0,0,0-1.078-1.911,5.184,5.184,0,0,0-1.715-1.372,4.907,4.907,0,0,0-2.254-.49,5.184,5.184,0,0,0-2.352.49,5.957,5.957,0,0,0-1.764,1.323,6.16,6.16,0,0,0-1.127,1.911,7.4,7.4,0,0,0-.392,2.352Zm11.418,9.458c-.2.049-.392.1-.637.147a4.764,4.764,0,0,1-.882.049,3.364,3.364,0,0,1-2.45-.833,3.642,3.642,0,0,1-.882-2.7V97.9h1.666v20.631a2.445,2.445,0,0,0,.343,1.421,1.511,1.511,0,0,0,1.421.588h.784a3.013,3.013,0,0,0,.637-.049v1.47Zm9.262,0c-.2.049-.392.1-.637.147a4.764,4.764,0,0,1-.882.049,3.364,3.364,0,0,1-2.45-.833,3.642,3.642,0,0,1-.882-2.7V97.9h1.666v20.631a2.445,2.445,0,0,0,.343,1.421,1.511,1.511,0,0,0,1.421.588h.784a3.014,3.014,0,0,0,.637-.049v1.47Zm4.459-21.268V98.341h2.352v2.352Zm.294,21.268V105.3h1.764v16.661Zm22.395,2.5a4.2,4.2,0,0,1-.343,1.764,4.526,4.526,0,0,1-.931,1.372,5.9,5.9,0,0,1-2.842,1.519,15.615,15.615,0,0,1-3.773.441,13.379,13.379,0,0,1-3.528-.441,5.875,5.875,0,0,1-2.7-1.519,3.916,3.916,0,0,1-.882-1.323,4.66,4.66,0,0,1-.294-1.715,4.192,4.192,0,0,1,.686-2.254,4.121,4.121,0,0,1,1.813-1.617,2.9,2.9,0,0,1-1.47-1.078,2.832,2.832,0,0,1-.637-1.666,3.058,3.058,0,0,1,.539-1.813,4.872,4.872,0,0,1,1.47-1.323,6.327,6.327,0,0,1-1.225-1.764,5.848,5.848,0,0,1-.441-2.3,5.4,5.4,0,0,1,.49-2.4,6.413,6.413,0,0,1,1.323-1.862,6.524,6.524,0,0,1,1.96-1.176,8.018,8.018,0,0,1,2.45-.392,7.188,7.188,0,0,1,3.92,1.127,3.085,3.085,0,0,1,1.274-1.666,3.857,3.857,0,0,1,2.058-.588.622.622,0,0,1,.294.049c.1,0,.2.049.294.049V105.3a.621.621,0,0,1-.294-.049.622.622,0,0,0-.294-.049,2.266,2.266,0,0,0-1.519.49,2.028,2.028,0,0,0-.784,1.323,5.16,5.16,0,0,1,.98,1.666,5.675,5.675,0,0,1,.343,2.058,5.615,5.615,0,0,1-.49,2.45A5.084,5.084,0,0,1,213.963,115a5.771,5.771,0,0,1-2.009,1.127,8.018,8.018,0,0,1-2.45.392,6.83,6.83,0,0,1-3.332-.784,3.8,3.8,0,0,0-1.176.784,1.735,1.735,0,0,0-.49,1.274,1.335,1.335,0,0,0,.343.98,2.563,2.563,0,0,0,.833.588,3.581,3.581,0,0,0,1.127.2,9.455,9.455,0,0,0,1.127.049h3.626A9.957,9.957,0,0,1,214.4,120a4.815,4.815,0,0,1,2.058,1.225,4.659,4.659,0,0,1,.98,1.372A3.612,3.612,0,0,1,217.883,124.46Zm-1.666,0a2.677,2.677,0,0,0-.2-1.176,2.781,2.781,0,0,0-.588-.882c-.784-.833-2.107-1.225-4.018-1.225H207a3.834,3.834,0,0,0-1.911,1.127,3.035,3.035,0,0,0-.833,2.3,2.961,2.961,0,0,0,.245,1.176,3.271,3.271,0,0,0,1.666,1.568,11.823,11.823,0,0,0,1.225.392,12.312,12.312,0,0,0,1.323.2,11.94,11.94,0,0,0,1.323.049,13.3,13.3,0,0,0,1.372-.049c.49-.049.98-.1,1.47-.2a6.413,6.413,0,0,0,1.372-.441,3.59,3.59,0,0,0,1.127-.784,4.077,4.077,0,0,0,.637-.882A4.211,4.211,0,0,0,216.217,124.46Zm-1.96-13.77a4.278,4.278,0,0,0-.343-1.813,4.659,4.659,0,0,0-.98-1.372,3.691,3.691,0,0,0-1.47-.882,5.738,5.738,0,0,0-3.626,0,3.691,3.691,0,0,0-1.47.882,4.659,4.659,0,0,0-.98,1.372,4.964,4.964,0,0,0,0,3.626,3.915,3.915,0,0,0,.98,1.372,4.273,4.273,0,0,0,1.47.833,5.737,5.737,0,0,0,3.626,0,4.273,4.273,0,0,0,1.47-.833,4.1,4.1,0,0,0,.98-1.372A5.193,5.193,0,0,0,214.257,110.69Zm20.141,3.332H221.656a8.372,8.372,0,0,0,1.715,5,6.207,6.207,0,0,0,1.666,1.323,5.571,5.571,0,0,0,2.352.49,4.8,4.8,0,0,0,3.626-1.47,4.087,4.087,0,0,0,.784-1.029,5.287,5.287,0,0,0,.49-1.323h1.715a5.188,5.188,0,0,1-.686,1.96,7.715,7.715,0,0,1-1.176,1.568,6.723,6.723,0,0,1-4.753,1.96,6.677,6.677,0,0,1-3.087-.686A7.025,7.025,0,0,1,222.1,120.1a7.8,7.8,0,0,1-1.568-2.793,11.576,11.576,0,0,1-.539-3.528,12.689,12.689,0,0,1,.343-3.087,7.5,7.5,0,0,1,1.323-2.842,7.045,7.045,0,0,1,8.723-2.205,7.211,7.211,0,0,1,2.254,1.764,8.843,8.843,0,0,1,1.421,2.6,9.177,9.177,0,0,1,.49,3.038Zm-1.666-1.519a7.331,7.331,0,0,0-.392-2.3,5.238,5.238,0,0,0-1.078-1.911,5.184,5.184,0,0,0-1.715-1.372,4.907,4.907,0,0,0-2.254-.49,5.184,5.184,0,0,0-2.352.49,5.957,5.957,0,0,0-1.764,1.323,6.16,6.16,0,0,0-1.127,1.911,7.4,7.4,0,0,0-.392,2.352Zm18.181,9.458V111.082a5.245,5.245,0,0,0-.98-3.381,4.057,4.057,0,0,0-3.283-1.176,4.751,4.751,0,0,0-2.6.637,4.534,4.534,0,0,0-1.715,1.617,6.9,6.9,0,0,0-.931,2.3,11.407,11.407,0,0,0-.294,2.6v8.331h-1.666V105.349h1.47l.2,3.038a4.763,4.763,0,0,1,.931-1.421,4.955,4.955,0,0,1,1.372-1.078,5.956,5.956,0,0,1,1.617-.686,7.238,7.238,0,0,1,1.715-.245,5.623,5.623,0,0,1,4.361,1.617,6.44,6.44,0,0,1,1.47,4.459v10.928Zm20.19-5.243a6.1,6.1,0,0,1-.735,2.254,5.7,5.7,0,0,1-1.421,1.813,6.149,6.149,0,0,1-1.96,1.176,6.53,6.53,0,0,1-2.4.441,7.276,7.276,0,0,1-2.793-.539,6.392,6.392,0,0,1-2.107-1.421,7.039,7.039,0,0,1-1.813-2.989,13.822,13.822,0,0,1,0-7.645,7.039,7.039,0,0,1,1.813-2.989,6.734,6.734,0,0,1,4.9-1.96,7.474,7.474,0,0,1,2.4.392,6.019,6.019,0,0,1,1.96,1.127,6.1,6.1,0,0,1,1.372,1.764,7,7,0,0,1,.686,2.3h-1.715a4.565,4.565,0,0,0-4.7-3.969,5.571,5.571,0,0,0-2.107.392,4.841,4.841,0,0,0-1.568,1.029,6.04,6.04,0,0,0-1.47,2.6,14.065,14.065,0,0,0,0,6.175,5.931,5.931,0,0,0,1.47,2.646,4.834,4.834,0,0,0,3.675,1.421,4.489,4.489,0,0,0,3.185-1.176,5.12,5.12,0,0,0,1.568-2.891H271.1Zm17.74-2.7H276.1a8.372,8.372,0,0,0,1.715,5,6.205,6.205,0,0,0,1.666,1.323,5.571,5.571,0,0,0,2.352.49,4.8,4.8,0,0,0,3.626-1.47,4.088,4.088,0,0,0,.784-1.029,5.288,5.288,0,0,0,.49-1.323h1.715a5.189,5.189,0,0,1-.686,1.96,7.717,7.717,0,0,1-1.176,1.568,6.723,6.723,0,0,1-4.753,1.96,6.677,6.677,0,0,1-3.087-.686,7.025,7.025,0,0,1-2.205-1.715,7.8,7.8,0,0,1-1.568-2.793,11.575,11.575,0,0,1-.539-3.528,12.691,12.691,0,0,1,.343-3.087,7.505,7.505,0,0,1,1.323-2.842,7.045,7.045,0,0,1,8.723-2.205,7.212,7.212,0,0,1,2.254,1.764A8.843,8.843,0,0,1,288.5,110a9.177,9.177,0,0,1,.49,3.038Zm-1.666-1.519a7.333,7.333,0,0,0-.392-2.3,5.239,5.239,0,0,0-1.078-1.911,5.184,5.184,0,0,0-1.715-1.372,4.907,4.907,0,0,0-2.254-.49,5.184,5.184,0,0,0-2.352.49,5.957,5.957,0,0,0-1.764,1.323,6.161,6.161,0,0,0-1.127,1.911,7.4,7.4,0,0,0-.392,2.352Z"
+          transform="translate(-3 -51.395)"
+        />
+        <path
+          id="Wordmark"
+          d="M21.573,42.21a6.9,6.9,0,0,1-1.911,4.851c-1.813,1.813-4.459,2.4-6.91,2.5A10.774,10.774,0,0,1,5.4,47.111,7.276,7.276,0,0,1,3,41.72H7.312a3.892,3.892,0,0,0,1.225,2.842,5.3,5.3,0,0,0,3.969,1.225,5.388,5.388,0,0,0,3.92-1.225c1.029-1.127,1.421-3.136,0-4.165-1.421-1.078-3.479-1.029-5.194-1.176a10.318,10.318,0,0,1-5.1-1.519,6.161,6.161,0,0,1-2.5-4.312A6.637,6.637,0,0,1,5.6,28a9.536,9.536,0,0,1,6.518-2.45A9.605,9.605,0,0,1,18.877,27.8a7.092,7.092,0,0,1,2.352,4.949H16.917a3.814,3.814,0,0,0-1.029-2.3,4.9,4.9,0,0,0-3.626-1.225A4.981,4.981,0,0,0,8.586,30.5a2.61,2.61,0,0,0,.49,4.116,7.958,7.958,0,0,0,2.646.539c.98.1,1.911.2,2.891.294a8.91,8.91,0,0,1,5,2.058A6.179,6.179,0,0,1,21.573,42.21ZM39.8,49.12l-1.617-1.862a9.668,9.668,0,0,1-10.242,1.617,6.876,6.876,0,0,1-3.626-8.527,8.563,8.563,0,0,1,3.724-4.067c-1.568-1.666-2.7-3.479-2.45-5.831a5.658,5.658,0,0,1,3.577-4.557,7.621,7.621,0,0,1,6.518.539,5.4,5.4,0,0,1,2.548,5.243c-.2,2.646-2.205,4.41-4.361,5.635l4.018,4.361a7.959,7.959,0,0,0,.588-2.842,27.506,27.506,0,0,0,.049-2.842h5.978v3.234h-2.7a10.091,10.091,0,0,1-1.421,5.194l4.263,4.655L39.8,49.12Zm-9.36-10.242c-1.078.686-2.254,1.372-2.646,2.7A3.533,3.533,0,0,0,28.629,45c1.715,1.764,5.439,1.568,7.057-.245Zm4.067-7.547a2.315,2.315,0,0,0-1.372-2.254,3.009,3.009,0,0,0-2.94.294,2.355,2.355,0,0,0-.735,2.646,7.126,7.126,0,0,0,2.058,2.744C32.941,33.978,34.51,33.145,34.51,31.331Zm30.579,2.009a7.189,7.189,0,0,1-2.3,5.586,8.983,8.983,0,0,1-5.88,1.862H52v8.282H47.839V25.941H56.9a9.314,9.314,0,0,1,5.88,1.813A7.027,7.027,0,0,1,65.088,33.341Zm-4.214.049A3.774,3.774,0,0,0,59.7,30.5a4.453,4.453,0,0,0-2.94-.882H52v7.5h4.753a4.2,4.2,0,0,0,2.94-.882A3.74,3.74,0,0,0,60.874,33.39ZM89.835,49.071l-.49-2.548c-1.127,2.156-3.92,3.038-6.175,2.989a8.753,8.753,0,0,1-6.518-2.6c-2.45-2.548-2.989-6.028-2.989-9.409s.49-6.812,2.989-9.311c3.528-3.528,10.193-3.724,13.77-.049A7.313,7.313,0,0,1,92.53,32.8H88.218a3.891,3.891,0,0,0-1.029-2.107c-1.813-2.107-5.684-1.764-7.5.147-1.666,1.764-1.813,4.459-1.813,6.763,0,2.254.2,4.949,1.813,6.665a5.294,5.294,0,0,0,7.2.147,6.039,6.039,0,0,0,1.519-4.508H82.877V36.428h9.6V49.12l-2.646-.049Zm12.937-.049a6.12,6.12,0,0,1-4.557-.441,4.226,4.226,0,0,1-1.862-3.92V25.451h4.116V44.024a1.632,1.632,0,0,0,.588,1.47,3.38,3.38,0,0,0,1.715.147v3.381Zm17.3-8.429a9.623,9.623,0,0,1-2.009,6.273,8.021,8.021,0,0,1-11.908,0,10.587,10.587,0,0,1,0-12.545,8.021,8.021,0,0,1,11.908,0A9.622,9.622,0,0,1,120.071,40.593Zm-4.116,0a6.012,6.012,0,0,0-1.225-4.263,3.638,3.638,0,0,0-5.145,0,6.255,6.255,0,0,0-1.225,4.263,6.012,6.012,0,0,0,1.225,4.263,3.638,3.638,0,0,0,5.145,0A6.012,6.012,0,0,0,115.954,40.593Zm22.983.049c0,2.793-.833,5.635-3.038,7.4-2.45,2.058-7.057,2.058-8.87-.833l-.245,1.862h-3.528V25.5h4.067v7.841a5.471,5.471,0,0,1,4.067-1.666,6.432,6.432,0,0,1,4.508,1.372C137.908,34.713,138.937,37.261,138.937,40.642Zm-4.165-.1a6.765,6.765,0,0,0-1.078-4.116,3.672,3.672,0,0,0-3.43-1.274,3.575,3.575,0,0,0-2.7,2.3,9.938,9.938,0,0,0-.441,4.165,5.3,5.3,0,0,0,1.421,3.577,3.617,3.617,0,0,0,5.145-.49A6.59,6.59,0,0,0,134.772,40.544Zm22.3,8.331c-1.862.833-4.655.588-4.9-1.911-1.519,2.7-5.586,3.136-8.135,1.96a5.206,5.206,0,0,1-2.058-7.939,6.516,6.516,0,0,1,4.655-2.156l5-.343V37.457a2.876,2.876,0,0,0-.784-2.156,3.33,3.33,0,0,0-1.911-.539c-1.617-.049-3.185.588-3.283,2.4h-3.969a5.6,5.6,0,0,1,1.911-4.018,7.55,7.55,0,0,1,4.214-1.47c2.842-.245,6.175.49,7.3,3.43a8.969,8.969,0,0,1,.49,3.43v6.322c0,.735.49,1.323,1.323,1.029a.18.18,0,0,0,.147-.049Zm-5.439-7.351-4.312.343a2.473,2.473,0,0,0-2.45,2.009,2.2,2.2,0,0,0,2.058,2.352,4.725,4.725,0,0,0,3.332-.882,3.652,3.652,0,0,0,1.323-2.989l.049-.833Zm14.407,7.5a6,6,0,0,1-4.606-.49,4.26,4.26,0,0,1-1.813-3.871V25.451h4.116V44.024a1.632,1.632,0,0,0,.588,1.47,3.426,3.426,0,0,0,1.715.147Z"
+          transform="translate(-3 -14.425)"
+          fill="#d6002a"
+        />
+        <rect
+          id="Bar"
+          width="163.037"
+          height="4.165"
+          transform="translate(0 0)"
+        />
+      </svg>
+      <!-- Mobility -->
+      <svg
+        id="spg_mobility"
+        xmlns="http://www.w3.org/2000/svg"
+        width="163.086"
+        height="77.525"
+        viewBox="0 0 163.086 77.525"
+      >
+        <path
+          id="Wordmark"
+          d="M21.673,42.161a6.9,6.9,0,0,1-1.911,4.851c-1.813,1.813-4.459,2.4-6.91,2.5a10.422,10.422,0,0,1-7.351-2.4,7.276,7.276,0,0,1-2.4-5.39H7.412a3.892,3.892,0,0,0,1.225,2.842,5.3,5.3,0,0,0,3.969,1.225,5.388,5.388,0,0,0,3.92-1.225c1.029-1.127,1.421-3.136,0-4.165-1.421-1.078-3.479-1.029-5.194-1.176a10.318,10.318,0,0,1-5.1-1.519,6.161,6.161,0,0,1-2.5-4.312A6.637,6.637,0,0,1,5.7,28a9.536,9.536,0,0,1,6.518-2.45A9.605,9.605,0,0,1,18.977,27.8a7.092,7.092,0,0,1,2.352,4.949H17.017a3.814,3.814,0,0,0-1.029-2.3,4.9,4.9,0,0,0-3.626-1.225A4.981,4.981,0,0,0,8.686,30.5a2.61,2.61,0,0,0,.49,4.116,7.958,7.958,0,0,0,2.646.539c.98.1,1.911.2,2.891.294a8.91,8.91,0,0,1,5,2.058A6.146,6.146,0,0,1,21.673,42.161ZM39.9,49.12l-1.617-1.862a9.668,9.668,0,0,1-10.242,1.617,6.876,6.876,0,0,1-3.626-8.527,8.564,8.564,0,0,1,3.724-4.067c-1.568-1.666-2.7-3.479-2.45-5.831a5.658,5.658,0,0,1,3.577-4.557,7.621,7.621,0,0,1,6.518.539,5.4,5.4,0,0,1,2.548,5.243c-.2,2.646-2.205,4.41-4.361,5.635l4.018,4.361a7.959,7.959,0,0,0,.588-2.842,27.506,27.506,0,0,0,.049-2.842h5.978v3.234h-2.7a10.091,10.091,0,0,1-1.421,5.194l4.263,4.655L39.9,49.12Zm-9.36-10.242c-1.078.686-2.254,1.372-2.646,2.7A3.533,3.533,0,0,0,28.729,45c1.715,1.764,5.439,1.568,7.057-.245Zm4.018-7.547a2.315,2.315,0,0,0-1.372-2.254,3.009,3.009,0,0,0-2.94.294,2.355,2.355,0,0,0-.735,2.646,7.126,7.126,0,0,0,2.058,2.744C32.992,33.978,34.561,33.145,34.561,31.331Zm30.628,2.009a7.188,7.188,0,0,1-2.3,5.586,8.937,8.937,0,0,1-5.831,1.862h-4.9v8.282H47.988V25.941h9.066a9.087,9.087,0,0,1,5.831,1.813A7.189,7.189,0,0,1,65.188,33.341Zm-4.263.049A3.774,3.774,0,0,0,59.749,30.5a4.453,4.453,0,0,0-2.94-.882H52.055v7.5h4.753a4.2,4.2,0,0,0,2.94-.882A3.74,3.74,0,0,0,60.925,33.39Zm29.01,15.681-.49-2.548c-1.127,2.156-3.92,3.038-6.175,2.989a8.753,8.753,0,0,1-6.518-2.6c-2.45-2.548-2.989-6.028-2.989-9.409s.49-6.812,2.989-9.311c3.528-3.528,10.193-3.724,13.77-.049A7.313,7.313,0,0,1,92.63,32.8H88.318a3.891,3.891,0,0,0-1.029-2.107c-1.813-2.107-5.684-1.764-7.5.147-1.666,1.764-1.813,4.459-1.813,6.763,0,2.254.2,4.949,1.813,6.665a5.294,5.294,0,0,0,7.2.147,6.245,6.245,0,0,0,1.519-4.508H82.977V36.428h9.6V49.12C92.63,49.071,89.935,49.071,89.935,49.071Zm12.888-.049a6.12,6.12,0,0,1-4.557-.441,4.226,4.226,0,0,1-1.862-3.92V25.451h4.116V44.024a1.632,1.632,0,0,0,.588,1.47,3.426,3.426,0,0,0,1.715.147v3.381Zm17.347-8.429a9.623,9.623,0,0,1-2.009,6.273,8.021,8.021,0,0,1-11.908,0,10.587,10.587,0,0,1,0-12.545,8.021,8.021,0,0,1,11.908,0A9.623,9.623,0,0,1,120.171,40.593Zm-4.165,0a6.012,6.012,0,0,0-1.225-4.263,3.638,3.638,0,0,0-5.145,0,6.255,6.255,0,0,0-1.225,4.263,6.012,6.012,0,0,0,1.225,4.263,3.638,3.638,0,0,0,5.145,0A6.012,6.012,0,0,0,116.005,40.593Zm22.983.049c0,2.793-.784,5.635-3.038,7.4-2.45,2.058-7.057,2.058-8.87-.833l-.245,1.862h-3.528V25.5h4.067v7.841a5.471,5.471,0,0,1,4.067-1.666,6.5,6.5,0,0,1,4.508,1.372C138.008,34.713,138.988,37.261,138.988,40.642Zm-4.116-.1a6.765,6.765,0,0,0-1.078-4.116,3.672,3.672,0,0,0-3.43-1.274,3.575,3.575,0,0,0-2.7,2.3,9.938,9.938,0,0,0-.441,4.165,5.3,5.3,0,0,0,1.421,3.577,3.617,3.617,0,0,0,5.145-.49A6.913,6.913,0,0,0,134.872,40.544Zm22.248,8.331c-1.862.833-4.655.588-4.9-1.911-1.519,2.7-5.586,3.136-8.135,1.96a5.206,5.206,0,0,1-2.058-7.939,6.516,6.516,0,0,1,4.655-2.156l5-.343V37.457A2.876,2.876,0,0,0,150.9,35.3a3.33,3.33,0,0,0-1.911-.539c-1.617-.049-3.185.588-3.283,2.4h-3.969a5.6,5.6,0,0,1,1.911-4.018,7.55,7.55,0,0,1,4.214-1.47c2.842-.245,6.175.49,7.3,3.43a8.969,8.969,0,0,1,.49,3.43v6.322c0,.735.49,1.323,1.323,1.029a.18.18,0,0,0,.147-.049v3.038Zm-5.439-7.351-4.312.343a2.473,2.473,0,0,0-2.45,2.009,2.2,2.2,0,0,0,2.058,2.352,4.918,4.918,0,0,0,3.381-.882,3.652,3.652,0,0,0,1.323-2.989v-.833Zm14.407,7.5a6.005,6.005,0,0,1-4.606-.49,4.26,4.26,0,0,1-1.813-3.871V25.451h4.116V44.024a1.632,1.632,0,0,0,.588,1.47,3.426,3.426,0,0,0,1.715.147v3.381Z"
+          transform="translate(-3.051 -14.425)"
+          fill="#d6002a"
+        />
+        <rect
+          id="Bar"
+          width="163.037"
+          height="4.165"
+          transform="translate(0.049 0)"
+        />
+        <g id="Name" data-name="Group 19190" transform="translate(0 46.505)">
+          <path
+            id="Path_76"
+            data-name="Path 76"
+            d="M23.484,122.42V101.3l-8.625,20.778H13.34L4.715,101.446V122.42H3V98.8H5.45l8.723,20.974L22.749,98.8H25.2v23.62Z"
+            transform="translate(-3 -98.359)"
+          />
+          <path
+            id="Path_77"
+            data-name="Path 77"
+            d="M73.307,120.821a13.088,13.088,0,0,1-.539,3.822,7.563,7.563,0,0,1-1.813,2.989,6.72,6.72,0,0,1-2.058,1.421,6.327,6.327,0,0,1-2.793.588,6.48,6.48,0,0,1-2.793-.588,6.4,6.4,0,0,1-2.058-1.421,7.038,7.038,0,0,1-1.813-2.989,13.821,13.821,0,0,1,0-7.645,7.563,7.563,0,0,1,1.813-2.989,6.721,6.721,0,0,1,2.058-1.421A6.327,6.327,0,0,1,66.1,112a6.48,6.48,0,0,1,2.793.588,6.4,6.4,0,0,1,2.058,1.421A7.038,7.038,0,0,1,72.768,117,13.088,13.088,0,0,1,73.307,120.821Zm-1.715,0a12.689,12.689,0,0,0-.343-3.087,5.687,5.687,0,0,0-1.519-2.6,5.941,5.941,0,0,0-1.568-1.078,5.859,5.859,0,0,0-4.214,0,4.976,4.976,0,0,0-1.568,1.078,6.157,6.157,0,0,0-1.519,2.6,12.159,12.159,0,0,0-.343,3.087,12.69,12.69,0,0,0,.343,3.087,5.688,5.688,0,0,0,1.519,2.6,5.942,5.942,0,0,0,1.568,1.078,5.859,5.859,0,0,0,4.214,0,4.976,4.976,0,0,0,1.568-1.078,6.157,6.157,0,0,0,1.519-2.6A12.69,12.69,0,0,0,71.592,120.821Z"
+            transform="translate(-31.507 -105.09)"
+          />
+          <path
+            id="Path_78"
+            data-name="Path 78"
+            d="M112.409,113.679a12.431,12.431,0,0,1-.686,4.067,7.317,7.317,0,0,1-2.058,3.136,5.34,5.34,0,0,1-1.911,1.127,6.683,6.683,0,0,1-2.5.441,6.526,6.526,0,0,1-1.666-.245,5.645,5.645,0,0,1-1.568-.686,5.553,5.553,0,0,1-1.323-1.078,4.46,4.46,0,0,1-.931-1.421l-.2,2.94H98.1V97.9h1.666v10.193a5.9,5.9,0,0,1,.931-1.323,6.834,6.834,0,0,1,1.323-1.029,8.944,8.944,0,0,1,1.568-.686,6.968,6.968,0,0,1,1.764-.245,6.144,6.144,0,0,1,2.6.49,7.5,7.5,0,0,1,1.96,1.274,7.943,7.943,0,0,1,1.96,3.136A15.213,15.213,0,0,1,112.409,113.679Zm-1.715-.049a10.687,10.687,0,0,0-.441-3.087,6.488,6.488,0,0,0-1.421-2.548,5.68,5.68,0,0,0-1.519-1.078,5.243,5.243,0,0,0-2.009-.392,4.924,4.924,0,0,0-2.009.343,4.443,4.443,0,0,0-1.47.931,5.8,5.8,0,0,0-1.617,2.5,11.361,11.361,0,0,0-.49,3.332,9.939,9.939,0,0,0,.49,3.234,6.836,6.836,0,0,0,1.617,2.6,5.922,5.922,0,0,0,1.47.98,4.594,4.594,0,0,0,1.911.343,5.5,5.5,0,0,0,1.862-.294,3.866,3.866,0,0,0,1.421-.882,5.808,5.808,0,0,0,1.666-2.6A9.6,9.6,0,0,0,110.694,113.63Z"
+            transform="translate(-51.497 -97.9)"
+          />
+          <path
+            id="Path_79"
+            data-name="Path 79"
+            d="M136.1,101.152V98.8h2.352v2.352Zm.294,21.268V105.759h1.764V122.42Z"
+            transform="translate(-70.876 -98.359)"
+          />
+          <path
+            id="Path_80"
+            data-name="Path 80"
+            d="M157.351,121.961c-.2.049-.392.1-.637.147a4.764,4.764,0,0,1-.882.049,3.364,3.364,0,0,1-2.45-.833,3.642,3.642,0,0,1-.882-2.7V97.9h1.666v20.68a2.445,2.445,0,0,0,.343,1.421,1.511,1.511,0,0,0,1.421.588h.784a3.014,3.014,0,0,0,.637-.049v1.421Z"
+            transform="translate(-79.239 -97.9)"
+          />
+          <path
+            id="Path_81"
+            data-name="Path 81"
+            d="M170,101.152V98.8h2.352v2.352Zm.294,21.268V105.759h1.764V122.42Z"
+            transform="translate(-88.163 -98.359)"
+          />
+          <path
+            id="Path_82"
+            data-name="Path 82"
+            d="M193.289,124.313c-.49.1-.931.2-1.372.294a6.471,6.471,0,0,1-1.372.1,3.812,3.812,0,0,1-3.332-1.372,5.9,5.9,0,0,1-.98-3.528V109.318H182.9V107.8h3.332v-4.606l1.666-.392v5h5.145v1.519H187.9v10.438a12.045,12.045,0,0,0,.1,1.372,3.558,3.558,0,0,0,.441,1.078,1.914,1.914,0,0,0,.833.686,3.619,3.619,0,0,0,1.372.245,12.015,12.015,0,0,0,1.323-.1c.441-.049.882-.147,1.323-.2v1.47Z"
+            transform="translate(-94.742 -100.399)"
+          />
+          <path
+            id="Path_83"
+            data-name="Path 83"
+            d="M217.7,133.239a5.971,5.971,0,0,1-1.715,2.5,4.331,4.331,0,0,1-2.793.882,4.765,4.765,0,0,1-.882-.049c-.245-.049-.49-.049-.686-.1a3.976,3.976,0,0,1-.539-.147V134.9a3.309,3.309,0,0,0,.686.1,10.437,10.437,0,0,0,1.323.1,2.763,2.763,0,0,0,1.911-.686,5.445,5.445,0,0,0,1.127-1.764l1.078-2.744L210.4,113h1.813l5.831,14.8,5.586-14.8h1.813Z"
+            transform="translate(-108.766 -105.6)"
+          />
+        </g>
+      </svg>
+      <!-- Layout Icons -->
+      <!-- 4 Column Assymetrical -->
+      <svg
+        id="layout_4_split_assymetrical"
+        xmlns="http://www.w3.org/2000/svg"
+        width="18"
+        height="18"
+        viewBox="0 0 18 18"
+      >
+        <g data-name="Group 13" transform="translate(-143 -1229)">
+          <path
+            id="Rectangle_10"
+            data-name="Rectangle 10"
+            d="M2,2V16H16V2H2M0,0H18V18H0Z"
+            transform="translate(143 1229)"
+            fill="#707070"
+          />
+          <path
+            id="Line_5"
+            data-name="Line 5"
+            d="M1,15H-1V0H1Z"
+            transform="translate(155.135 1230.5)"
+            fill="#707070"
+          />
+          <path
+            id="Line_6"
+            data-name="Line 6"
+            d="M14.594,1H0V-1H14.594Z"
+            transform="translate(144.906 1239.5)"
+            fill="#707070"
+          />
+        </g>
+      </svg>
+      <!-- 4 Column Symmetrical -->
+      <svg
+        id="layout_4_split_symetrical"
+        xmlns="http://www.w3.org/2000/svg"
+        width="18"
+        height="18"
+        viewBox="0 0 18 18"
+      >
+        <g data-name="Group 14" transform="translate(-163 -1229)">
+          <path
+            id="Rectangle_11"
+            data-name="Rectangle 11"
+            d="M2,2V16H16V2H2M0,0H18V18H0Z"
+            transform="translate(163 1229)"
+            fill="#707070"
+          />
+          <path
+            id="Line_7"
+            data-name="Line 7"
+            d="M1,15H-1V0H1Z"
+            transform="translate(172.116 1230.5)"
+            fill="#707070"
+          />
+          <path
+            id="Line_8"
+            data-name="Line 8"
+            d="M15.232,1H0V-1H15.232Z"
+            transform="translate(164.5 1239.5)"
+            fill="#707070"
+          />
+        </g>
+      </svg>
+      <!-- 3 Column Horizontal Assymetrical -->
+      <svg
+        id="layout_bottom_split_assymetrical"
+        xmlns="http://www.w3.org/2000/svg"
+        width="18"
+        height="18"
+        viewBox="0 0 18 18"
+      >
+        <g data-name="Group 15" transform="translate(-143 -1250)">
+          <path
+            id="Rectangle_14"
+            data-name="Rectangle 14"
+            d="M2,2V16H16V2H2M0,0H18V18H0Z"
+            transform="translate(143 1250)"
+            fill="#707070"
+          />
+          <path
+            id="Line_14"
+            data-name="Line 14"
+            d="M1,7H-1V0H1Z"
+            transform="translate(155.135 1259.5)"
+            fill="#707070"
+          />
+          <path
+            id="Line_15"
+            data-name="Line 15"
+            d="M14.594,1H0V-1H14.594Z"
+            transform="translate(144.906 1260.5)"
+            fill="#707070"
+          />
+        </g>
+      </svg>
+      <!-- 3 Column Horizontal Symetrical -->
+      <svg
+        id="layout_bottom_split_symetrical"
+        xmlns="http://www.w3.org/2000/svg"
+        width="18"
+        height="18"
+        viewBox="0 0 18 18"
+      >
+        <g data-name="Group 19" transform="translate(-163 -1250)">
+          <path
+            id="Rectangle_17"
+            data-name="Rectangle 17"
+            d="M2,2V16H16V2H2M0,0H18V18H0Z"
+            transform="translate(163 1250)"
+            fill="#707070"
+          />
+          <path
+            id="Line_20"
+            data-name="Line 20"
+            d="M1,7H-1V0H1Z"
+            transform="translate(172.116 1259.5)"
+            fill="#707070"
+          />
+          <path
+            id="Line_21"
+            data-name="Line 21"
+            d="M15.232,1H0V-1H15.232Z"
+            transform="translate(164.5 1260.5)"
+            fill="#707070"
+          />
+        </g>
+      </svg>
+      <!-- 3 Column Vertical Assymetrical -->
+      <svg
+        id="layout_side_split_assymetrical"
+        xmlns="http://www.w3.org/2000/svg"
+        width="18"
+        height="18"
+        viewBox="0 0 18 18"
+      >
+        <g data-name="Group 17" transform="translate(-143 -1272)">
+          <path
+            id="Rectangle_16"
+            data-name="Rectangle 16"
+            d="M2,2V16H16V2H2M0,0H18V18H0Z"
+            transform="translate(143 1272)"
+            fill="#707070"
+          />
+          <path
+            id="Line_17"
+            data-name="Line 17"
+            d="M1,15H-1V0H1Z"
+            transform="translate(155.135 1273.5)"
+            fill="#707070"
+          />
+          <path
+            id="Line_18"
+            data-name="Line 18"
+            d="M6,1H0V-1H6Z"
+            transform="translate(154.5 1281)"
+            fill="#707070"
+          />
+        </g>
+      </svg>
+      <!-- 3 Column Vertical Symetrical -->
+      <svg
+        id="layout_side_split_symetrical"
+        xmlns="http://www.w3.org/2000/svg"
+        width="18"
+        height="18"
+        viewBox="0 0 18 18"
+      >
+        <g data-name="Group 21" transform="translate(-163 -1272)">
+          <path
+            id="Rectangle_20"
+            data-name="Rectangle 20"
+            d="M2,2V16H16V2H2M0,0H18V18H0Z"
+            transform="translate(163 1272)"
+            fill="#707070"
+          />
+          <path
+            id="Line_25"
+            data-name="Line 25"
+            d="M1,15H-1V0H1Z"
+            transform="translate(172.116 1273.5)"
+            fill="#707070"
+          />
+          <path
+            id="Line_26"
+            data-name="Line 26"
+            d="M9,1H0V-1H9Z"
+            transform="translate(172 1281)"
+            fill="#707070"
+          />
+        </g>
+      </svg>
+      <!-- 2 Column Vertical -->
+      <svg
+        id="layout_2_row"
+        xmlns="http://www.w3.org/2000/svg"
+        width="18"
+        height="18"
+        viewBox="0 0 18 18"
+      >
+        <g data-name="Group 20" transform="translate(-163 -1293)">
+          <path
+            id="Rectangle_19"
+            data-name="Rectangle 19"
+            d="M2,2V16H16V2H2M0,0H18V18H0Z"
+            transform="translate(163 1293)"
+            fill="#707070"
+          />
+          <path
+            id="Line_24"
+            data-name="Line 24"
+            d="M15.232,1H0V-1H15.232Z"
+            transform="translate(164.5 1305.5)"
+            fill="#707070"
+          />
+        </g>
+      </svg>
+      <!-- 2 Column Horizontal -->
+      <svg
+        id="layout_2_col"
+        xmlns="http://www.w3.org/2000/svg"
+        width="18"
+        height="18"
+        viewBox="0 0 18 18"
+      >
+        <g data-name="Group 16" transform="translate(-143 -1293)">
+          <path
+            id="Rectangle_15"
+            data-name="Rectangle 15"
+            d="M2,2V16H16V2H2M0,0H18V18H0Z"
+            transform="translate(143 1293)"
+            fill="#707070"
+          />
+          <path
+            id="Line_16"
+            data-name="Line 16"
+            d="M1,15H-1V0H1Z"
+            transform="translate(155.135 1294.5)"
+            fill="#707070"
+          />
+        </g>
+      </svg>
+      <!-- 1 Column Horizontal -->
+      <svg
+        id="layout_3_row"
+        xmlns="http://www.w3.org/2000/svg"
+        width="18"
+        height="18"
+        viewBox="0 0 18 18"
+      >
+        <g data-name="Group 22" transform="translate(0.406)">
+          <path
+            id="Rectangle_18"
+            data-name="Rectangle 18"
+            d="M2,2V16H16V2H2M0,0H18V18H0Z"
+            transform="translate(-0.406)"
+            fill="#707070"
+          />
+          <g data-name="Group 2" transform="translate(0.968 6)">
+            <path
+              id="Line_29"
+              data-name="Line 29"
+              d="M1,15.658H-1V0H1Z"
+              transform="translate(0) rotate(-90)"
+              fill="#707070"
+            />
+            <path
+              id="Line_30"
+              data-name="Line 30"
+              d="M1,15.658H-1V0H1Z"
+              transform="translate(0 6) rotate(-90)"
+              fill="#707070"
+            />
+          </g>
+        </g>
+      </svg>
+      <!-- 1 Column Vertical -->
+      <svg
+        id="layout_3_col"
+        xmlns="http://www.w3.org/2000/svg"
+        width="18"
+        height="18"
+        viewBox="0 0 18 18"
+      >
+        <g data-name="Group 18" transform="translate(-163 -1314)">
+          <path
+            id="Rectangle_12"
+            data-name="Rectangle 12"
+            d="M2,2V16H16V2H2M0,0H18V18H0Z"
+            transform="translate(163 1314)"
+            fill="#707070"
+          />
+          <path
+            id="Line_9"
+            data-name="Line 9"
+            d="M1,15H-1V0H1Z"
+            transform="translate(175.155 1315.5)"
+            fill="#707070"
+          />
+          <path
+            id="Line_19"
+            data-name="Line 19"
+            d="M1,15H-1V0H1Z"
+            transform="translate(169.077 1315.5)"
+            fill="#707070"
+          />
+        </g>
+      </svg>
+    </div>
+  </body>
+</html>
