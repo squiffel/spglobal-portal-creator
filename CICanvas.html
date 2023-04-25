@@ -576,6 +576,7 @@
       canvasContent.portal_size_percent = 50;
       canvasContent.portal_upload_image_number = 0;
       canvasContent.portal_override_margins = false;
+      canvasContent.portal_primary_image_side = true;
       update_color_scheme("white");
 
       // UI States
@@ -1089,6 +1090,10 @@
             canvasContent.portal_override_margins =
               !canvasContent.portal_override_margins;
           }
+          if (button_label.includes("Primary image side")) {
+            canvasContent.portal_primary_image_side =
+              !canvasContent.portal_primary_image_side;
+          }
         }
 
         // Update canvas
@@ -1328,6 +1333,12 @@
                 addToggleSwitchWithLabel(
                   "Show margins",
                   canvasContent.portal_override_margins
+                );
+              }
+              if (canvasContent.portal_count == 2) {
+                addToggleSwitchWithLabel(
+                  "Primary image side",
+                  canvasContent.portal_primary_image_side
                 );
               }
             }
@@ -1761,8 +1772,16 @@
           canvasContent.portal_size_percent > 0
         ) {
           canvasContent.portal_margins = true;
-          var portal_large = get_portal_specs("large", "right");
-          var portal_small = get_portal_specs("small", "left");
+
+          // Override LARGE on LEFT
+          var portal_large = get_portal_specs("big", "left");
+          var portal_small = get_portal_specs("small", "right");
+
+          // Default LARGE on RIGHT
+          if (canvasContent.portal_primary_image_side) {
+            var portal_large = get_portal_specs("big", "right");
+            var portal_small = get_portal_specs("small", "left");
+          }
 
           let img_a = get_image(0);
           addImageToCanvas(
