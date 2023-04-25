@@ -565,7 +565,7 @@
       canvas_content.portal_upload_image_number = 0;
       canvas_content.portal_override_margins = false;
       canvas_content.portal_primary_image_side = true;
-
+      // Default focal point
       canvas_content.portal_focal_point = [];
       for (var i = 0; i < 2; i++) {
         canvas_content.portal_focal_point[i] = {
@@ -573,8 +573,11 @@
           y: 0,
           size: 20,
           dragging: false,
+          relative_x: 0,
+          relative_y: 0,
         };
       }
+
       update_color_scheme("white");
 
       // UI States
@@ -915,6 +918,7 @@
             let n = parseInt(button_label);
             let img = image_container.children[n];
             // If you delete the primary image, move the secondary focal point to the primary
+            console.log("portal number " + n);
             if (n == 0) {
               canvas_content.portal_focal_point[0] =
                 canvas_content.portal_focal_point[1];
@@ -2049,10 +2053,22 @@
           // Clear the canvas
           portal_ctx.clearRect(0, 0, portal_canvas.width, portal_canvas.height);
 
+          // Draw image & focal point
           drawImageAndFocalPoint();
         };
 
+        // Focal point position
         portal_canvas.addEventListener("mousedown", (event) => {
+          calculate_focal_point_within_image_boundary();
+        });
+
+        portal_canvas.addEventListener("mousemove", (event) => {
+          if (canvas_content.portal_focal_point[n].dragging) {
+            calculate_focal_point_within_image_boundary();
+          }
+        });
+
+        function calculate_focal_point_within_image_boundary() {
           const rect = portal_canvas.getBoundingClientRect();
 
           // Move focal point to mouse but constrain inside the image
@@ -2076,64 +2092,22 @@
             imgY,
             Math.min(y, imgY + height)
           );
+
+          drawImageAndFocalPoint();
           canvas_content.portal_focal_point[n].dragging = true;
-        });
+        }
 
-        portal_canvas.addEventListener("mousemove", (event) => {
-          if (canvas_content.portal_focal_point[n].dragging) {
-            const rect = portal_canvas.getBoundingClientRect();
-
-            // Move focal point to mouse but constrain inside the image
-            const x = event.clientX - rect.left;
-            const y = event.clientY - rect.top;
-
-            const scaleFactor = Math.min(
-              portal_canvas.width / img.width,
-              portal_canvas.height / img.height
-            );
-            const width = img.width * scaleFactor;
-            const height = img.height * scaleFactor;
-            const imgX = (portal_canvas.width - width) / 2;
-            const imgY = (portal_canvas.height - height) / 2;
-
-            canvas_content.portal_focal_point[n].x = Math.max(
-              imgX,
-              Math.min(x, imgX + width)
-            );
-            canvas_content.portal_focal_point[n].y = Math.max(
-              imgY,
-              Math.min(y, imgY + height)
-            );
-
-            drawImageAndFocalPoint();
-          }
-        });
-
+        // Relative focal points
         portal_canvas.addEventListener("mouseup", () => {
-          if (canvas_content.portal_focal_point[n].dragging) {
-            canvas_content.portal_focal_point[n].dragging = false;
-            drawImageAndFocalPoint();
-
-            // Calculate the relative position of the focal point within the image
-            const scaleFactor = Math.min(
-              portal_canvas.width / img.width,
-              portal_canvas.height / img.height
-            );
-            const width = img.width * scaleFactor;
-            const height = img.height * scaleFactor;
-            const imgX = (portal_canvas.width - width) / 2;
-            const imgY = (portal_canvas.height - height) / 2;
-
-            const relativeX =
-              (canvas_content.portal_focal_point[n].x - imgX) / width;
-            const relativeY =
-              (canvas_content.portal_focal_point[n].y - imgY) / height;
-            console.log("Relative position:", { x: relativeX, y: relativeY });
-          }
+          caclulate_relative_focal_point();
         });
 
         // End dragging if mouse is released outside the canvas
         document.addEventListener("mouseup", () => {
+          caclulate_relative_focal_point();
+        });
+
+        function caclulate_relative_focal_point() {
           if (canvas_content.portal_focal_point[n].dragging) {
             canvas_content.portal_focal_point[n].dragging = false;
             drawImageAndFocalPoint();
@@ -2152,9 +2126,12 @@
               (canvas_content.portal_focal_point[n].x - imgX) / width;
             const relativeY =
               (canvas_content.portal_focal_point[n].y - imgY) / height;
+
+            canvas_content.portal_focal_point[n].relative_x = relativeX;
+            canvas_content.portal_focal_point[n].relative_y = relativeY;
             console.log("Relative position:", { x: relativeX, y: relativeY });
           }
-        });
+        }
 
         if (!portal_exists) {
           // Add to canvas
