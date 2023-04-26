@@ -1,11 +1,7 @@
 
 My goal is to:
 
--- Add dropdown templates to opening screen
 -- Modify the MARGINS on super long skinny graphics to be bigger (+ add a minium of the & logo rule)
--- A rotate layout option
-
--- Fix logo alignment at bottom
 
 -- Ability to HIDE logo when its FULL SCREEN IMAGE
 -- FULL SCREEN WHITE BACKGROND -- CHANGE LOGO TO FULL BLACK
@@ -14,7 +10,7 @@ My goal is to:
 
 -- Copy
 -- Layouts
--- Logo size
+-- Logo size (Based on MARGIN size?)
 
 -- Styles
 ---- Seek & Prosper

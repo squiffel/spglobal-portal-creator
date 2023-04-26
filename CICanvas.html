@@ -560,6 +560,7 @@
 
       // Set to default
       canvas_content.logo = "spg_corporate";
+      canvas_content.logo_position = "bottom_left";
       canvas_content.portal_image_flip = [false, false];
       canvas_content.portal_size_percent = 50;
       canvas_content.portal_upload_image_number = 0;
@@ -1101,7 +1102,7 @@
             canvas_content.portal_image_flip[n] =
               !canvas_content.portal_image_flip[n];
           }
-          if (button_label.includes("Show margins")) {
+          if (button_label.includes("Visible margins")) {
             canvas_content.portal_override_margins =
               !canvas_content.portal_override_margins;
           }
@@ -1190,6 +1191,15 @@
         if (buttonName === "logo_button") {
           expandLeftPanel();
           current_panel_open = "Logo";
+          // Update logo position
+          addLabelToInsideToolsContainer("Position");
+          createDropdownMenu(
+            ["bottom left", "top left", "top right", "bottom right"],
+            "logo_position",
+            canvas_content.logo_position
+          );
+
+          // Select logo
           addLabelToInsideToolsContainer("Logo");
           addButtonToInsideToolsContainer("Corporate");
           addButtonToInsideToolsContainer("Ratings");
@@ -1219,14 +1229,6 @@
 
           // Show Grid
           addToggleSwitchWithLabel("Show Grid", canvas_content.show_guides);
-
-          // Update logo position
-          addLabelToInsideToolsContainer("Logo position");
-          createDropdownMenu(
-            ["bottom left", "top left", "top right", "bottom right"],
-            "logo_position",
-            canvas_content.logo_position
-          );
 
           // Layout buttons
           addLabelToInsideToolsContainer("Layout");
@@ -1320,10 +1322,6 @@
           expandLeftPanel();
           current_panel_open = "Image";
 
-          // Portal upload
-          addLabelToInsideToolsContainer("Upload");
-          addFileUploadArea();
-
           // Size and position
           let userImageContainer = document.getElementById(
             "user-image-container"
@@ -1373,7 +1371,7 @@
               // Show marginss
               if (canvas_content.portal_count == 1) {
                 addToggleSwitchWithLabel(
-                  "Show margins",
+                  "Visible margins",
                   canvas_content.portal_override_margins
                 );
               }
@@ -1386,7 +1384,11 @@
             }
           }
 
-          // Add IMAGE controls
+          // Portal upload
+          addLabelToInsideToolsContainer("Upload");
+          addFileUploadArea();
+
+          // Add Focal Point controls
           let user_image_container = document.getElementById(
             "user-image-container"
           );
@@ -1426,7 +1428,7 @@
         console.log(selected_value);
 
         // Logo type
-        if (current_panel_open == "Layout") {
+        if (current_panel_open == "Logo") {
           if (button_label == "logo_position") {
             var position_name = selected_value.toLowerCase().replace(/ /g, "_");
             console.log("LOGO POSITION: " + position_name);
@@ -1710,34 +1712,45 @@
         height = height * logo_scale;
 
         // Default bottom left
-        var position = [
-          canvas_content.marginLeft,
-          canvas_content.marginBottom - height,
-        ];
+        var position = {
+          x: canvas_content.marginLeft,
+          y: canvas_content.marginBottom - height,
+        };
 
-        if ("logo_position" in canvas_content) {
-          var logo_positon = canvas_content.logo_position;
-          if (logo_positon == "top_left") {
-            position = [canvas_content.marginLeft, canvas_content.marginTop];
-          }
-          if (logo_positon == "top_right") {
-            position = [
-              canvas_content.marginRight - width,
-              canvas_content.marginTop,
-            ];
-          }
-          if (logo_positon == "bottom_right") {
-            position = [
-              canvas_content.marginRight - width,
-              canvas_content.marginBottom - height,
-            ];
+        let logo_position = canvas_content.logo_position;
+
+        // Move logo to position
+        if (logo_position == "top_left") {
+          position.x = canvas_content.marginLeft;
+          position.y = canvas_content.marginTop;
+        }
+        if (logo_position == "top_right") {
+          position.x = canvas_content.marginRight - width;
+          position.y = canvas_content.marginTop;
+        }
+        if (logo_position == "bottom_right") {
+          position.x = canvas_content.marginRight - width;
+          position.y = canvas_content.marginBottom - height;
+        }
+
+        // Shift the logo down -- If it has descenders
+        let logo_shift_percent = 0.08974358974;
+        if (
+          logo_name != "spg_corporate" &&
+          logo_name != "spg_dow_jones_indices"
+        ) {
+          if (
+            logo_position == "bottom_right" ||
+            logo_position == "bottom_left"
+          ) {
+            position.y += height * logo_shift_percent;
           }
         }
 
         // Load as an image
         let image = new Image();
         image.onload = () => {
-          ctx.drawImage(image, position[0], position[1], width, height);
+          ctx.drawImage(image, position.x, position.y, width, height);
         };
         image.src = blobURL;
       }
@@ -1755,10 +1768,23 @@
         }
 
         // Calculate 8% of the shortest side
-        var margin = Math.floor((shortestSide * 0.08) / 16) * 16; // Factors of 16
+        let side_percent = 0.08;
+        let side_percent_tighter = 0.07;
+        let factor = 8;
+
+        var margin =
+          Math.floor((shortestSide * side_percent) / factor) * factor; // Factors of 16
+
+        // Tighten up
+        if (margin >= 40) {
+          margin =
+            Math.floor((shortestSide * side_percent_tighter) / factor) * factor; // Factors of 16
+        }
 
         margin = Math.max(margin, 16); // Minimum of 16px
         margin = Math.min(margin, 64); // Maximum of 96px
+
+        console.log("margin: " + margin);
 
         canvas_content.margin = margin;
 
