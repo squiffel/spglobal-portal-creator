@@ -2012,7 +2012,8 @@
         calculateGrid(canvas_content.show_guides);
 
         // Test font
-        addTextToCanvas(
+        console.log(`margin top ${canvas_content.marginTop}`);
+        let added_text = addTextToCanvas(
           "Hello hello how I try, to find myself sometimes and think about the chickens in the sky and I love communities french fries",
           canvas_content.marginLeft,
           canvas_content.marginTop,
@@ -2024,6 +2025,7 @@
           1.15,
           700
         );
+        console.log(added_text);
 
         // Add logo
         if ("logo" in canvas_content) {
@@ -2381,7 +2383,8 @@
         fontColor,
         letterSpacing,
         lineHeight,
-        fontWeight
+        fontWeight,
+        textWrap
       ) {
         function getTextWidth(text, fontSize, letterSpacing) {
           let width = 0;
@@ -2394,9 +2397,20 @@
           return width;
         }
 
+        function isAnyWordWiderThanRect(words) {
+          return words.some(
+            (word) => getTextWidth(word, fontSize, letterSpacing) > rectWidth
+          );
+        }
+
         function fitText() {
           let lines = [];
           let words = text.split(" ");
+
+          while (isAnyWordWiderThanRect(words)) {
+            fontSize -= 1;
+          }
+
           let currentLine = words[0];
 
           for (let i = 1; i < words.length; i++) {
@@ -2421,28 +2435,27 @@
           return lines;
         }
 
-        const fittedTextLines = fitText();
+        let fittedTextLines = fitText();
         ctx.fillStyle = fontColor;
         ctx.font = `${fontWeight} ${fontSize}px sans-serif`;
-        ctx.textBaseline = "top";
-
-        let textWidth = 0;
-        let textHeight = 0;
 
         for (let i = 0; i < fittedTextLines.length; i++) {
           const line = fittedTextLines[i];
-          const lineWidth = getTextWidth(line, fontSize, letterSpacing);
-          const lineHeightPx = fontSize * lineHeight;
-
-          ctx.fillText(line, position_x, position_y + lineHeightPx * i);
-          textWidth = Math.max(textWidth, lineWidth);
-          textHeight += lineHeightPx;
+          let pos_y = position_y + i * fontSize * lineHeight + fontSize;
+          ctx.fillText(line, position_x, pos_y);
         }
 
+        const textWidth = getTextWidth(
+          fittedTextLines[0],
+          fontSize,
+          letterSpacing
+        );
+        const textHeight = fittedTextLines.length * fontSize * lineHeight;
+
         return {
-          fontSize: fontSize,
-          textWidth: textWidth,
-          textHeight: textHeight,
+          finalFontSize: fontSize,
+          textWidth,
+          textHeight,
         };
       }
     </script>
