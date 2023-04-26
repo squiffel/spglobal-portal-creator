@@ -1,12 +1,6 @@
 
 My goal is to:
 
--- Focal point -- DOESN'T QUITE MANAGE TO CENTER IT
-
-[XXXX------0----------------XXXX]
-[0        0.3                  1]
-[XXXX + XXXX]
-
 -- Fix logo alignment at bottom
 -- Add dropdown templates to opening screen
 -- Add dropdown templates to LAYOUT

@@ -1546,6 +1546,12 @@
           let relative_y =
             canvas_content.portal_focal_point[image_number].relative_y;
 
+          // Flip relative coordinates if image is mirrored
+          if (image_flip) {
+            relative_x = 1 - relative_x;
+            relative_y = 1 - relative_y;
+          }
+
           // Center image exactly in canvas mask
           let img_x_position = scaledWidth * relative_x - maskRectWidth * 0.5;
           img_x_position = Math.max(0, img_x_position); // Constraints
