@@ -1331,7 +1331,7 @@
               let spacer = document.createElement("div");
               spacer.style.display = "block";
               spacer.style.width = "100%";
-              spacer.style.height = "32px";
+              spacer.style.height = "34px";
               insideToolsContainer.appendChild(spacer);
               spacer.appendChild(select_position);
               spacer.appendChild(select_size);
@@ -1536,13 +1536,24 @@
           let scaledWidth = image.width / scaleFactor;
           let scaledHeight = image.height / scaleFactor;
 
-          // Calculate the center of the image
-          let img_x_position =
-            Math.abs(maskRectWidth - scaledWidth) *
+          // Calculate the focal point of the image -- Currently not quite centering it
+
+          let canvas_margin_x = Math.abs(maskRectWidth - scaledWidth);
+          let canvas_margin_y = Math.abs(maskRectHeight - scaledHeight);
+
+          let relative_x =
             canvas_content.portal_focal_point[image_number].relative_x;
-          let img_y_position =
-            Math.abs(maskRectHeight - scaledHeight) *
+          let relative_y =
             canvas_content.portal_focal_point[image_number].relative_y;
+
+          // Center image exactly in canvas mask
+          let img_x_position = scaledWidth * relative_x - maskRectWidth * 0.5;
+          img_x_position = Math.max(0, img_x_position); // Constraints
+          img_x_position = Math.min(canvas_margin_x, img_x_position);
+
+          let img_y_position = scaledHeight * relative_y - maskRectHeight * 0.5;
+          img_y_position = Math.max(0, img_y_position); // Constraints
+          img_y_position = Math.min(canvas_margin_y, img_y_position);
 
           // Draw the clipping mask in the center of the canvas
           ctx.save();
