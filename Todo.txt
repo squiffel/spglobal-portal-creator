@@ -6,8 +6,11 @@ My goal is to:
 -- A rotate layout option
 
 -- Fix logo alignment at bottom
+
 -- Ability to HIDE logo when its FULL SCREEN IMAGE
--- Ability to change LOGO to BLACK OR WHITE when Full Screen image
+-- FULL SCREEN WHITE BACKGROND -- CHANGE LOGO TO FULL BLACK
+---- Add toggle switch to REVERSE (WHITE if Black, Black if white)
+
 
 -- Copy
 -- Layouts
@@ -19,3 +22,5 @@ My goal is to:
 ---- Podcast
 
 -- Speakers*
+
+Hide portal should be a separate toggle switch?
