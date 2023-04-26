@@ -1,9 +1,13 @@
 
 My goal is to:
 
--- Fix logo alignment at bottom
 -- Add dropdown templates to opening screen
 -- Add dropdown templates to LAYOUT
+
+-- Fix logo alignment at bottom
+-- Ability to HIDE logo when its FULL SCREEN IMAGE
+-- Ability to change LOGO to BLACK OR WHITE when Full Screen image
+
 -- Copy
 -- Layouts
 -- Logo size

@@ -2036,8 +2036,18 @@
             2 * Math.PI
           );
           portal_ctx.fillStyle = canvas_content.portal_focal_point[n].dragging
-            ? "rgba(214, 0, 42, 1.0)"
-            : "rgba(214, 0, 42, 0.5)";
+            ? "rgba(44, 146, 229, 0.8)"
+            : "rgba(44, 146, 229, 0.5)";
+          portal_ctx.fill();
+          portal_ctx.beginPath();
+          portal_ctx.arc(
+            canvas_content.portal_focal_point[n].x,
+            canvas_content.portal_focal_point[n].y,
+            canvas_content.portal_focal_point[n].size / 8,
+            0,
+            2 * Math.PI
+          );
+          portal_ctx.fillStyle = "rgba(255, 255, 255, 1.0)";
           portal_ctx.fill();
         }
 
