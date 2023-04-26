@@ -920,8 +920,12 @@
             // If you delete the primary image, move the secondary focal point to the primary
             console.log("portal number " + n);
             if (n == 0) {
+              // Transfer focal point information over
               canvas_content.portal_focal_point[0] =
                 canvas_content.portal_focal_point[1];
+              // Transfer mirroring information over
+              canvas_content.portal_image_flip[0] =
+                canvas_content.portal_image_flip[1];
             }
             image_container.removeChild(img);
           }
@@ -2078,13 +2082,17 @@
           portal_canvas.width = insideToolsContainer.clientWidth;
           portal_canvas.height = portal_canvas.width * 0.66;
 
-          // Reset image location to the center
+          // Reset image
           if (resetFocalPoint[n]) {
+            // Reset focal point to center
             canvas_content.portal_focal_point[n].x = portal_canvas.width / 2;
             canvas_content.portal_focal_point[n].y = portal_canvas.height / 2;
             canvas_content.portal_focal_point[n].relative_x = 0.5;
             canvas_content.portal_focal_point[n].relative_y = 0.5;
             resetFocalPoint[n] = false;
+
+            // Reset mirror image
+            canvas_content.portal_image_flip[n] = false;
           }
 
           // Clear the canvas
