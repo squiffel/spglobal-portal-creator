@@ -577,7 +577,7 @@
           relative_y: 0.5,
         };
       }
-
+      // Set default color scheme
       update_color_scheme("white");
 
       // UI States
@@ -653,6 +653,9 @@
         if (canvas_content.orientation == "vertical") {
           canvas_content.portal_side = "top";
         }
+
+        // Update the grid
+        calculateGrid(canvas_content.show_guides);
 
         // Update the canvas with the custom attributes
         updateCanvas();
@@ -1013,7 +1016,7 @@
 
       //Input box modified
       function inputbox_modified(event) {
-        console.log(event.target.name, event.target.value);
+        //console.log(event.target.name, event.target.value);
       }
 
       // Button clicked
@@ -1268,6 +1271,32 @@
             "layout_2_col"
           );
 
+          // Templates
+          addLabelToInsideToolsContainer("Templates");
+          let select_template = createDropdownMenu(
+            [
+              "Custom",
+              "1920x1080",
+              "1920x420",
+              "1800x300",
+              "1500x300",
+              "Social Media 1200x628",
+              "Social Media 628x1200",
+              "Social Media 1200x1200",
+              "1220x180",
+              "728x90",
+              "990x120",
+              "Email 600x150",
+              "Email 400x100",
+              "616x205",
+              "300x600",
+              "300x250",
+              "160x600",
+            ],
+            "canvas_size",
+            "Custom"
+          );
+
           // Update layout size
           addLabelToInsideToolsContainer("Size");
           addTextToInsideToolsContainer("Width (min 88, max 1920)");
@@ -1281,6 +1310,7 @@
           btn.id = "heightInput";
           btn.classList.add("input_fixed_height");
           let submit_button = addButtonToInsideToolsContainer("Submit");
+          submit_button.id = "submit_canvas_size_button";
           submit_button.style.marginTop = "4px";
           convert_to_blue_button_style(submit_button);
         }
@@ -1402,16 +1432,38 @@
             console.log("LOGO POSITION: " + position_name);
             canvas_content.logo_position = position_name;
           }
+
+          if (button_label == "canvas_size") {
+            const inputString = selected_value;
+            const regex = /(\d+)x(\d+)/;
+            const match = inputString.match(regex);
+
+            const width = parseInt(match[1]);
+            const height = parseInt(match[2]);
+
+            let input_box_width = document.getElementById("widthInput");
+            let input_box_height = document.getElementById("heightInput");
+
+            input_box_width.value = width;
+            input_box_height.value = height;
+
+            let submit_button = document.getElementById(
+              "submit_canvas_size_button"
+            );
+            submit_button.click();
+          }
         }
 
         if (current_panel_open == "Image") {
           if (button_label == "portal_side") {
             canvas_content.portal_side = selected_value;
           }
+
           if (button_label == "portal_size") {
             console.log("PORTAL SIZE: " + selected_value);
             canvas_content.portal_size_percent = parseInt(selected_value);
           }
+
           if (button_label == "portal_image") {
             console.log("Portal Image Replace " + selected_value);
             canvas_content.portal_upload_image_number =
@@ -1697,8 +1749,9 @@
 
         // Calculate 8% of the shortest side
         var margin = Math.floor((shortestSide * 0.08) / 16) * 16; // Factors of 16
+
         margin = Math.max(margin, 16); // Minimum of 16px
-        margin = Math.min(margin, 96); // Maximum of 96px
+        margin = Math.min(margin, 64); // Maximum of 96px
 
         canvas_content.margin = margin;
 

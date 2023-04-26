@@ -2,7 +2,8 @@
 My goal is to:
 
 -- Add dropdown templates to opening screen
--- Add dropdown templates to LAYOUT
+-- Modify the MARGINS on super long skinny graphics to be bigger (+ add a minium of the & logo rule)
+-- A rotate layout option
 
 -- Fix logo alignment at bottom
 -- Ability to HIDE logo when its FULL SCREEN IMAGE
