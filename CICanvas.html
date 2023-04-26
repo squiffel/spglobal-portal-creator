@@ -2011,6 +2011,20 @@
         // Grid system
         calculateGrid(canvas_content.show_guides);
 
+        // Test font
+        addTextToCanvas(
+          "Hello hello how I try, to find myself sometimes and think about the chickens in the sky and I love communities french fries",
+          canvas_content.marginLeft,
+          canvas_content.marginTop,
+          canvas_content.marginWidth,
+          canvas_content.marginHeight,
+          36,
+          canvas_content.color_font,
+          0,
+          1.15,
+          700
+        );
+
         // Add logo
         if ("logo" in canvas_content) {
           drawLogo(canvas_content.logo);
@@ -2354,6 +2368,82 @@
           // Add to canvas
           insideToolsContainer.appendChild(portal_canvas);
         }
+      }
+
+      // Add text to canvas
+      function addTextToCanvas(
+        text,
+        position_x,
+        position_y,
+        rectWidth,
+        rectHeight,
+        fontSize,
+        fontColor,
+        letterSpacing,
+        lineHeight,
+        fontWeight
+      ) {
+        function getTextWidth(text, fontSize, letterSpacing) {
+          let width = 0;
+          ctx.font = `${fontWeight} ${fontSize}px sans-serif`;
+
+          for (let i = 0; i < text.length; i++) {
+            width += ctx.measureText(text[i]).width + letterSpacing;
+          }
+
+          return width;
+        }
+
+        function fitText() {
+          let lines = [];
+          let words = text.split(" ");
+          let currentLine = words[0];
+
+          for (let i = 1; i < words.length; i++) {
+            const word = words[i];
+            const newLine = currentLine + " " + word;
+
+            if (getTextWidth(newLine, fontSize, letterSpacing) <= rectWidth) {
+              currentLine = newLine;
+            } else {
+              lines.push(currentLine);
+              currentLine = word;
+            }
+          }
+
+          lines.push(currentLine);
+
+          if (lines.length * fontSize * lineHeight > rectHeight) {
+            fontSize -= 1;
+            return fitText();
+          }
+
+          return lines;
+        }
+
+        const fittedTextLines = fitText();
+        ctx.fillStyle = fontColor;
+        ctx.font = `${fontWeight} ${fontSize}px sans-serif`;
+        ctx.textBaseline = "top";
+
+        let textWidth = 0;
+        let textHeight = 0;
+
+        for (let i = 0; i < fittedTextLines.length; i++) {
+          const line = fittedTextLines[i];
+          const lineWidth = getTextWidth(line, fontSize, letterSpacing);
+          const lineHeightPx = fontSize * lineHeight;
+
+          ctx.fillText(line, position_x, position_y + lineHeightPx * i);
+          textWidth = Math.max(textWidth, lineWidth);
+          textHeight += lineHeightPx;
+        }
+
+        return {
+          fontSize: fontSize,
+          textWidth: textWidth,
+          textHeight: textHeight,
+        };
       }
     </script>
 
