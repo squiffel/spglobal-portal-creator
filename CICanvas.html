@@ -1334,7 +1334,7 @@
 
           // Update layout size
           addLabelToInsideToolsContainer("Size");
-          addTextToInsideToolsContainer("Width (min 88, max 1920)");
+          addTextToInsideToolsContainer("Width (min 144, max 1920)");
           let btn = addInputBoxToInsideToolsContainer("width");
           btn.value = canvas.width;
           btn.id = "widthInput";
@@ -1764,6 +1764,27 @@
         let logo_width = width * logo_scale;
         let logo_height = height * logo_scale;
 
+        // Minimum size requirements
+        let min_height = 24;
+        let min_width = 96;
+
+        if (logo_height < min_height || logo_width < min_width) {
+          console.log(`ERROR: Logo too small ${logo_width} x ${logo_height}`);
+
+          if (logo_width < min_width) {
+            logo_scale = min_width / width;
+          }
+
+          if (logo_height < min_height) {
+            logo_scale = min_height / height;
+          }
+
+          logo_width = width * logo_scale;
+          logo_height = height * logo_scale;
+
+          console.log(`Resized logo ${logo_width} x ${logo_height}`);
+        }
+
         // Default bottom left
         var position = {
           x: canvas_content.marginLeft,
@@ -1837,7 +1858,14 @@
         margin = Math.max(margin, 16); // Minimum of 16px
         margin = Math.min(margin, 64); // Maximum of 96px
 
-        console.log("margin: " + margin);
+        // 12px on tiny graphics
+        let switch_to_min_margins_size = 256;
+        if (
+          canvas.width < switch_to_min_margins_size &&
+          canvas.height < switch_to_min_margins_size
+        ) {
+          margin = 12;
+        }
 
         canvas_content.margin = margin;
 

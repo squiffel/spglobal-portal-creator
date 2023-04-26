@@ -10,6 +10,7 @@ My goal is to:
 
 -- Copy
 -- Layouts
+---- Will need constraints on IMAGE POSITIONS so that the logo isn't tiny on super wide vertical shots. Don't let them do POSITION TOP
 -- Logo size (Based on MARGIN size?)
 
 -- Styles
