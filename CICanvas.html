@@ -1435,6 +1435,12 @@
 
           if (button_label == "canvas_size") {
             const inputString = selected_value;
+            // Exit if not a number
+            if (inputString == "Custom") {
+              return;
+            }
+
+            // Get the width
             const regex = /(\d+)x(\d+)/;
             const match = inputString.match(regex);
 
@@ -1447,6 +1453,7 @@
             input_box_width.value = width;
             input_box_height.value = height;
 
+            // Update the canvas
             let submit_button = document.getElementById(
               "submit_canvas_size_button"
             );
