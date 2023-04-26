@@ -1017,7 +1017,7 @@
 
       //Input box modified
       function inputbox_modified(event) {
-        //console.log(event.target.name, event.target.value);
+        console.log(event.target.name, event.target.value);
       }
 
       // Button clicked
@@ -1042,6 +1042,39 @@
           // Resize Canvas
           if (button_label.includes("Submit")) {
             createCanvas();
+          }
+        }
+
+        // Image
+        if (current_panel_open == "Image") {
+          if (button_label.includes("Convert to primary")) {
+            let userImageContainer = document.getElementById(
+              "user-image-container"
+            );
+            if (userImageContainer) {
+              if (userImageContainer.children.length > 1) {
+                // Move primary image below secondary
+                let primary_image = userImageContainer.children[0];
+                userImageContainer.removeChild(primary_image);
+                userImageContainer.appendChild(primary_image);
+
+                // Transfer attributes
+                let primary_focal_point = canvas_content.portal_focal_point[0];
+                let secondary_focal_point =
+                  canvas_content.portal_focal_point[1];
+
+                let primary_mirror = canvas_content.portal_image_flip[0];
+                let secondary_mirror = canvas_content.portal_image_flip[1];
+
+                canvas_content.portal_focal_point[0] = secondary_focal_point;
+                canvas_content.portal_focal_point[1] = primary_focal_point;
+                canvas_content.portal_image_flip[0] = secondary_mirror;
+                canvas_content.portal_image_flip[1] = primary_mirror;
+
+                // Update panel
+                update_toolbox_panel("image_button");
+              }
+            }
           }
         }
         // Update
@@ -1196,7 +1229,7 @@
           createDropdownMenu(
             ["bottom left", "top left", "top right", "bottom right"],
             "logo_position",
-            canvas_content.logo_position
+            canvas_content.logo_position.toLowerCase().replace(/_/g, " ")
           );
 
           // Select logo
@@ -1399,6 +1432,11 @@
                 let portal_label =
                   i == 0 ? "Portal [PRIMARY]" : "Portal [Secondary]";
                 addLabelToInsideToolsContainer(portal_label);
+                // Add make primary button
+                if (i == 1) {
+                  let makePrimaryButton =
+                    addButtonToInsideToolsContainer("Convert to primary");
+                }
                 // Focal point setter
                 createImagePreviewWithFocalPoint(img, i);
                 // Show Grid
@@ -1434,7 +1472,9 @@
             console.log("LOGO POSITION: " + position_name);
             canvas_content.logo_position = position_name;
           }
+        }
 
+        if (current_panel_open == "Layout") {
           if (button_label == "canvas_size") {
             const inputString = selected_value;
             // Exit if not a number
@@ -1463,6 +1503,7 @@
           }
         }
 
+        // Portals
         if (current_panel_open == "Image") {
           if (button_label == "portal_side") {
             canvas_content.portal_side = selected_value;
@@ -1707,14 +1748,26 @@
         let blobURL = URL.createObjectURL(blob);
 
         // Logo scale
-        let logo_scale = 1;
-        width = width * logo_scale;
-        height = height * logo_scale;
+        // Default is based on the margins. Scale is 1 if the margins are 40px
+        let logo_scale = Math.max(0.65, canvas_content.margin / 40); // 1
+
+        // Then we have to check if the logo will fit in the space provided which is the margins
+        if (width * logo_scale > canvas_content.marginWidth) {
+          logo_scale = canvas_content.marginWidth / width; // Modify the logo scale to fit
+        }
+
+        if (height * logo_scale > canvas_content.marginHeight) {
+          logo_scale = canvas_content.marginHeight / height; // Check if the modified logo scale fits
+        }
+
+        // Update the logo size
+        let logo_width = width * logo_scale;
+        let logo_height = height * logo_scale;
 
         // Default bottom left
         var position = {
           x: canvas_content.marginLeft,
-          y: canvas_content.marginBottom - height,
+          y: canvas_content.marginBottom - logo_height,
         };
 
         let logo_position = canvas_content.logo_position;
@@ -1725,12 +1778,12 @@
           position.y = canvas_content.marginTop;
         }
         if (logo_position == "top_right") {
-          position.x = canvas_content.marginRight - width;
+          position.x = canvas_content.marginRight - logo_width;
           position.y = canvas_content.marginTop;
         }
         if (logo_position == "bottom_right") {
-          position.x = canvas_content.marginRight - width;
-          position.y = canvas_content.marginBottom - height;
+          position.x = canvas_content.marginRight - logo_width;
+          position.y = canvas_content.marginBottom - logo_height;
         }
 
         // Shift the logo down -- If it has descenders
@@ -1743,14 +1796,14 @@
             logo_position == "bottom_right" ||
             logo_position == "bottom_left"
           ) {
-            position.y += height * logo_shift_percent;
+            position.y += logo_height * logo_shift_percent;
           }
         }
 
         // Load as an image
         let image = new Image();
         image.onload = () => {
-          ctx.drawImage(image, position.x, position.y, width, height);
+          ctx.drawImage(image, position.x, position.y, logo_width, logo_height);
         };
         image.src = blobURL;
       }
@@ -1812,7 +1865,6 @@
           if (canvas_content.portal_side == "bottom") {
             canvas_content.marginBottom -= canvas_content.portal_height;
           }
-          //console.log("Portal side: " + canvas_content.portal_side);
         }
 
         // Add top and bottom margins if the PORTAL has margins and is FULL CANVAS
