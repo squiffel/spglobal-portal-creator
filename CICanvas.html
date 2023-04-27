@@ -657,6 +657,11 @@
           canvas_content.portal_side = "top";
         }
 
+        // Update panel
+        if (current_panel_open == "Layout") {
+          update_toolbox_panel("layout_button");
+        }
+
         // Update the grid
         calculateGrid(canvas_content.show_guides);
 
@@ -1138,7 +1143,7 @@
             canvas_content.show_guides = toggleValue;
           }
 
-          if (button_label.includes("Visible margins")) {
+          if (button_label.includes("Portal visible margins")) {
             canvas_content.portal_override_margins =
               !canvas_content.portal_override_margins;
           }
@@ -1317,7 +1322,7 @@
               // Show marginss
               if (canvas_content.portal_count == 1) {
                 addToggleSwitchWithLabel(
-                  "Visible margins",
+                  "Portal visible margins",
                   canvas_content.portal_override_margins
                 );
               }
@@ -1380,7 +1385,7 @@
           addLabelToInsideToolsContainer("Templates");
           let select_template = createDropdownMenu(
             [
-              "Custom",
+              "Select...",
               "1920x1080",
               "1920x420",
               "1800x300",
@@ -1399,7 +1404,7 @@
               "160x600",
             ],
             "canvas_size",
-            "Custom"
+            "Select..."
           );
 
           // Update layout size
@@ -1488,7 +1493,7 @@
           if (button_label == "canvas_size") {
             const inputString = selected_value;
             // Exit if not a number
-            if (inputString == "Custom") {
+            if (inputString == "Select...") {
               return;
             }
 
@@ -1853,13 +1858,6 @@
           }
         }
 
-        // Load as an image
-        let image = new Image();
-        image.onload = () => {
-          ctx.drawImage(image, position.x, position.y, logo_width, logo_height);
-        };
-        image.src = blobURL;
-
         // Store dynamic information about the logo
         canvas_content.logo = {
           x: position.x,
@@ -1870,6 +1868,21 @@
           name: logo_name,
           corner: logo_position,
         };
+
+        // Do not render logo if there are two portals and it fills the entire canvas
+        if (
+          canvas_content.portal_count == 2 &&
+          canvas_content.portal_size_percent == 100
+        ) {
+          return;
+        }
+
+        // Load as an image
+        let image = new Image();
+        image.onload = () => {
+          ctx.drawImage(image, position.x, position.y, logo_width, logo_height);
+        };
+        image.src = blobURL;
       }
 
       // Margins
@@ -2063,14 +2076,7 @@
       }
 
       function renderText() {
-        // Dynamic font size (Default)
-        let font_size = Math.floor(canvas_content.marginWidth / 160) * 16;
-        font_size = Math.max(32, font_size);
-        font_size = Math.min(72, font_size);
-
-        // Largest font size (Manual override)
-        // Not coded yet
-
+        // Text available space and position
         let position = {
           x: canvas_content.marginLeft,
           y: canvas_content.marginTop,
@@ -2090,6 +2096,23 @@
             logo_padding,
         };
 
+        // Dynamic font size (Default)
+        let longest_side = Math.max(text_area.width, text_area.height);
+        let font_size = Math.floor(longest_side / 160) * 16;
+        font_size = Math.max(32, font_size);
+
+        let font_size_max =
+          text_area.width > 700 && text_area.height > 700 ? 96 : 72;
+        font_size = Math.min(font_size_max, font_size);
+
+        // Smaller fonts on vertical text areas
+        if (longest_side == text_area.height) {
+          font_size -= 8;
+        }
+
+        // Largest font size (Manual override)
+        // Not coded yet
+
         let headline = addTextToCanvas(
           canvas_content.headline,
           position.x,
@@ -2099,7 +2122,7 @@
           font_size,
           canvas_content.color_font,
           0,
-          1.15,
+          1.05,
           700
         );
 
@@ -2592,12 +2615,14 @@
           return lines;
         }
 
+        // Only render font sizes larger than 16
+        fontSize = Math.max(16, fontSize);
+
         let fittedTextLines = fitText();
-        //fittedTextLines = removeWidows(fittedTextLines);
-        //fittedTextLines = balanceText(fittedTextLines);
         ctx.fillStyle = fontColor;
         ctx.font = `${fontWeight} ${fontSize}px Akkurat LL`;
 
+        // Render font
         for (let i = 0; i < fittedTextLines.length; i++) {
           const line = fittedTextLines[i];
           let offset_y = 0.75; // First line has too much padding
