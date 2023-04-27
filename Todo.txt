@@ -7,8 +7,10 @@ My goal is to:
 -- FULL SCREEN WHITE BACKGROND -- CHANGE LOGO TO FULL BLACK
 ---- Add toggle switch to REVERSE (WHITE if Black, Black if white)
 
-
 -- Copy
+---- Add the ability to BREAK WORDS based on how its broken in the inputBox
+---- Add the ability to INCREASE font size (Set to LARGEST POSSIBLE -- Then it downscales)
+
 -- Layouts
 ---- Will need constraints on IMAGE POSITIONS so that the logo isn't tiny on super wide vertical shots. Don't let them do POSITION TOP
 -- Logo size (Based on MARGIN size?)
