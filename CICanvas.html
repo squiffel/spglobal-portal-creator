@@ -1856,11 +1856,17 @@
         };
 
         // Do not render logo if there are two portals and it fills the entire canvas
-        if (
-          canvas_content.portal_count == 2 &&
-          canvas_content.portal_size_percent == 100
-        ) {
-          return;
+        if (canvas_content.portal_size_percent == 100) {
+          if (
+            canvas_content.portal_count == 2 ||
+            (canvas_content.portal_count == 1 &&
+              canvas_content.portal_override_margins)
+          ) {
+            console.log(
+              "Logo does not show when the image is full screen with margins"
+            );
+            return;
+          }
         }
 
         // Load as an image
@@ -1957,18 +1963,37 @@
         canvas_content.marginHeight =
           canvas_content.marginBottom - canvas_content.marginTop;
 
-        if (show_guides) {
-          // Set the stroke color and style
-          ctx.strokeStyle = "#92BFF5";
-          ctx.lineWidth = 1;
+        // Draw guides
+        draw_guides(show_guides, "Margins");
+      }
 
+      function draw_guides(
+        show_guides,
+        name = "",
+        position = {
+          x: canvas_content.marginLeft,
+          y: canvas_content.marginTop,
+          width: canvas_content.marginWidth,
+          height: canvas_content.marginHeight,
+        },
+        color = "#92BFF5"
+      ) {
+        if (show_guides) {
           // Draw the blue rectangle outline
           setTimeout(function () {
+            // Set the stroke color and style
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 1;
             ctx.strokeRect(
-              canvas_content.marginLeft,
-              canvas_content.marginTop,
-              canvas_content.marginWidth,
-              canvas_content.marginHeight
+              position.x,
+              position.y,
+              position.width,
+              position.height
+            );
+            console.log(
+              `${name} -- width: ${parseInt(
+                position.width
+              )} x height: ${parseInt(position.height)}`
             );
           }, 100);
         }
@@ -2093,8 +2118,11 @@
 
         // Smaller fonts on vertical text areas
         if (longest_side == text_area.height) {
+          console.log(`Shrunk text  ${font_size}  >  ${font_size - 8}`);
           font_size -= 8;
         }
+
+        console.log("Initial calculated font size: " + font_size);
 
         // Largest font size (Manual override)
         // Not coded yet
@@ -2111,6 +2139,8 @@
           1.05,
           700
         );
+
+        console.log("Dynamic calculated font size: " + headline.fontSize);
       }
 
       function get_portal_specs(portal_size, portal_side) {
@@ -2604,13 +2634,14 @@
         ctx.fillStyle = fontColor;
         ctx.font = `${fontWeight} ${fontSize}px Akkurat LL`;
 
+        let offset_y = 0.75; // First line has too much padding
         // Render font
         for (let i = 0; i < fittedTextLines.length; i++) {
           const line = fittedTextLines[i];
-          let offset_y = 0.75; // First line has too much padding
-          let pos_y =
+
+          let calculated_position_y =
             position_y + i * fontSize * lineHeight + fontSize * offset_y;
-          ctx.fillText(line, position_x, pos_y);
+          ctx.fillText(line, position_x, calculated_position_y);
         }
 
         const textWidth = getTextWidth(
@@ -2620,8 +2651,22 @@
         );
         const textHeight = fittedTextLines.length * fontSize * lineHeight;
 
+        // Render guides
+        draw_guides(
+          canvas_content.show_guides,
+          "Text",
+          {
+            x: position_x,
+            y: position_y,
+            width: rectWidth,
+            height: rectHeight,
+          },
+          "#d6002a"
+        );
+
+        // Return results
         return {
-          finalFontSize: fontSize,
+          fontSize,
           textWidth,
           textHeight,
         };
