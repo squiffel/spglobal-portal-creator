@@ -7,7 +7,7 @@
     <style>
       html,
       body {
-        font-family: sans-serif;
+        font-family: Akkurat LL;
         margin: 0;
         padding: 0;
         height: 100%;
@@ -240,7 +240,7 @@
       }
 
       .toolbox_expanded_inputbox {
-        font-family: sans-serif;
+        font-family: Akkurat LL;
         padding: 11px 8px;
         width: 100%;
         text-align: left;
@@ -559,8 +559,8 @@
       let resetFocalPoint = [false, false];
 
       // Set to default
-      canvas_content.logo = "spg_corporate";
-      canvas_content.logo_position = "bottom_left";
+      canvas_content.logo = { name: "spg_corporate", corner: "bottom_left" };
+
       canvas_content.portal_image_flip = [false, false];
       canvas_content.portal_size_percent = 50;
       canvas_content.portal_upload_image_number = 0;
@@ -578,6 +578,8 @@
           relative_y: 0.5,
         };
       }
+
+      canvas_content.headline = "Connecting energy through insights.";
       // Set default color scheme
       update_color_scheme("white");
 
@@ -1017,7 +1019,16 @@
 
       //Input box modified
       function inputbox_modified(event) {
-        console.log(event.target.name, event.target.value);
+        //console.log(event.target.name, event.target.value);
+        let button_label = event.target.name;
+        let string_value = event.target.value;
+
+        if (button_label == "input_headline") {
+          canvas_content.headline = string_value;
+          console.log(canvas_content.headline);
+        }
+
+        updateCanvas();
       }
 
       // Button clicked
@@ -1034,7 +1045,7 @@
         // Logo type
         if (current_panel_open == "Logo") {
           var logo_name = button_label.toLowerCase().replace(/ /g, "_");
-          canvas_content.logo = "spg_" + logo_name;
+          canvas_content.logo.name = "spg_" + logo_name;
         }
 
         // Layout
@@ -1126,15 +1137,7 @@
           if (button_label.includes("Show Grid")) {
             canvas_content.show_guides = toggleValue;
           }
-        }
 
-        if (current_panel_open == "Image") {
-          if (button_label.includes("Mirror horizontally")) {
-            // Flip image horizontally
-            let n = parseInt(element.name);
-            canvas_content.portal_image_flip[n] =
-              !canvas_content.portal_image_flip[n];
-          }
           if (button_label.includes("Visible margins")) {
             canvas_content.portal_override_margins =
               !canvas_content.portal_override_margins;
@@ -1145,17 +1148,30 @@
           }
         }
 
+        if (current_panel_open == "Image") {
+          if (button_label.includes("Mirror horizontally")) {
+            // Flip image horizontally
+            let n = parseInt(element.name);
+            canvas_content.portal_image_flip[n] =
+              !canvas_content.portal_image_flip[n];
+          }
+        }
+
         // Update canvas
         updateCanvas();
       }
 
-      function addInputBoxToInsideToolsContainer(input_box_name) {
+      function addInputBoxToInsideToolsContainer(
+        input_box_name,
+        default_string = ""
+      ) {
         const insideToolsContainer = document.querySelector(
           ".inside_tools_container"
         );
         const inputBox = document.createElement("textarea");
         inputBox.className = "toolbox_expanded_inputbox";
         inputBox.placeholder = "Type...";
+        inputBox.value = default_string;
         inputBox.name = "input_" + input_box_name;
         inputBox.addEventListener("input", inputbox_modified);
         insideToolsContainer.appendChild(inputBox);
@@ -1224,13 +1240,6 @@
         if (buttonName === "logo_button") {
           expandLeftPanel();
           current_panel_open = "Logo";
-          // Update logo position
-          addLabelToInsideToolsContainer("Position");
-          createDropdownMenu(
-            ["bottom left", "top left", "top right", "bottom right"],
-            "logo_position",
-            canvas_content.logo_position.toLowerCase().replace(/_/g, " ")
-          );
 
           // Select logo
           addLabelToInsideToolsContainer("Logo");
@@ -1247,7 +1256,10 @@
           current_panel_open = "Text";
 
           addLabelToInsideToolsContainer("Headline");
-          addInputBoxToInsideToolsContainer("headline");
+          addInputBoxToInsideToolsContainer(
+            "headline",
+            canvas_content.headline
+          );
           addLabelToInsideToolsContainer("Body");
           addInputBoxToInsideToolsContainer("body");
           addLabelToInsideToolsContainer("Call to action");
@@ -1260,9 +1272,88 @@
           expandLeftPanel();
           current_panel_open = "Layout";
 
+          // Update logo position
+          addLabelToInsideToolsContainer("Logo Position");
+          createDropdownMenu(
+            ["bottom left", "top left", "bottom right"], // "top right",
+            "logo_position",
+            canvas_content.logo.corner.toLowerCase().replace(/_/g, " ")
+          );
+
           // Show Grid
           addToggleSwitchWithLabel("Show Grid", canvas_content.show_guides);
 
+          // Size and position
+          let userImageContainer = document.getElementById(
+            "user-image-container"
+          );
+
+          if (userImageContainer) {
+            if (userImageContainer.children.length > 0) {
+              // Position
+              addLabelToInsideToolsContainer("Portal Position");
+
+              let select_position = createDropdownMenu(
+                ["top", "right", "bottom", "left"],
+                "portal_side",
+                canvas_content.portal_side
+              );
+              /*
+              select_position.style.float = "left";
+              select_position.style.display = "inline-block";
+              select_position.style.width = "47%";
+              */
+              // Size
+              addLabelToInsideToolsContainer("Portal Size");
+
+              let select_size = createDropdownMenu(
+                ["100%", "66%", "50%", "33%", "0%"],
+                "portal_size",
+                canvas_content.portal_size_percent + "%"
+              );
+              /*
+              select_size.style.float = "right";
+              select_size.style.display = "inline-block";
+              select_size.style.width = "47%";
+              */
+              changeDropdownMenuText(select_size, "100%", "Fill Canvas");
+              changeDropdownMenuText(select_size, "66%", "Two Thirds");
+              changeDropdownMenuText(select_size, "50%", "Half");
+              changeDropdownMenuText(select_size, "33%", "One Third");
+              changeDropdownMenuText(select_size, "0%", "Hide");
+
+              /*
+              // Move inside the container
+              const insideToolsContainer = document.querySelector(
+                ".inside_tools_container"
+              );
+              // Create container
+              let spacer = document.createElement("div");
+              spacer.style.display = "block";
+              spacer.style.width = "100%";
+              spacer.style.height = "34px";
+              insideToolsContainer.appendChild(spacer);
+              spacer.appendChild(select_position);
+              spacer.appendChild(select_size);
+              */
+
+              // Show marginss
+              if (canvas_content.portal_count == 1) {
+                addToggleSwitchWithLabel(
+                  "Visible margins",
+                  canvas_content.portal_override_margins
+                );
+              }
+              if (canvas_content.portal_count == 2) {
+                addToggleSwitchWithLabel(
+                  "Primary image side",
+                  canvas_content.portal_primary_image_side
+                );
+              }
+            }
+          }
+
+          /*
           // Layout buttons
           addLabelToInsideToolsContainer("Layout");
           addSquareButtonsToInsideToolsContainer(
@@ -1306,6 +1397,8 @@
             "layout_2_col"
           );
 
+          */
+
           // Templates
           addLabelToInsideToolsContainer("Templates");
           let select_template = createDropdownMenu(
@@ -1333,7 +1426,7 @@
           );
 
           // Update layout size
-          addLabelToInsideToolsContainer("Size");
+          addLabelToInsideToolsContainer("Custom Size");
           addTextToInsideToolsContainer("Width (min 144, max 1920)");
           let btn = addInputBoxToInsideToolsContainer("width");
           btn.value = canvas.width;
@@ -1354,68 +1447,6 @@
         if (buttonName === "image_button") {
           expandLeftPanel();
           current_panel_open = "Image";
-
-          // Size and position
-          let userImageContainer = document.getElementById(
-            "user-image-container"
-          );
-
-          if (userImageContainer) {
-            if (userImageContainer.children.length > 0) {
-              // Position
-              addLabelToInsideToolsContainer("Portal Position & Size");
-
-              let select_position = createDropdownMenu(
-                ["top", "right", "bottom", "left"],
-                "portal_side",
-                canvas_content.portal_side
-              );
-              select_position.style.float = "left";
-              select_position.style.display = "inline-block";
-              select_position.style.width = "47%";
-              // Size
-              let select_size = createDropdownMenu(
-                ["100%", "66%", "50%", "33%", "0%"],
-                "portal_size",
-                canvas_content.portal_size_percent + "%"
-              );
-              select_size.style.float = "right";
-              select_size.style.display = "inline-block";
-              select_size.style.width = "47%";
-              changeDropdownMenuText(select_size, "100%", "Fill Canvas");
-              changeDropdownMenuText(select_size, "66%", "Two Thirds");
-              changeDropdownMenuText(select_size, "50%", "Half");
-              changeDropdownMenuText(select_size, "33%", "One Third");
-              changeDropdownMenuText(select_size, "0%", "Hide");
-
-              // Move inside the container
-              const insideToolsContainer = document.querySelector(
-                ".inside_tools_container"
-              );
-              // Create container
-              let spacer = document.createElement("div");
-              spacer.style.display = "block";
-              spacer.style.width = "100%";
-              spacer.style.height = "34px";
-              insideToolsContainer.appendChild(spacer);
-              spacer.appendChild(select_position);
-              spacer.appendChild(select_size);
-
-              // Show marginss
-              if (canvas_content.portal_count == 1) {
-                addToggleSwitchWithLabel(
-                  "Visible margins",
-                  canvas_content.portal_override_margins
-                );
-              }
-              if (canvas_content.portal_count == 2) {
-                addToggleSwitchWithLabel(
-                  "Primary image side",
-                  canvas_content.portal_primary_image_side
-                );
-              }
-            }
-          }
 
           // Portal upload
           addLabelToInsideToolsContainer("Upload");
@@ -1467,14 +1498,16 @@
 
         // Logo type
         if (current_panel_open == "Logo") {
-          if (button_label == "logo_position") {
-            var position_name = selected_value.toLowerCase().replace(/ /g, "_");
-            console.log("LOGO POSITION: " + position_name);
-            canvas_content.logo_position = position_name;
-          }
+          // PASS
         }
 
         if (current_panel_open == "Layout") {
+          if (button_label == "logo_position") {
+            var position_name = selected_value.toLowerCase().replace(/ /g, "_");
+            console.log("LOGO POSITION: " + position_name);
+            canvas_content.logo.corner = position_name;
+          }
+
           if (button_label == "canvas_size") {
             const inputString = selected_value;
             // Exit if not a number
@@ -1501,10 +1534,7 @@
             );
             submit_button.click();
           }
-        }
 
-        // Portals
-        if (current_panel_open == "Image") {
           if (button_label == "portal_side") {
             canvas_content.portal_side = selected_value;
           }
@@ -1513,7 +1543,10 @@
             console.log("PORTAL SIZE: " + selected_value);
             canvas_content.portal_size_percent = parseInt(selected_value);
           }
+        }
 
+        // Portals
+        if (current_panel_open == "Image") {
           if (button_label == "portal_image") {
             console.log("Portal Image Replace " + selected_value);
             canvas_content.portal_upload_image_number =
@@ -1718,12 +1751,13 @@
         return offscreenCanvas;
       }
 
-      function drawLogo(logo_name) {
+      function drawLogo() {
         // Make logos visible
         let logo_container = document.getElementById("svg-container");
         logo_container.style.display = "inline";
 
         // Get original size
+        let logo_name = canvas_content.logo.name;
         let svgElement = document.getElementById(logo_name);
         let { width, height } = svgElement.getBBox();
 
@@ -1791,7 +1825,7 @@
           y: canvas_content.marginBottom - logo_height,
         };
 
-        let logo_position = canvas_content.logo_position;
+        let logo_position = canvas_content.logo.corner;
 
         // Move logo to position
         if (logo_position == "top_left") {
@@ -1827,6 +1861,17 @@
           ctx.drawImage(image, position.x, position.y, logo_width, logo_height);
         };
         image.src = blobURL;
+
+        // Store dynamic information about the logo
+        canvas_content.logo = {
+          x: position.x,
+          y: position.y,
+          width: logo_width,
+          height: logo_height,
+          min_padding: logo_height * 0.2948717949,
+          name: logo_name,
+          corner: logo_position,
+        };
       }
 
       // Margins
@@ -2011,26 +2056,58 @@
         // Grid system
         calculateGrid(canvas_content.show_guides);
 
-        // Test font
-        console.log(`margin top ${canvas_content.marginTop}`);
-        let added_text = addTextToCanvas(
-          "Hello hello how I try, to find myself sometimes and think about the chickens in the sky and I love communities french fries",
-          canvas_content.marginLeft,
-          canvas_content.marginTop,
-          canvas_content.marginWidth,
-          canvas_content.marginHeight,
-          36,
+        // Add logo
+        if ("logo" in canvas_content) {
+          drawLogo();
+        }
+
+        // Render Text
+        renderText();
+      }
+
+      function renderText() {
+        let font_size = Math.floor(canvas_content.marginWidth / 160) * 16;
+        font_size = Math.max(32, font_size);
+        font_size = Math.min(72, font_size);
+
+        /*
+        canvas_content.logo.corner = "top left";
+        canvas_content.logo_position = { x: position.x, y: position.y };
+        canvas_content.logo = { width: logo_width, height: logo_height };
+        */
+
+        let position = {
+          x: canvas_content.marginLeft,
+          y: canvas_content.marginTop,
+        };
+
+        if (canvas_content.logo.corner.includes("top")) {
+          position.y +=
+            canvas_content.logo.height + canvas_content.logo.min_padding * 1.5;
+        }
+
+        let text_area = {
+          width: canvas_content.marginWidth,
+          height:
+            canvas_content.marginHeight -
+            canvas_content.logo.height +
+            canvas_content.logo.min_padding,
+        };
+
+        let headline = addTextToCanvas(
+          canvas_content.headline,
+          position.x,
+          position.y,
+          text_area.width,
+          text_area.Height,
+          font_size,
           canvas_content.color_font,
           0,
           1.15,
           700
         );
-        console.log(added_text);
 
-        // Add logo
-        if ("logo" in canvas_content) {
-          drawLogo(canvas_content.logo);
-        }
+        console.log(headline);
       }
 
       function get_portal_specs(portal_size, portal_side) {
@@ -2388,7 +2465,7 @@
       ) {
         function getTextWidth(text, fontSize, letterSpacing) {
           let width = 0;
-          ctx.font = `${fontWeight} ${fontSize}px sans-serif`;
+          ctx.font = `${fontWeight} ${fontSize}px Akkurat LL`;
 
           for (let i = 0; i < text.length; i++) {
             width += ctx.measureText(text[i]).width + letterSpacing;
@@ -2420,6 +2497,71 @@
           }
 
           return arr;
+        }
+
+        // Balanced text attempt 1.0
+        function balanceText(lines, maxIterations = 5) {
+          if (lines.length < 2 || maxIterations === 0) return lines;
+
+          const totalChars = lines.reduce((acc, line) => acc + line.length, 0);
+          const targetLineLength = Math.ceil(totalChars / lines.length);
+
+          const words = lines.join(" ").split(" ");
+          const balancedLines = [];
+
+          let currentLine = words.shift();
+          while (words.length > 0) {
+            const nextWord = words.shift();
+
+            if (currentLine.length + 1 + nextWord.length <= targetLineLength) {
+              currentLine += ` ${nextWord}`;
+            } else {
+              balancedLines.push(currentLine);
+              currentLine = nextWord;
+            }
+          }
+          balancedLines.push(currentLine);
+
+          const maxAllowedLines = lines.length + 1;
+          while (balancedLines.length < maxAllowedLines) {
+            let shouldBreak = false;
+            for (let i = balancedLines.length - 1; i > 0; i--) {
+              const wordsInLine = balancedLines[i].split(" ");
+              const movedWord = wordsInLine.shift();
+              balancedLines[i - 1] += ` ${movedWord}`;
+              balancedLines[i] = wordsInLine.join(" ");
+
+              if (balancedLines.length === maxAllowedLines) {
+                shouldBreak = true;
+                break;
+              }
+            }
+            if (shouldBreak) break;
+          }
+
+          const initialScore = distributionScore(lines, targetLineLength);
+          const newScore = distributionScore(balancedLines, targetLineLength);
+
+          if (newScore < initialScore) {
+            return balanceText(balancedLines, maxIterations - 1);
+          } else {
+            return lines;
+          }
+        }
+
+        function distributionScore(lines, targetLineLength) {
+          return lines.reduce((acc, line) => {
+            const diff = line.length - targetLineLength;
+            return acc + Math.abs(diff);
+          }, 0);
+        }
+
+        // Helper function to calculate the score of a line distribution.
+        function distributionScore(lines, targetLineLength) {
+          return lines.reduce((acc, line) => {
+            const diff = line.length - targetLineLength;
+            return acc + Math.abs(diff);
+          }, 0);
         }
 
         function fitText() {
@@ -2455,9 +2597,10 @@
         }
 
         let fittedTextLines = fitText();
-        fittedTextLines = removeWidows(fittedTextLines);
+        //fittedTextLines = removeWidows(fittedTextLines);
+        //fittedTextLines = balanceText(fittedTextLines);
         ctx.fillStyle = fontColor;
-        ctx.font = `${fontWeight} ${fontSize}px sans-serif`;
+        ctx.font = `${fontWeight} ${fontSize}px Akkurat LL`;
 
         for (let i = 0; i < fittedTextLines.length; i++) {
           const line = fittedTextLines[i];
