@@ -1275,7 +1275,7 @@
           // Update logo position
           addLabelToInsideToolsContainer("Logo Position");
           createDropdownMenu(
-            ["bottom left", "top left", "bottom right"], // "top right",
+            ["top left", "bottom left", "bottom right"], // "top right",
             "logo_position",
             canvas_content.logo.corner.toLowerCase().replace(/_/g, " ")
           );
@@ -1298,11 +1298,7 @@
                 "portal_side",
                 canvas_content.portal_side
               );
-              /*
-              select_position.style.float = "left";
-              select_position.style.display = "inline-block";
-              select_position.style.width = "47%";
-              */
+
               // Size
               addLabelToInsideToolsContainer("Portal Size");
 
@@ -1311,31 +1307,12 @@
                 "portal_size",
                 canvas_content.portal_size_percent + "%"
               );
-              /*
-              select_size.style.float = "right";
-              select_size.style.display = "inline-block";
-              select_size.style.width = "47%";
-              */
+
               changeDropdownMenuText(select_size, "100%", "Fill Canvas");
               changeDropdownMenuText(select_size, "66%", "Two Thirds");
               changeDropdownMenuText(select_size, "50%", "Half");
               changeDropdownMenuText(select_size, "33%", "One Third");
               changeDropdownMenuText(select_size, "0%", "Hide");
-
-              /*
-              // Move inside the container
-              const insideToolsContainer = document.querySelector(
-                ".inside_tools_container"
-              );
-              // Create container
-              let spacer = document.createElement("div");
-              spacer.style.display = "block";
-              spacer.style.width = "100%";
-              spacer.style.height = "34px";
-              insideToolsContainer.appendChild(spacer);
-              spacer.appendChild(select_position);
-              spacer.appendChild(select_size);
-              */
 
               // Show marginss
               if (canvas_content.portal_count == 1) {
@@ -1726,6 +1703,11 @@
               canvas_content.portal_divider_height
             );
           }
+
+          // Render text over image if there is one full screen image
+          if (is_fullscreen_image()) {
+            renderText();
+          }
         };
       }
 
@@ -1751,6 +1733,14 @@
         return offscreenCanvas;
       }
 
+      function is_fullscreen_image() {
+        return (
+          canvas_content.portal_size_percent == 100 &&
+          canvas_content.portal_count == 1 &&
+          canvas_content.portal_override_margins == false
+        );
+      }
+
       function drawLogo() {
         // Make logos visible
         let logo_container = document.getElementById("svg-container");
@@ -1763,8 +1753,16 @@
 
         // Update colors
         svgElement.getElementById("Bar").style.fill = canvas_content.color_font;
+
         svgElement.getElementById("Wordmark").style.fill =
           canvas_content.color_wordmark;
+
+        // Set to solid color if the canvas image fills the entire screen
+        if (is_fullscreen_image()) {
+          svgElement.getElementById("Wordmark").style.fill =
+            canvas_content.color_font;
+        }
+
         let name = svgElement.getElementById("Name");
         if (name != null) {
           name.style.fill = canvas_content.color_font;
@@ -1980,10 +1978,11 @@
       function updateCanvas() {
         clearCanvas();
 
+        // Text
+        text_has_been_rendered = false;
+
         // Update color scheme
-        if ("background_color" in canvas_content) {
-          drawBackground();
-        }
+        drawBackground();
 
         // Add image
         let userImageContainer = document.getElementById(
@@ -2057,41 +2056,38 @@
         calculateGrid(canvas_content.show_guides);
 
         // Add logo
-        if ("logo" in canvas_content) {
-          drawLogo();
-        }
+        drawLogo();
 
         // Render Text
         renderText();
       }
 
       function renderText() {
+        // Dynamic font size (Default)
         let font_size = Math.floor(canvas_content.marginWidth / 160) * 16;
         font_size = Math.max(32, font_size);
         font_size = Math.min(72, font_size);
 
-        /*
-        canvas_content.logo.corner = "top left";
-        canvas_content.logo_position = { x: position.x, y: position.y };
-        canvas_content.logo = { width: logo_width, height: logo_height };
-        */
+        // Largest font size (Manual override)
+        // Not coded yet
 
         let position = {
           x: canvas_content.marginLeft,
           y: canvas_content.marginTop,
         };
 
+        let logo_padding = canvas_content.logo.min_padding * 3;
+
         if (canvas_content.logo.corner.includes("top")) {
-          position.y +=
-            canvas_content.logo.height + canvas_content.logo.min_padding * 1.5;
+          position.y += canvas_content.logo.height + logo_padding;
         }
 
         let text_area = {
           width: canvas_content.marginWidth,
           height:
             canvas_content.marginHeight -
-            canvas_content.logo.height +
-            canvas_content.logo.min_padding,
+            canvas_content.logo.height -
+            logo_padding,
         };
 
         let headline = addTextToCanvas(
@@ -2099,7 +2095,7 @@
           position.x,
           position.y,
           text_area.width,
-          text_area.Height,
+          text_area.height,
           font_size,
           canvas_content.color_font,
           0,
@@ -2604,7 +2600,9 @@
 
         for (let i = 0; i < fittedTextLines.length; i++) {
           const line = fittedTextLines[i];
-          let pos_y = position_y + i * fontSize * lineHeight + fontSize;
+          let offset_y = 0.75; // First line has too much padding
+          let pos_y =
+            position_y + i * fontSize * lineHeight + fontSize * offset_y;
           ctx.fillText(line, position_x, pos_y);
         }
 

@@ -2,12 +2,15 @@
 My goal is to:
 
 -- Modify the MARGINS on super long skinny graphics to be bigger (+ add a minium of the & logo rule)
+-- Modify the 
 
 -- Ability to HIDE logo when its FULL SCREEN IMAGE
 -- FULL SCREEN WHITE BACKGROND -- CHANGE LOGO TO FULL BLACK
 ---- Add toggle switch to REVERSE (WHITE if Black, Black if white)
 
 -- Copy
+---- RENDER THE TEXT AFTER THE IMAGE HAS LOADED
+---- Modify the alignment at the top of the canvas so that it's not got weird extra padding
 ---- Add the ability to BREAK WORDS based on how its broken in the inputBox
 ---- Add the ability to INCREASE font size (Set to LARGEST POSSIBLE -- Then it downscales)
 
