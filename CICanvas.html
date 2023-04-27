@@ -560,6 +560,7 @@
 
       // Set to default
       canvas_content.logo = { name: "spg_corporate", corner: "bottom_left" };
+      canvas_content.text_bottom_aligned = false;
 
       canvas_content.portal_image_flip = [false, false];
       canvas_content.portal_size_percent = 50;
@@ -1138,6 +1139,10 @@
             canvas_content.show_guides = toggleValue;
           }
 
+          if (button_label.includes("Text bottom aligned")) {
+            canvas_content.text_bottom_aligned = toggleValue;
+          }
+
           if (button_label.includes("Portal visible margins")) {
             canvas_content.portal_override_margins =
               !canvas_content.portal_override_margins;
@@ -1270,16 +1275,24 @@
           expandLeftPanel();
           current_panel_open = "Layout";
 
+          // Show Grid
+          addToggleSwitchWithLabel("Show Grid", canvas_content.show_guides);
+
           // Update logo position
           addLabelToInsideToolsContainer("Logo Position");
           createDropdownMenu(
-            ["top left", "bottom left", "bottom right"], // "top right",
+            ["top left", "bottom left"], // "top right", "bottom right"
             "logo_position",
             canvas_content.logo.corner.toLowerCase().replace(/_/g, " ")
           );
 
-          // Show Grid
-          addToggleSwitchWithLabel("Show Grid", canvas_content.show_guides);
+          // Text bottom aligned
+          if (canvas_content.logo.corner.includes("top")) {
+            addToggleSwitchWithLabel(
+              "Text bottom aligned",
+              canvas_content.text_bottom_aligned
+            );
+          }
 
           // Size and position
           let userImageContainer = document.getElementById(
@@ -1471,6 +1484,12 @@
           if (button_label == "logo_position") {
             var position_name = selected_value.toLowerCase().replace(/ /g, "_");
             canvas_content.logo.corner = position_name;
+            canvas_content.text_bottom_aligned = false;
+            // Default is to snap the text to the bottom of the canvas
+            if (position_name.includes("top")) {
+              canvas_content.text_bottom_aligned = true;
+            }
+            update_toolbox_panel("layout_button");
           }
 
           if (button_label == "canvas_size") {
@@ -2627,29 +2646,40 @@
           return lines;
         }
 
-        // Only render font sizes larger than 16
-        fontSize = Math.max(16, fontSize);
-
+        // Fit text
         let fittedTextLines = fitText();
-        ctx.fillStyle = fontColor;
-        ctx.font = `${fontWeight} ${fontSize}px Akkurat LL`;
 
-        let offset_y = 0.75; // First line has too much padding
-        // Render font
-        for (let i = 0; i < fittedTextLines.length; i++) {
-          const line = fittedTextLines[i];
-
-          let calculated_position_y =
-            position_y + i * fontSize * lineHeight + fontSize * offset_y;
-          ctx.fillText(line, position_x, calculated_position_y);
-        }
-
+        // Get text size
         const textWidth = getTextWidth(
           fittedTextLines[0],
           fontSize,
           letterSpacing
         );
         const textHeight = fittedTextLines.length * fontSize * lineHeight;
+
+        // Snap to bottom
+        let snap_y = 0;
+        if (canvas_content.text_bottom_aligned) {
+          snap_y = rectHeight - textHeight;
+        }
+
+        // Only render font sizes larger than 16
+        fontSize = Math.max(16, fontSize);
+
+        // Render font
+        ctx.fillStyle = fontColor;
+        ctx.font = `${fontWeight} ${fontSize}px Akkurat LL`;
+
+        let offset_y = 0.75; // First line has too much padding
+        for (let i = 0; i < fittedTextLines.length; i++) {
+          const line = fittedTextLines[i];
+          let calculated_position_y =
+            snap_y +
+            position_y +
+            i * fontSize * lineHeight +
+            fontSize * offset_y;
+          ctx.fillText(line, position_x, calculated_position_y);
+        }
 
         // Render guides
         draw_guides(
