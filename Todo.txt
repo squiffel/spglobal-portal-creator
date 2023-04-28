@@ -2,14 +2,13 @@
 My goal is to:
 
 
-
 -- Logo
 ---- Each logo needs its own unique minimum size
 
 -- Copy
----- Add the ability to BREAK WORDS based on how its broken in the inputBox -- OR -- Automatic text balancedLines
+---- Better font size settings by breakpoints
 ---- Description + CTA + Button
----- character count limits
+---- Character count limits
 
 -- Layouts
 ---- Need to move the TEXT layout location to a column next to the logo rather than row above

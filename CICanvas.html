@@ -570,6 +570,7 @@
         "API",
         "EV",
         "ESG",
+        "Seek & Prosper",
       ];
 
       // Country list
@@ -1345,6 +1346,7 @@
         }
 
         if (current_panel_open == "Text") {
+          // Convert to Sentence case protecting a list of brand words & countries
           if (event.target.name == "headline") {
             canvas_content.headline = convertToBrandVoice(
               canvas_content.headline
@@ -1446,7 +1448,7 @@
         let button_label = element.innerText;
 
         if (current_panel_open == "Text") {
-          if (button_label.includes("Ignore line breaks")) {
+          if (button_label.includes("Automatic line breaks")) {
             canvas_content.ignore_line_breaks.headline =
               !canvas_content.ignore_line_breaks.headline;
           }
@@ -1580,21 +1582,24 @@
 
           addLabelToInsideToolsContainer("Headline");
           //convertToBrandVoice(
-          addInputBoxToInsideToolsContainer(
+          let headline_button = addInputBoxToInsideToolsContainer(
             "headline",
             canvas_content.headline
           );
+          headline_button.style.height = "100px";
           addButtonToInsideToolsContainer(
             "Convert to sentence case",
             "headline"
           );
           addToggleSwitchWithLabel(
-            "Ignore line breaks",
+            "Automatic line breaks",
             canvas_content.ignore_line_breaks.headline
           );
           //canvas_content.ignore_line_breaks.headline
           addLabelToInsideToolsContainer("Body");
-          addInputBoxToInsideToolsContainer("Description");
+          let description_button =
+            addInputBoxToInsideToolsContainer("Description");
+          description_button.style.height = "200px";
           addLabelToInsideToolsContainer("Call to action");
           addInputBoxToInsideToolsContainer("cta");
         }
