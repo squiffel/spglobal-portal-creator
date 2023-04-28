@@ -1,7 +1,10 @@
 Some built in Features
 
 Automatic capitalization of products and countries can be set
+the regex is breaking it
+let words = text.split(/((?:S&P Global)|\s+)/).filter((w) => w.trim().length > 0);
 
+The text split is NO LONGER WORKING
 
 -- Logo
 ---- Each logo needs its own unique minimum size
