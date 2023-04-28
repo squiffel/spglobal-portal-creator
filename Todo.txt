@@ -1,8 +1,8 @@
 Some built in Features
 
 Automatic capitalization of products and countries can be set
-the regex is breaking it
-let words = text.split(/((?:S&P Global)|\s+)/).filter((w) => w.trim().length > 0);
+We can add character limits and warn people about bad practices
+We could add in prexisting brand tag lines
 
 The text split is NO LONGER WORKING
 
