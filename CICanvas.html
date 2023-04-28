@@ -542,6 +542,305 @@
     <script>
       var canvas, ctx;
 
+      // Brand words for Title Case
+      const brandWords = [
+        "Dow Jones Indices",
+        "Market Intelligence",
+        "Commodity Insights",
+        "Platts",
+        "S&P",
+        "S&P Global",
+        "S&P Global Ratings",
+        "Essential Intelligence",
+        "S&P Global Mobility",
+        "S&P Global Engineering Solutions",
+        "S&P Global Marketplace",
+        "Sustainable1",
+        "SPIVA",
+        "Cappitech",
+        "Indices",
+        "Energy Transition",
+        "IHS Markit",
+        "Kensho",
+        "Dimensions Pro",
+        "Capital IQ Pro",
+        "Xpressfeed",
+        "5G",
+        "4G",
+        "API",
+        "EV",
+        "ESG",
+      ];
+
+      // Country list
+      const countryList = [
+        "Atlantic",
+        "Arctic",
+        "Indian",
+        "Pacific",
+        "Asia",
+        "Africa",
+        "America",
+        "North America",
+        "South America",
+        "Antartica",
+        "Europe",
+        "Oceania",
+        "Afghanistan",
+        "Åland Islands",
+        "Albania",
+        "Algeria",
+        "American Samoa",
+        "Andorra",
+        "Angola",
+        "Anguilla",
+        "Antarctica",
+        "Antigua and Barbuda",
+        "Argentina",
+        "Armenia",
+        "Aruba",
+        "Australia",
+        "Austria",
+        "Azerbaijan",
+        "Bahamas",
+        "Bahrain",
+        "Bangladesh",
+        "Barbados",
+        "Belarus",
+        "Belgium",
+        "Belize",
+        "Benin",
+        "Bermuda",
+        "Bhutan",
+        "Bolivia",
+        "Bonaire, Sint Eustatius and Saba",
+        "Bosnia and Herzegovina",
+        "Botswana",
+        "Bouvet Island",
+        "Brazil",
+        "Britain",
+        "British",
+        "British Indian Ocean Territory",
+        "Brunei Darussalam",
+        "Bulgaria",
+        "Burkina Faso",
+        "Burundi",
+        "Cabo Verde",
+        "Cambodia",
+        "Cameroon",
+        "Canada",
+        "Cayman Islands",
+        "Central African Republic",
+        "Chad",
+        "Chile",
+        "China",
+        "Christmas Island",
+        "Cocos (Keeling) Islands",
+        "Colombia",
+        "Comoros",
+        "Congo (the Democratic Republic of the)",
+        "Congo",
+        "Cook Islands",
+        "Costa Rica",
+        "Croatia",
+        "Cuba",
+        "Curaçao",
+        "Cyprus",
+        "Czechia",
+        "Côte d'Ivoire",
+        "Denmark",
+        "Djibouti",
+        "Dominica",
+        "Dominican Republic",
+        "Ecuador",
+        "Egypt",
+        "El Salvador",
+        "Equatorial Guinea",
+        "Eritrea",
+        "Estonia",
+        "Eswatini",
+        "Ethiopia",
+        "England",
+        "Falkland Islands [Malvinas]",
+        "Faroe Islands",
+        "Fiji",
+        "Finland",
+        "France",
+        "French Guiana",
+        "French Polynesia",
+        "French Southern Territories",
+        "Gabon",
+        "Gambia",
+        "Georgia",
+        "Germany",
+        "Ghana",
+        "Gibraltar",
+        "Greece",
+        "Greenland",
+        "Grenada",
+        "Guadeloupe",
+        "Guam",
+        "Guatemala",
+        "Guernsey",
+        "Guinea",
+        "Guinea-Bissau",
+        "Guyana",
+        "Haiti",
+        "Heard Island and McDonald Islands",
+        "Holy See",
+        "Honduras",
+        "Hong Kong",
+        "Hungary",
+        "Iceland",
+        "India",
+        "Indonesia",
+        "Iran (Islamic Republic of)",
+        "Iraq",
+        "Ireland",
+        "Isle of Man",
+        "Israel",
+        "Italy",
+        "Jamaica",
+        "Japan",
+        "Jersey",
+        "Jordan",
+        "Kazakhstan",
+        "Kenya",
+        "Kiribati",
+        "Korea (the Democratic People's Republic of)",
+        "Korea (the Republic of)",
+        "Kuwait",
+        "Kyrgyzstan",
+        "Lao People's Democratic Republic",
+        "Latvia",
+        "Lebanon",
+        "Lesotho",
+        "Liberia",
+        "Libya",
+        "Liechtenstein",
+        "Lithuania",
+        "Luxembourg",
+        "Macao",
+        "Madagascar",
+        "Malawi",
+        "Malaysia",
+        "Maldives",
+        "Mali",
+        "Malta",
+        "Marshall Islands",
+        "Martinique",
+        "Mauritania",
+        "Mauritius",
+        "Mayotte",
+        "Mexico",
+        "Micronesia (Federated States of)",
+        "Moldova (the Republic of)",
+        "Monaco",
+        "Mongolia",
+        "Montenegro",
+        "Montserrat",
+        "Morocco",
+        "Mozambique",
+        "Myanmar",
+        "Namibia",
+        "Nauru",
+        "Nepal",
+        "Netherlands",
+        "New Caledonia",
+        "New Zealand",
+        "Nicaragua",
+        "Niger",
+        "Nigeria",
+        "Niue",
+        "Norfolk Island",
+        "Northern Mariana Islands",
+        "Norway",
+        "Oman",
+        "Pakistan",
+        "Palau",
+        "Palestine, State of",
+        "Panama",
+        "Papua New Guinea",
+        "Paraguay",
+        "Peru",
+        "Philippines",
+        "Pitcairn",
+        "Poland",
+        "Portugal",
+        "Puerto Rico",
+        "Qatar",
+        "Republic of North Macedonia",
+        "Romania",
+        "Russian Federation",
+        "Rwanda",
+        "Réunion",
+        "Saint Barthélemy",
+        "Saint Helena, Ascension and Tristan da Cunha",
+        "Saint Kitts and Nevis",
+        "Saint Lucia",
+        "Saint Martin (French part)",
+        "Saint Pierre and Miquelon",
+        "Saint Vincent and the Grenadines",
+        "Samoa",
+        "San Marino",
+        "Sao Tome and Principe",
+        "Saudi Arabia",
+        "Senegal",
+        "Serbia",
+        "Seychelles",
+        "Sierra Leone",
+        "Singapore",
+        "Sint Maarten (Dutch part)",
+        "Slovakia",
+        "Slovenia",
+        "Solomon Islands",
+        "Somalia",
+        "South Africa",
+        "South Georgia and the South Sandwich Islands",
+        "South Sudan",
+        "Spain",
+        "Sri Lanka",
+        "Sudan",
+        "Suriname",
+        "Svalbard and Jan Mayen",
+        "Sweden",
+        "Switzerland",
+        "Syrian Arab Republic",
+        "Taiwan (Province of China)",
+        "Tajikistan",
+        "Tanzania, United Republic of",
+        "Thailand",
+        "Timor-Leste",
+        "Togo",
+        "Tokelau",
+        "Tonga",
+        "Trinidad and Tobago",
+        "Tunisia",
+        "Turkey",
+        "Turkmenistan",
+        "Turks and Caicos Islands",
+        "Tuvalu",
+        "Uganda",
+        "Ukraine",
+        "United Arab Emirates",
+        "United Kingdom of Great Britain and Northern Ireland",
+        "United States Minor Outlying Islands",
+        "United States of America",
+        "USA",
+        "Uruguay",
+        "Uzbekistan",
+        "Vanuatu",
+        "Venezuela (Bolivarian Republic of)",
+        "Viet Nam",
+        "Virgin Islands (British)",
+        "Virgin Islands (U.S.)",
+        "Wallis and Futuna",
+        "Western Sahara",
+        "Yemen",
+        "Zambia",
+        "Zimbabwe",
+      ];
+
       // enums
       var spglobal_colors = {
         black: "#000000",
@@ -561,7 +860,7 @@
       // Set to default
       canvas_content.logo = { name: "spg_corporate", corner: "bottom_left" };
       canvas_content.text_bottom_aligned = false;
-      canvas_content.remove_widows = { headline: false };
+      canvas_content.ignore_line_breaks = { headline: true };
 
       canvas_content.portal_image_flip = [false, false];
       canvas_content.portal_size_percent = 50;
@@ -581,7 +880,7 @@
         };
       }
 
-      canvas_content.headline = "Connecting energy through insights.";
+      canvas_content.headline = "";
       // Set default color scheme
       update_color_scheme("white");
 
@@ -987,13 +1286,14 @@
       }
 
       // Add buttons
-      function addButtonToInsideToolsContainer(label_string) {
+      function addButtonToInsideToolsContainer(label_string, name = "") {
         const insideToolsContainer = document.querySelector(
           ".inside_tools_container"
         );
         const button = document.createElement("button");
         button.className = "toolbox_expanded_button";
         button.textContent = label_string;
+        button.name = name;
         button.addEventListener("click", panelButtonClicked);
         insideToolsContainer.appendChild(button);
         return button;
@@ -1042,6 +1342,16 @@
         // Color scheme
         if (current_panel_open == "Color") {
           update_color_scheme(button_label); // Set background color, font and logo colors
+        }
+
+        if (current_panel_open == "Text") {
+          if (event.target.name == "headline") {
+            canvas_content.headline = convertToBrandVoice(
+              canvas_content.headline
+            );
+            document.getElementsByName("input_headline")[0].value =
+              canvas_content.headline;
+          }
         }
 
         // Logo type
@@ -1135,12 +1445,14 @@
       function toggleSwitchValueChanged(element, toggleValue) {
         let button_label = element.innerText;
 
-        if (current_panel_open == "Layout") {
-          if (button_label.includes("Remove widow")) {
-            canvas_content.remove_widows.headline =
-              !canvas_content.remove_widows.headline;
+        if (current_panel_open == "Text") {
+          if (button_label.includes("Ignore line breaks")) {
+            canvas_content.ignore_line_breaks.headline =
+              !canvas_content.ignore_line_breaks.headline;
           }
+        }
 
+        if (current_panel_open == "Layout") {
           if (button_label.includes("Show Grid")) {
             canvas_content.show_guides = toggleValue;
           }
@@ -1267,15 +1579,20 @@
           current_panel_open = "Text";
 
           addLabelToInsideToolsContainer("Headline");
+          //convertToBrandVoice(
           addInputBoxToInsideToolsContainer(
             "headline",
             canvas_content.headline
           );
-          addToggleSwitchWithLabel(
-            "Remove widow",
-            canvas_content.remove_widows.headline
+          addButtonToInsideToolsContainer(
+            "Convert to sentence case",
+            "headline"
           );
-          //canvas_content.remove_widows.headline
+          addToggleSwitchWithLabel(
+            "Ignore line breaks",
+            canvas_content.ignore_line_breaks.headline
+          );
+          //canvas_content.ignore_line_breaks.headline
           addLabelToInsideToolsContainer("Body");
           addInputBoxToInsideToolsContainer("Description");
           addLabelToInsideToolsContainer("Call to action");
@@ -2159,9 +2476,11 @@
 
         // Largest font size (Manual override)
         // Not coded yet
-
         let headline = addTextToCanvas(
-          canvas_content.headline,
+          removeNewLinesAndReturns(
+            canvas_content.headline,
+            canvas_content.ignore_line_breaks.headline
+          ),
           position.x,
           position.y,
           text_area.width,
@@ -2513,6 +2832,14 @@
         }
       }
 
+      // Remove line breaks
+      function removeNewLinesAndReturns(str, remove) {
+        if (remove) {
+          return str.replace(/[\n\r]/g, "");
+        }
+        return str;
+      }
+
       // Add text to canvas
       function addTextToCanvas(
         text,
@@ -2527,10 +2854,13 @@
         fontWeight,
         textWrap
       ) {
+        // Get the width of the text
         function getTextWidth(text, fontSize, letterSpacing) {
+          // Start the width as 0
           let width = 0;
           ctx.font = `${fontWeight} ${fontSize}px Akkurat LL`;
 
+          // Measure all the words combined with spaces
           for (let i = 0; i < text.length; i++) {
             width += ctx.measureText(text[i]).width + letterSpacing;
           }
@@ -2538,10 +2868,69 @@
           return width;
         }
 
+        // Check if ONE word is wider than the container
         function isAnyWordWiderThanRect(words) {
           return words.some(
             (word) => getTextWidth(word, fontSize, letterSpacing) > rectWidth
           );
+        }
+
+        function fitText() {
+          let lines = [];
+          let words = text.split(" ");
+
+          // If ONE word is wider than the container shrink the font size until it fits
+          while (isAnyWordWiderThanRect(words)) {
+            fontSize -= 1;
+          }
+
+          // First word in current line
+          let currentLine = words[0];
+
+          // Go through all the words in the sentence
+          for (let i = 1; i < words.length; i++) {
+            // Get the next word in the string
+            const word = words[i];
+
+            // Check if the word contains a newline or return character
+            if (word.includes("\n") || word.includes("\r")) {
+              const [beforeSpecialChar, afterSpecialChar] = word.split(
+                /[\n\r]/,
+                2
+              );
+
+              // Add the part before the special character to the current line and push it to lines array
+              const lineBeforeSpecialChar =
+                currentLine + " " + beforeSpecialChar;
+              lines.push(lineBeforeSpecialChar);
+
+              // Move the remaining text after the special character to a new line
+              currentLine = afterSpecialChar;
+            } else {
+              // Add word to the current string of words
+              const newLine = currentLine + " " + word;
+
+              // Check if the combined words are less than the width of the container
+              if (getTextWidth(newLine, fontSize, letterSpacing) <= rectWidth) {
+                currentLine = newLine; // Update the current line
+              } else {
+                // If the word doesn't fit on this line, move it to the start of the next line
+                lines.push(currentLine);
+                currentLine = word;
+              }
+            }
+          }
+
+          // Create an array where the lines are sorted by whether they fit horizontally in the available space. Text wrap.
+          lines.push(currentLine);
+
+          // Check if the resulting lines fit in the container vertically, if not make the font smaller and recursively start the process again.
+          if (lines.length * fontSize * lineHeight > rectHeight) {
+            fontSize -= 1;
+            return fitText();
+          }
+
+          return lines;
         }
 
         function removeWidows(arr) {
@@ -2563,103 +2952,6 @@
           return arr;
         }
 
-        // Balanced text attempt 1.0
-        function balanceText(lines, maxIterations = 5) {
-          if (lines.length < 2 || maxIterations === 0) return lines;
-
-          const totalChars = lines.reduce((acc, line) => acc + line.length, 0);
-          const targetLineLength = Math.ceil(totalChars / lines.length);
-
-          const words = lines.join(" ").split(" ");
-          const balancedLines = [];
-
-          let currentLine = words.shift();
-          while (words.length > 0) {
-            const nextWord = words.shift();
-
-            if (currentLine.length + 1 + nextWord.length <= targetLineLength) {
-              currentLine += ` ${nextWord}`;
-            } else {
-              balancedLines.push(currentLine);
-              currentLine = nextWord;
-            }
-          }
-          balancedLines.push(currentLine);
-
-          const maxAllowedLines = lines.length + 1;
-          while (balancedLines.length < maxAllowedLines) {
-            let shouldBreak = false;
-            for (let i = balancedLines.length - 1; i > 0; i--) {
-              const wordsInLine = balancedLines[i].split(" ");
-              const movedWord = wordsInLine.shift();
-              balancedLines[i - 1] += ` ${movedWord}`;
-              balancedLines[i] = wordsInLine.join(" ");
-
-              if (balancedLines.length === maxAllowedLines) {
-                shouldBreak = true;
-                break;
-              }
-            }
-            if (shouldBreak) break;
-          }
-
-          const initialScore = distributionScore(lines, targetLineLength);
-          const newScore = distributionScore(balancedLines, targetLineLength);
-
-          if (newScore < initialScore) {
-            return balanceText(balancedLines, maxIterations - 1);
-          } else {
-            return lines;
-          }
-        }
-
-        function distributionScore(lines, targetLineLength) {
-          return lines.reduce((acc, line) => {
-            const diff = line.length - targetLineLength;
-            return acc + Math.abs(diff);
-          }, 0);
-        }
-
-        // Helper function to calculate the score of a line distribution.
-        function distributionScore(lines, targetLineLength) {
-          return lines.reduce((acc, line) => {
-            const diff = line.length - targetLineLength;
-            return acc + Math.abs(diff);
-          }, 0);
-        }
-
-        function fitText() {
-          let lines = [];
-          let words = text.split(" ");
-
-          while (isAnyWordWiderThanRect(words)) {
-            fontSize -= 1;
-          }
-
-          let currentLine = words[0];
-
-          for (let i = 1; i < words.length; i++) {
-            const word = words[i];
-            const newLine = currentLine + " " + word;
-
-            if (getTextWidth(newLine, fontSize, letterSpacing) <= rectWidth) {
-              currentLine = newLine;
-            } else {
-              lines.push(currentLine);
-              currentLine = word;
-            }
-          }
-
-          lines.push(currentLine);
-
-          if (lines.length * fontSize * lineHeight > rectHeight) {
-            fontSize -= 1;
-            return fitText();
-          }
-
-          return lines;
-        }
-
         // Fit text
         let fittedTextLines = fitText();
 
@@ -2678,11 +2970,10 @@
         }
 
         // Only render font sizes larger than 16
-        fontSize = Math.max(16, fontSize);
-
-        if (canvas_content.remove_widows.headline == true) {
-          fittedTextLines = removeWidows(fittedTextLines);
+        if (fontSize < 16) {
+          console.log("Too small " + fontSize + "px");
         }
+        fontSize = Math.max(16, fontSize);
 
         // Render font
         ctx.fillStyle = fontColor;
@@ -2718,6 +3009,37 @@
           textWidth,
           textHeight,
         };
+      }
+
+      // Brand voice
+      function convertToBrandVoice(str) {
+        // Convert the string to sentence case
+        const sentenceCase =
+          str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+
+        // Replace specific words in the sentence with their array versions
+        const regex = new RegExp("\\b(" + brandWords.join("|") + ")\\b", "gi");
+        const result = sentenceCase.replace(regex, (matchedWord) => {
+          const wordIndex = brandWords.findIndex(
+            (word) => word.toLowerCase() === matchedWord.toLowerCase()
+          );
+          return brandWords[wordIndex];
+        });
+
+        return convertCountriesToSentenceCase(result);
+      }
+
+      function convertCountriesToSentenceCase(inputStr) {
+        const regex = new RegExp("\\b(" + countryList.join("|") + ")\\b", "gi");
+        const result = inputStr.replace(regex, (matchedCountry) => {
+          // Find the correct format of the matched country from the list
+          const correctFormat = countryList.find(
+            (country) => country.toLowerCase() === matchedCountry.toLowerCase()
+          );
+          return correctFormat || matchedCountry;
+        });
+
+        return result;
       }
     </script>
 
