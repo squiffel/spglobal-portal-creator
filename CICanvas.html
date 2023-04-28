@@ -1621,18 +1621,20 @@
             "Automatic line breaks",
             canvas_content.ignore_line_breaks.headline
           );
-          addLabelToInsideToolsContainer("Headline min-width");
+
+          addLabelToInsideToolsContainer("Dynamic font size");
           let fit_word = addInputBoxToInsideToolsContainer(
             "fit_word",
             canvas_content.text_container_minimum_character_width
           );
-          fit_word.placeholder = "Copy must fit on one line...";
-          //canvas_content.text_container_minimum_character_width
-          //canvas_content.ignore_line_breaks.headline
+          fit_word.placeholder = "Fit these words on one line...";
+          fit_word.classList.add("input_fixed_height");
+
           addLabelToInsideToolsContainer("Body");
           let description_button =
             addInputBoxToInsideToolsContainer("Description");
           description_button.style.height = "200px";
+
           addLabelToInsideToolsContainer("Call to action");
           addInputBoxToInsideToolsContainer("cta");
         }
