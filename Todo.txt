@@ -11,6 +11,9 @@ My goal is to:
 ---- Character count limits
 
 -- Layouts
+---- Full width image with small text boxes
+---- ---- Portal: (Hidden, Partial, Full)
+---- ---- Text: (Full, Two Thirds, Half, One Third)
 ---- Need to move the TEXT layout location to a column next to the logo rather than row above
 ---- Will need constraints on IMAGE POSITIONS so that the logo isn't tiny on super wide vertical shots. Don't let them do POSITION TOP
 

@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>S&P Global Portal Creator</title>
+    <title>S&P Portal Creator</title>
     <style>
       html,
       body {
@@ -896,7 +896,7 @@
         };
       }
 
-      canvas_content.headline = "";
+      canvas_content.headline = "Powering the Markets of the Future";
       // Set default color scheme
       update_color_scheme("white");
 
@@ -1663,16 +1663,25 @@
               addLabelToInsideToolsContainer("Portal Size");
 
               let select_size = createDropdownMenu(
-                ["100%", "66%", "50%", "33%", "0%"],
+                ["100%", "150%", "66%", "50%", "33%", "0%"],
                 "portal_size",
                 canvas_content.portal_size_percent + "%"
               );
 
-              changeDropdownMenuText(select_size, "100%", "Fill Canvas");
-              changeDropdownMenuText(select_size, "66%", "Two Thirds");
-              changeDropdownMenuText(select_size, "50%", "Half");
-              changeDropdownMenuText(select_size, "33%", "One Third");
-              changeDropdownMenuText(select_size, "0%", "Hide");
+              changeDropdownMenuText(
+                select_size,
+                "150%",
+                "100% Portal 50% Text"
+              );
+              changeDropdownMenuText(
+                select_size,
+                "100%",
+                "100% Portal 100% Text"
+              );
+              changeDropdownMenuText(select_size, "66%", "66% Portal 33% Text");
+              changeDropdownMenuText(select_size, "50%", "50% Portal 50% Text");
+              changeDropdownMenuText(select_size, "33%", "33% Portal 66% Text");
+              changeDropdownMenuText(select_size, "0%", "No Portal 100% Text");
 
               // Show marginss
               if (canvas_content.portal_count == 1) {
@@ -1874,7 +1883,8 @@
           }
 
           if (button_label == "portal_size") {
-            canvas_content.portal_size_percent = parseInt(selected_value);
+            let value = parseInt(selected_value);
+            canvas_content.portal_size_percent = value;
           }
         }
 
@@ -1948,7 +1958,10 @@
         if (color == "yellow" || color == "blue") {
           canvas_content.color_wordmark = spglobal_colors.black;
         }
-        if (color == "red" || color == "black") {
+        if (color == "black") {
+          canvas_content.color_font = spglobal_colors.white;
+        }
+        if (color == "red") {
           canvas_content.color_font = spglobal_colors.white;
           canvas_content.color_wordmark = spglobal_colors.white;
         }
@@ -2021,7 +2034,6 @@
           // Flip relative coordinates if image is mirrored
           if (image_flip) {
             relative_x = 1 - relative_x;
-            relative_y = 1 - relative_y;
           }
 
           // Center image exactly in canvas mask
@@ -2087,7 +2099,7 @@
 
       function is_fullscreen_image() {
         return (
-          canvas_content.portal_size_percent == 100 &&
+          canvas_content.portal_size_percent >= 100 &&
           canvas_content.portal_count == 1 &&
           canvas_content.portal_override_margins == false
         );
@@ -2227,7 +2239,7 @@
         };
 
         // Do not render logo if there are two portals and it fills the entire canvas
-        if (canvas_content.portal_size_percent == 100) {
+        if (canvas_content.portal_size_percent >= 100) {
           if (
             canvas_content.portal_count == 2 ||
             (canvas_content.portal_count == 1 &&
@@ -2255,6 +2267,7 @@
 
         // Determine the shortest side of the canvas
         const shortestSide = Math.min(width, height);
+        const longestSide = Math.max(width, height);
         canvas_content.shortestSide = "height";
         if (shortestSide == width) {
           canvas_content.shortestSide = "width";
@@ -2297,7 +2310,7 @@
         // Update margins if there are PORTALS
         if (
           canvas_content.portal_count > 0 &&
-          canvas_content.portal_size_percent != 100 &&
+          canvas_content.portal_size_percent < 100 &&
           canvas_content.portal_size_percent != 0
         ) {
           if (canvas_content.portal_side == "right") {
@@ -2317,7 +2330,7 @@
         // Add top and bottom margins if the PORTAL has margins and is FULL CANVAS
         if (
           canvas_content.portal_count > 0 &&
-          canvas_content.portal_size_percent == 100
+          canvas_content.portal_size_percent >= 100
         ) {
           if (
             canvas_content.portal_margins ||
@@ -2478,6 +2491,16 @@
             logo_padding,
         };
 
+        // Limit portal size
+        if (canvas_content.portal_size_percent == 150) {
+          if (canvas_content.shortestSide == "height") {
+            text_area.width = text_area.width * 0.5;
+          }
+          if (canvas_content.shortestSide == "width") {
+            text_area.height = text_area.height * 0.5;
+          }
+        }
+
         // Dynamic font size (Default)
         let longest_side = Math.max(text_area.width, text_area.height);
         let font_size = Math.floor(longest_side / 160) * 16;
@@ -2501,7 +2524,7 @@
         // Largest font size (Manual override)
         // Not coded yet
         let headline = addTextToCanvas(
-          clearFormatting(
+          removeNewAndReturnLines(
             canvas_content.headline,
             canvas_content.ignore_line_breaks.headline
           ),
@@ -2554,7 +2577,7 @@
             canvas_content.margin * fit_margins;
           pos_y = canvas_content.margin * fit_margins;
           // Remove bottom margins too
-          if (canvas_content.portal_size_percent == 100) {
+          if (canvas_content.portal_size_percent >= 100) {
             content_height =
               canvas.height * canvas_percent -
               canvas_content.margin * (fit_margins * 2);
@@ -2769,6 +2792,9 @@
 
           // Draw image & focal point
           drawImageAndFocalPoint();
+
+          // Update canvas
+          updateCanvas();
         };
 
         // Focal point position
@@ -2859,19 +2885,24 @@
       }
 
       // Remove line breaks
-      function clearFormatting(str, remove = true) {
+      function removeNewAndReturnLines(str, remove = true) {
+        if (remove) {
+          return str.replace(/[\n\r]/g, " "); // Remove new lines
+        }
+        return str;
+      }
+
+      // Remove line breaks
+      function clearFormatting(str) {
         function capitalizeAfterPeriod(str) {
           return str.replace(/\.(\s+)?(\w)/g, (match, space, letter) => {
             return `.${space || ""}${letter.toUpperCase()}`;
           });
         }
 
-        if (remove) {
-          str = str.replace(/[\n\r]/g, " "); // Remove new lines
-          str = str.replace(/\s+/g, " "); // Remove double spaces
-          return capitalizeAfterPeriod(str);
-        }
-        return str;
+        str = removeNewAndReturnLines(str); // Remove new lines
+        str = str.replace(/\s+/g, " "); // Remove double spaces
+        return capitalizeAfterPeriod(str);
       }
 
       // Focal point canvas highlight
@@ -3008,6 +3039,30 @@
           return arr;
         }
 
+        function drawTextWithSuperscript(text, x, y) {
+          const specialChars = ["™", "®", "©"];
+          const originalFontSize = parseInt(ctx.font.match(/\d+/)[0]);
+          const superscriptFontSize = Math.floor(originalFontSize * 0.6);
+          const superscriptYOffset = -Math.floor(originalFontSize * 0.3);
+          const spacingFactor = 0.6; // Adjust this value to change the spacing after special characters
+
+          let currentPositionX = x;
+          for (let i = 0; i < text.length; i++) {
+            let char = text.charAt(i);
+            let isSpecialChar = specialChars.includes(char);
+
+            if (isSpecialChar) {
+              ctx.font = ctx.font.replace(/\d+/, superscriptFontSize);
+              ctx.fillText(char, currentPositionX, y + superscriptYOffset);
+              ctx.font = ctx.font.replace(/\d+/, originalFontSize);
+              currentPositionX += ctx.measureText(char).width * spacingFactor; // Apply the spacing factor
+            } else {
+              ctx.fillText(char, currentPositionX, y);
+              currentPositionX += ctx.measureText(char).width;
+            }
+          }
+        }
+
         // Fit text
         let fittedTextLines = fitText();
 
@@ -3043,7 +3098,8 @@
             position_y +
             i * fontSize * lineHeight +
             fontSize * offset_y;
-          ctx.fillText(line, position_x, calculated_position_y);
+          drawTextWithSuperscript(line, position_x, calculated_position_y);
+          //ctx.fillText(line, position_x, calculated_position_y);
         }
 
         // Render guides
