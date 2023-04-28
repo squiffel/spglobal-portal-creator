@@ -6,20 +6,18 @@ My goal is to:
 ---- Each logo needs its own unique minimum size
 
 -- Copy
----- Better font size settings by breakpoints
+---- Need to prevent the word "S&P Global Market Intelligence" being split up on two lines if its in the copy.
+--------- Maybe there is a function that shrinks the text to fit "Enginnering Solutions" on one line
+---- Better font size settings by tailoring specific font sizes at specific breakpoints
 ---- Description + CTA + Button
----- Character count limits
+---- Character count limits ? -- Maybe I just flag it like Twitter does. Red warning label
 
 -- Layouts
----- Full width image with small text boxes
----- ---- Portal: (Hidden, Partial, Full)
----- ---- Text: (Full, Two Thirds, Half, One Third)
----- Need to move the TEXT layout location to a column next to the logo rather than row above
----- Will need constraints on IMAGE POSITIONS so that the logo isn't tiny on super wide vertical shots. Don't let them do POSITION TOP
+---- When the canvas is super wide, move the text to the right of the logo
 
 -- Styles
 ---- Seek & Prosper
----- CI Event
+---- CI Event -- ADD EVENT NAME
 ---- Podcast
 
 -- Speakers*
