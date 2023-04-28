@@ -1,13 +1,14 @@
 
 My goal is to:
 
--- Modify the MARGINS on super long skinny graphics to be bigger (+ add a minium of the & logo rule)
 
+
+-- Logo
+---- Each logo needs its own unique minimum size
 
 -- Copy
 ---- Align Text to BOTTOM? if the logo is above?
----- Add the ability to BREAK WORDS based on how its broken in the inputBox
----- Figure out the best way to determine the font size dynamically, do want to make this a control people can edit
+---- Add the ability to BREAK WORDS based on how its broken in the inputBox -- YES
 
 -- Layouts
 ---- Need to move the TEXT layout location to a column next to the logo rather than row above
@@ -20,4 +21,8 @@ My goal is to:
 
 -- Speakers*
 
-Hide portal should be a separate toggle switch?
+
+Scope creep
+-- Hide portal should be a separate toggle switch?
+-- Make canvas size setting ONE line with two Input Boxes
+-- I need to able to hide settings WHILE explaining why they are hidden

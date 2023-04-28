@@ -561,6 +561,7 @@
       // Set to default
       canvas_content.logo = { name: "spg_corporate", corner: "bottom_left" };
       canvas_content.text_bottom_aligned = false;
+      canvas_content.remove_widows = { headline: false };
 
       canvas_content.portal_image_flip = [false, false];
       canvas_content.portal_size_percent = 50;
@@ -1135,6 +1136,11 @@
         let button_label = element.innerText;
 
         if (current_panel_open == "Layout") {
+          if (button_label.includes("Remove widow")) {
+            canvas_content.remove_widows.headline =
+              !canvas_content.remove_widows.headline;
+          }
+
           if (button_label.includes("Show Grid")) {
             canvas_content.show_guides = toggleValue;
           }
@@ -1265,6 +1271,11 @@
             "headline",
             canvas_content.headline
           );
+          addToggleSwitchWithLabel(
+            "Remove widow",
+            canvas_content.remove_widows.headline
+          );
+          //canvas_content.remove_widows.headline
           addLabelToInsideToolsContainer("Body");
           addInputBoxToInsideToolsContainer("Description");
           addLabelToInsideToolsContainer("Call to action");
@@ -1342,50 +1353,50 @@
           }
 
           /*
-          // Layout buttons
-          addLabelToInsideToolsContainer("Layout");
-          addSquareButtonsToInsideToolsContainer(
-            "layout_buttons",
-            "layout_4_split_assymetrical"
-          );
-          addSquareButtonsToInsideToolsContainer(
-            "layout_buttons",
-            "layout_4_split_symetrical"
-          );
-          addSquareButtonsToInsideToolsContainer(
-            "layout_buttons",
-            "layout_bottom_split_assymetrical"
-          );
-          addSquareButtonsToInsideToolsContainer(
-            "layout_buttons",
-            "layout_bottom_split_symetrical"
-          );
-          addSquareButtonsToInsideToolsContainer(
-            "layout_buttons",
-            "layout_side_split_assymetrical"
-          );
-          addSquareButtonsToInsideToolsContainer(
-            "layout_buttons",
-            "layout_side_split_symetrical"
-          );
-          addSquareButtonsToInsideToolsContainer(
-            "layout_buttons",
-            "layout_3_row"
-          );
-          addSquareButtonsToInsideToolsContainer(
-            "layout_buttons",
-            "layout_3_col"
-          );
-          addSquareButtonsToInsideToolsContainer(
-            "layout_buttons",
-            "layout_2_row"
-          );
-          addSquareButtonsToInsideToolsContainer(
-            "layout_buttons",
-            "layout_2_col"
-          );
+                // Layout buttons
+                addLabelToInsideToolsContainer("Layout");
+                addSquareButtonsToInsideToolsContainer(
+                  "layout_buttons",
+                  "layout_4_split_assymetrical"
+                );
+                addSquareButtonsToInsideToolsContainer(
+                  "layout_buttons",
+                  "layout_4_split_symetrical"
+                );
+                addSquareButtonsToInsideToolsContainer(
+                  "layout_buttons",
+                  "layout_bottom_split_assymetrical"
+                );
+                addSquareButtonsToInsideToolsContainer(
+                  "layout_buttons",
+                  "layout_bottom_split_symetrical"
+                );
+                addSquareButtonsToInsideToolsContainer(
+                  "layout_buttons",
+                  "layout_side_split_assymetrical"
+                );
+                addSquareButtonsToInsideToolsContainer(
+                  "layout_buttons",
+                  "layout_side_split_symetrical"
+                );
+                addSquareButtonsToInsideToolsContainer(
+                  "layout_buttons",
+                  "layout_3_row"
+                );
+                addSquareButtonsToInsideToolsContainer(
+                  "layout_buttons",
+                  "layout_3_col"
+                );
+                addSquareButtonsToInsideToolsContainer(
+                  "layout_buttons",
+                  "layout_2_row"
+                );
+                addSquareButtonsToInsideToolsContainer(
+                  "layout_buttons",
+                  "layout_2_col"
+                );
 
-          */
+                */
 
           // Templates
           addLabelToInsideToolsContainer("Templates");
@@ -2129,7 +2140,10 @@
         // Dynamic font size (Default)
         let longest_side = Math.max(text_area.width, text_area.height);
         let font_size = Math.floor(longest_side / 160) * 16;
-        font_size = Math.max(32, font_size);
+
+        let font_size_width = Math.floor(text_area.width / 150) * 16;
+        let font_size_height = Math.floor(text_area.height / 110) * 16;
+        font_size = Math.max(32, (font_size_width + font_size_height) / 2);
 
         let font_size_max =
           text_area.width > 700 && text_area.height > 700 ? 96 : 72;
@@ -2138,7 +2152,7 @@
         // Smaller fonts on vertical text areas
         if (longest_side == text_area.height) {
           console.log(`Shrunk text  ${font_size}  >  ${font_size - 8}`);
-          font_size -= 8;
+          //font_size -= 8;
         }
 
         console.log("Initial calculated font size: " + font_size);
@@ -2665,6 +2679,10 @@
 
         // Only render font sizes larger than 16
         fontSize = Math.max(16, fontSize);
+
+        if (canvas_content.remove_widows.headline == true) {
+          fittedTextLines = removeWidows(fittedTextLines);
+        }
 
         // Render font
         ctx.fillStyle = fontColor;
