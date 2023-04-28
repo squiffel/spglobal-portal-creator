@@ -2983,11 +2983,31 @@
           );
         }
 
+        function mergeSPGlobal(words) {
+          const result = [];
+          let i = 0;
+
+          while (i < words.length) {
+            if (
+              i + 1 < words.length &&
+              words[i] === "S&P" &&
+              words[i + 1] === "Global"
+            ) {
+              result.push("S&P Global");
+              i += 2;
+            } else {
+              result.push(words[i]);
+              i++;
+            }
+          }
+
+          return result;
+        }
+
         function fitText(customString = "") {
           let lines = [];
-          let words = text
-            .split(/((?:S&P Global)|\s+)/)
-            .filter((w) => w.trim().length > 0);
+          let words = text.split(" ");
+          words = mergeSPGlobal(words); // Merges S&P Global into one word
 
           // If ONE word is wider than the container (with custom string) shrink the font size until it fits
           while (isAnyWordWiderThanRect(words, customString)) {
