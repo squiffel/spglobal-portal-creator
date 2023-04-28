@@ -40,14 +40,15 @@
 
       .secondary {
         background: none;
-        border: 2px solid #2c92e5;
+        border: 2px solid #777;
         transition: 0.3s;
-        color: #2c92e5;
+        color: #777;
       }
 
       .secondary:hover {
         background-color: #e7f0f5;
         border: 2px solid #2c92e5;
+        color: #2c92e5;
       }
 
       .toggle-switch-container {
@@ -163,6 +164,11 @@
         padding: 8px;
         color: #666666;
         font-size: 11px;
+      }
+
+      .active {
+        color: #2c92e5 !important;
+        font-weight: bold !important;
       }
 
       .tools {
@@ -345,7 +351,15 @@
 
       .focal_point_canvas {
         border-radius: 4px;
-        border: 1px solid #a0a0a0;
+        border: 2px solid #cccccc;
+        width: 214px;
+        height: 141px;
+        box-sizing: border-box;
+      }
+
+      .focal_point_highlight {
+        border: 2px solid #4280bf;
+        box-sizing: border-box;
       }
 
       #canvas {
@@ -571,6 +585,7 @@
         "EV",
         "ESG",
         "Seek & Prosper",
+        "Ratings360",
       ];
 
       // Country list
@@ -1166,7 +1181,11 @@
           );
           changeDropdownMenuText(select_image, "0", "Primary Portal");
           changeDropdownMenuText(select_image, "1", "Secondary Portal");
+
           select_image.style.marginTop = "8px";
+          select_image.style.marginRight = "16px";
+          select_image.style.display = "inline-block";
+          select_image.style.width = "68%";
         }
 
         const fileInput = document.createElement("input");
@@ -1177,7 +1196,7 @@
 
         const browseButton = document.createElement("button");
         browseButton.style.marginTop = "8px";
-        browseButton.textContent = "Upload image";
+        browseButton.textContent = "Upload";
         container.appendChild(browseButton);
 
         browseButton.addEventListener("click", function () {
@@ -1309,7 +1328,7 @@
         label.className = "toolbox_expanded_label";
         label.textContent = label_string;
         insideToolsContainer.appendChild(label);
-        return insideToolsContainer;
+        return label;
       }
 
       // Text label
@@ -1587,10 +1606,7 @@
             canvas_content.headline
           );
           headline_button.style.height = "100px";
-          addButtonToInsideToolsContainer(
-            "Convert to sentence case",
-            "headline"
-          );
+          addButtonToInsideToolsContainer("Clear formating", "headline");
           addToggleSwitchWithLabel(
             "Automatic line breaks",
             canvas_content.ignore_line_breaks.headline
@@ -1783,14 +1799,15 @@
               if (img) {
                 let portal_label =
                   i == 0 ? "Portal [PRIMARY]" : "Portal [Secondary]";
-                addLabelToInsideToolsContainer(portal_label);
+                let label = addLabelToInsideToolsContainer(portal_label);
+                label.classList.add("portal_label");
+                // Focal point setter
+                createImagePreviewWithFocalPoint(img, i);
                 // Add make primary button
                 if (i == 1) {
                   let makePrimaryButton =
                     addButtonToInsideToolsContainer("Convert to primary");
                 }
-                // Focal point setter
-                createImagePreviewWithFocalPoint(img, i);
                 // Show Grid
                 let toggle_switch = addToggleSwitchWithLabel(
                   "Mirror horizontally",
@@ -1866,6 +1883,8 @@
           if (button_label == "portal_image") {
             canvas_content.portal_upload_image_number =
               parseInt(selected_value);
+
+            update_canvas_highlight();
           }
         }
 
@@ -2482,7 +2501,7 @@
         // Largest font size (Manual override)
         // Not coded yet
         let headline = addTextToCanvas(
-          removeNewLinesAndReturns(
+          clearFormatting(
             canvas_content.headline,
             canvas_content.ignore_line_breaks.headline
           ),
@@ -2741,6 +2760,8 @@
 
             // Reset mirror image
             canvas_content.portal_image_flip[n] = false;
+
+            update_canvas_highlight();
           }
 
           // Clear the canvas
@@ -2838,11 +2859,41 @@
       }
 
       // Remove line breaks
-      function removeNewLinesAndReturns(str, remove) {
+      function clearFormatting(str, remove = true) {
+        function capitalizeAfterPeriod(str) {
+          return str.replace(/\.(\s+)?(\w)/g, (match, space, letter) => {
+            return `.${space || ""}${letter.toUpperCase()}`;
+          });
+        }
+
         if (remove) {
-          return str.replace(/[\n\r]/g, "");
+          str = str.replace(/[\n\r]/g, " "); // Remove new lines
+          str = str.replace(/\s+/g, " "); // Remove double spaces
+          return capitalizeAfterPeriod(str);
         }
         return str;
+      }
+
+      // Focal point canvas highlight
+      function update_canvas_highlight() {
+        // Add highlights
+        let focal_canvas =
+          document.getElementsByClassName("focal_point_canvas");
+        let focal_label = document.getElementsByClassName("portal_label");
+
+        if (focal_canvas) {
+          // Remove highlighted canvas
+          for (var i = 0; i < focal_canvas.length; i++) {
+            focal_canvas[i].classList.remove("focal_point_highlight");
+            focal_label[i].classList.remove("active");
+          }
+          let q = parseInt(canvas_content.portal_upload_image_number);
+          // Add highlighted canvas
+          if (focal_canvas[q]) {
+            focal_canvas[q].classList.add("focal_point_highlight");
+            focal_label[q].classList.add("active");
+          }
+        }
       }
 
       // Add text to canvas
@@ -3031,7 +3082,7 @@
           return brandWords[wordIndex];
         });
 
-        return convertCountriesToSentenceCase(result);
+        return clearFormatting(convertCountriesToSentenceCase(result));
       }
 
       function convertCountriesToSentenceCase(inputStr) {
