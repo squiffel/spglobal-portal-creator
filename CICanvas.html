@@ -557,17 +557,18 @@
       var canvas, ctx;
 
       // Brand words for Title Case
-      const brandWords = [
+      const capitalizationArray = [
         "Dow Jones Indices",
-        "Market Intelligence",
-        "Commodity Insights",
         "Platts",
+        "S&P Cheese Ratings",
         "S&P",
         "S&P Global",
         "S&P Global Ratings",
+        "Market Intelligence",
+        "Commodity Insights",
         "Essential Intelligence",
         "S&P Global Mobility",
-        "S&P Global Engineering Solutions",
+        "Engineering Solutions",
         "S&P Global Marketplace",
         "Sustainable1",
         "SPIVA",
@@ -822,7 +823,7 @@
         "Sweden",
         "Switzerland",
         "Syrian Arab Republic",
-        "Taiwan (Province of China)",
+        "Taiwan",
         "Tajikistan",
         "Tanzania, United Republic of",
         "Thailand",
@@ -839,17 +840,20 @@
         "Uganda",
         "Ukraine",
         "United Arab Emirates",
-        "United Kingdom of Great Britain and Northern Ireland",
+        "UK",
+        "United Kingdom",
+        "Great Britain",
+        "Ireland",
         "United States Minor Outlying Islands",
         "United States of America",
         "USA",
         "Uruguay",
         "Uzbekistan",
         "Vanuatu",
-        "Venezuela (Bolivarian Republic of)",
+        "Venezuela",
         "Viet Nam",
-        "Virgin Islands (British)",
-        "Virgin Islands (U.S.)",
+        "Virgin Islands",
+        "Virgin Islands",
         "Wallis and Futuna",
         "Western Sahara",
         "Yemen",
@@ -877,6 +881,8 @@
       canvas_content.logo = { name: "spg_corporate", corner: "bottom_left" };
       canvas_content.text_bottom_aligned = false;
       canvas_content.ignore_line_breaks = { headline: true };
+
+      canvas_content.text_container_minimum_character_width = "";
 
       canvas_content.portal_image_flip = [false, false];
       canvas_content.portal_size_percent = 50;
@@ -1351,6 +1357,11 @@
           canvas_content.headline = string_value;
         }
 
+        if (button_label == "input_fit_word") {
+          console.log(string_value);
+          canvas_content.text_container_minimum_character_width = string_value;
+        }
+
         updateCanvas();
       }
 
@@ -1600,7 +1611,6 @@
           current_panel_open = "Text";
 
           addLabelToInsideToolsContainer("Headline");
-          //convertToBrandVoice(
           let headline_button = addInputBoxToInsideToolsContainer(
             "headline",
             canvas_content.headline
@@ -1611,6 +1621,13 @@
             "Automatic line breaks",
             canvas_content.ignore_line_breaks.headline
           );
+          addLabelToInsideToolsContainer("Headline min-width");
+          let fit_word = addInputBoxToInsideToolsContainer(
+            "fit_word",
+            canvas_content.text_container_minimum_character_width
+          );
+          fit_word.placeholder = "Copy must fit on one line...";
+          //canvas_content.text_container_minimum_character_width
           //canvas_content.ignore_line_breaks.headline
           addLabelToInsideToolsContainer("Body");
           let description_button =
@@ -2515,11 +2532,11 @@
 
         // Smaller fonts on vertical text areas
         if (longest_side == text_area.height) {
-          console.log(`Shrunk text  ${font_size}  >  ${font_size - 8}`);
+          //console.log(`Shrunk text  ${font_size}  >  ${font_size - 8}`);
           //font_size -= 8;
         }
 
-        console.log("Initial calculated font size: " + font_size);
+        //console.log("Initial calculated font size: " + font_size);
 
         // Largest font size (Manual override)
         // Not coded yet
@@ -2539,7 +2556,7 @@
           700
         );
 
-        console.log("Dynamic calculated font size: " + headline.fontSize);
+        //console.log("Dynamic calculated font size: " + headline.fontSize);
       }
 
       function get_portal_specs(portal_size, portal_side) {
@@ -2955,19 +2972,23 @@
           return width;
         }
 
-        // Check if ONE word is wider than the container
-        function isAnyWordWiderThanRect(words) {
-          return words.some(
-            (word) => getTextWidth(word, fontSize, letterSpacing) > rectWidth
+        // Check if ONE word is wider than the container, and if custom string is wider than the container
+        function isAnyWordWiderThanRect(words, customString) {
+          return (
+            words.some(
+              (word) => getTextWidth(word, fontSize, letterSpacing) > rectWidth
+            ) || getTextWidth(customString, fontSize, letterSpacing) > rectWidth
           );
         }
 
-        function fitText() {
+        function fitText(customString = "") {
           let lines = [];
-          let words = text.split(" ");
+          let words = text
+            .split(/((?:S&P Global)|\s+)/)
+            .filter((w) => w.trim().length > 0);
 
-          // If ONE word is wider than the container shrink the font size until it fits
-          while (isAnyWordWiderThanRect(words)) {
+          // If ONE word is wider than the container (with custom string) shrink the font size until it fits
+          while (isAnyWordWiderThanRect(words, customString)) {
             fontSize -= 1;
           }
 
@@ -2979,31 +3000,44 @@
             // Get the next word in the string
             const word = words[i];
 
-            // Check if the word contains a newline or return character
-            if (word.includes("\n") || word.includes("\r")) {
-              const [beforeSpecialChar, afterSpecialChar] = word.split(
-                /[\n\r]/,
-                2
-              );
-
-              // Add the part before the special character to the current line and push it to lines array
-              const lineBeforeSpecialChar =
-                currentLine + " " + beforeSpecialChar;
-              lines.push(lineBeforeSpecialChar);
-
-              // Move the remaining text after the special character to a new line
-              currentLine = afterSpecialChar;
-            } else {
-              // Add word to the current string of words
+            if (word === "S&P Global") {
               const newLine = currentLine + " " + word;
 
-              // Check if the combined words are less than the width of the container
               if (getTextWidth(newLine, fontSize, letterSpacing) <= rectWidth) {
-                currentLine = newLine; // Update the current line
+                currentLine = newLine;
               } else {
-                // If the word doesn't fit on this line, move it to the start of the next line
                 lines.push(currentLine);
                 currentLine = word;
+              }
+            } else {
+              // Check if the word contains a newline or return character
+              if (word.includes("\n") || word.includes("\r")) {
+                const [beforeSpecialChar, afterSpecialChar] = word.split(
+                  /[\n\r]/,
+                  2
+                );
+
+                // Add the part before the special character to the current line and push it to lines array
+                const lineBeforeSpecialChar =
+                  currentLine + " " + beforeSpecialChar;
+                lines.push(lineBeforeSpecialChar);
+
+                // Move the remaining text after the special character to a new line
+                currentLine = afterSpecialChar;
+              } else {
+                // Add word to the current string of words
+                const newLine = currentLine + " " + word;
+
+                // Check if the combined words are less than the width of the container
+                if (
+                  getTextWidth(newLine, fontSize, letterSpacing) <= rectWidth
+                ) {
+                  currentLine = newLine; // Update the current line
+                } else {
+                  // If the word doesn't fit on this line, move it to the start of the next line
+                  lines.push(currentLine);
+                  currentLine = word;
+                }
               }
             }
           }
@@ -3014,7 +3048,7 @@
           // Check if the resulting lines fit in the container vertically, if not make the font smaller and recursively start the process again.
           if (lines.length * fontSize * lineHeight > rectHeight) {
             fontSize -= 1;
-            return fitText();
+            return fitText(customString);
           }
 
           return lines;
@@ -3064,7 +3098,9 @@
         }
 
         // Fit text
-        let fittedTextLines = fitText();
+        let fittedTextLines = fitText(
+          canvas_content.text_container_minimum_character_width
+        );
 
         // Get text size
         const textWidth = getTextWidth(
@@ -3098,8 +3134,8 @@
             position_y +
             i * fontSize * lineHeight +
             fontSize * offset_y;
+          // Add superscript, trademark and copywriting
           drawTextWithSuperscript(line, position_x, calculated_position_y);
-          //ctx.fillText(line, position_x, calculated_position_y);
         }
 
         // Render guides
@@ -3123,22 +3159,50 @@
         };
       }
 
-      // Brand voice
-      function convertToBrandVoice(str) {
-        // Convert the string to sentence case
-        const sentenceCase =
-          str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+      function escapeRegExp(string) {
+        return string.replace(/[.*+\-?^${}()|[\]\\]/g, "\\$&");
+      }
 
-        // Replace specific words in the sentence with their array versions
-        const regex = new RegExp("\\b(" + brandWords.join("|") + ")\\b", "gi");
-        const result = sentenceCase.replace(regex, (matchedWord) => {
-          const wordIndex = brandWords.findIndex(
-            (word) => word.toLowerCase() === matchedWord.toLowerCase()
+      function capitalizeFirstLetterOfSentence(match) {
+        return match.charAt(0).toUpperCase() + match.slice(1);
+      }
+
+      function replaceWithCapitalized(string, capitalizationArray) {
+        const lowercaseString = string.toLowerCase();
+
+        // Capitalize the first letter of the first word in every sentence
+        let modifiedString = lowercaseString.replace(
+          /(^\w)|(\.\s*\w)/g,
+          capitalizeFirstLetterOfSentence
+        );
+
+        // Sort capitalizationArray in descending order of length
+        const sortedCapitalizationArray = capitalizationArray
+          .slice()
+          .sort((a, b) => b.length - a.length);
+
+        sortedCapitalizationArray.forEach((element) => {
+          const lowercaseElement = element.toLowerCase();
+          const escapedLowercaseElement = escapeRegExp(lowercaseElement);
+          const regex = new RegExp(
+            "(?<=^|\\s|[^\\w])" +
+              escapedLowercaseElement.split(" ").join("\\s+") +
+              "(?=$|\\s|[^\\w])",
+            "g"
           );
-          return brandWords[wordIndex];
+          modifiedString = modifiedString.replace(regex, element);
         });
 
-        return clearFormatting(convertCountriesToSentenceCase(result));
+        return modifiedString;
+      }
+
+      // Brand voice
+      function convertToBrandVoice(string) {
+        // Remove formating
+        string = clearFormatting(string);
+        result = replaceWithCapitalized(string, capitalizationArray);
+
+        return convertCountriesToSentenceCase(result);
       }
 
       function convertCountriesToSentenceCase(inputStr) {

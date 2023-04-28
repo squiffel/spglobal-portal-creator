@@ -1,5 +1,6 @@
+Some built in Features
 
-My goal is to:
+Automatic capitalization of products and countries can be set
 
 
 -- Logo
@@ -11,6 +12,7 @@ My goal is to:
 ---- Better font size settings by tailoring specific font sizes at specific breakpoints
 ---- Description + CTA + Button
 ---- Character count limits ? -- Maybe I just flag it like Twitter does. Red warning label
+---0 N
 
 -- Layouts
 ---- When the canvas is super wide, move the text to the right of the logo
