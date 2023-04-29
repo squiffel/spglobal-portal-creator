@@ -950,6 +950,7 @@
         canvas = document.getElementById("canvas");
         if (canvas) {
           canvas.remove();
+          document.getElementById("canvas_container").remove();
         }
 
         // Create a new canvas
@@ -990,6 +991,28 @@
 
         // Update the canvas with the custom attributes
         updateCanvas();
+
+        let dimensions = document.createElement("div");
+        dimensions.id = "canvas_dimensions";
+        dimensions.style.color = "#777777";
+        dimensions.style.fontSize = "12px";
+        dimensions.style.textAlign = "center";
+        dimensions.style.marginTop = "5px";
+        dimensions.style.margin = "0 96px 96px 96px"; // Set the margin of the dimensions div
+        dimensions.textContent = `${canvas.width} x ${canvas.height}`;
+
+        let canvas_container = document.createElement("div");
+        canvas_container.id = "canvas_container";
+        canvas_container.style.display = "flex";
+        canvas_container.style.flexDirection = "column";
+        canvas_container.style.alignItems = "center";
+
+        canvas.parentElement.insertBefore(canvas_container, canvas);
+        canvas_container.appendChild(canvas);
+        canvas_container.appendChild(dimensions);
+
+        canvas.style.margin = "96px 96px 8px 96px"; // top right bottom left
+        dimensions.style.margin = "0 96px 88px 96px"; // Set the margin of the dimensions div
       }
 
       function handleWindowResize() {
