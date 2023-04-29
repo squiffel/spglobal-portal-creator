@@ -1289,7 +1289,7 @@
           return;
         }
 
-        addLabelToInsideToolsContainer("Upload");
+        addLabelToInsideToolsContainer("Add Portal");
 
         const dragDropArea = document.createElement("div");
         dragDropArea.classList.add("drag-drop-area");
@@ -2380,7 +2380,10 @@
         let svgElement = document.getElementById(logo_name);
         let { width, height } = svgElement.getBBox();
 
-        // Update colors
+        // Market Intelligence logo should fit in all circumstances
+        let reference = { width: 285.9903259277344, height: 78.15953063964844 };
+
+        // Update SVG logo colors
         svgElement.getElementById("Bar").style.fill = canvas_content.color_font;
 
         svgElement.getElementById("Wordmark").style.fill =
@@ -2409,38 +2412,33 @@
         let blobURL = URL.createObjectURL(blob);
 
         // Logo scale
+        let rescaled = false;
         // Default is based on the margins. Scale is 1 if the margins are 40px
         let logo_scale = Math.max(0.65, canvas_content.margin / 40); // 1
 
         // Then we have to check if the logo will fit in the space provided which is the margins
-        if (width * logo_scale > canvas_content.marginWidth) {
-          logo_scale = canvas_content.marginWidth / width; // Modify the logo scale to fit
+        if (reference.width * logo_scale > canvas_content.marginWidth) {
+          logo_scale = canvas_content.marginWidth / reference.width; // Modify the logo scale to fit
         }
 
-        if (height * logo_scale > canvas_content.marginHeight) {
-          logo_scale = canvas_content.marginHeight / height; // Check if the modified logo scale fits
+        if (reference.height * logo_scale > canvas_content.marginHeight) {
+          logo_scale = canvas_content.marginHeight / reference.height; // Check if the modified logo scale fits
         }
 
         // Update the logo size
         let logo_width = width * logo_scale;
         let logo_height = height * logo_scale;
 
-        // Minimum size requirements
-        let min_height = 24;
-        let min_width = 96;
-
-        // Rescale logo to minimum specs
-        if (logo_height < min_height || logo_width < min_width) {
-          if (logo_width < min_width) {
-            logo_scale = min_width / width;
-          }
-
+        // If corproate logo is smaller than minimum requirements, rescale it
+        if (logo_name.includes("corporate")) {
+          let min_height = 18;
+          // Rescale logo to minimum specs
           if (logo_height < min_height) {
             logo_scale = min_height / height;
+            logo_width = width * logo_scale;
+            logo_height = height * logo_scale;
+            console.log("Rescaled corproate logo");
           }
-
-          logo_width = width * logo_scale;
-          logo_height = height * logo_scale;
         }
 
         // Logo does not fit in the available space
@@ -2766,15 +2764,7 @@
           }
         }
 
-        // Dynamic font size (Default)
-        /*
-        let longest_side = Math.max(text_area.width, text_area.height);
-        let font_size = Math.floor(longest_side / 160) * 16;
-
-        let font_size_width = Math.floor(text_area.width / 150) * 16;
-        let font_size_height = Math.floor(text_area.height / 110) * 16;
-        font_size = Math.max(32, (font_size_width + font_size_height) / 2);
-        */
+        // Dynamic font size
         let font_size_max =
           text_area.width > 700 && text_area.height > 700 ? 96 : 72;
 
@@ -2783,6 +2773,18 @@
 
         font_size_max =
           text_area.width < 500 && text_area.height < 500 ? 48 : font_size_max;
+
+        // Super wide canvas with image and long text
+        if (canvas_content.headline.length > 32) {
+          font_size_max =
+            text_area.width > 500 &&
+            text_area.height > 180 &&
+            text_area.height < 300 &&
+            text_area.width < 1200
+              ? 56
+              : font_size_max;
+        }
+
         font_size = font_size_max; //Math.min(font_size_max, font_size);
 
         console.log(`Initial font size ${font_size}px`);
