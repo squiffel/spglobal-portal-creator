@@ -40,6 +40,7 @@
 
       .secondary {
         background: none;
+        box-sizing: border-box;
         border: 2px solid #777;
         transition: 0.3s;
         color: #777;
@@ -1284,27 +1285,16 @@
       function addFileUploadArea() {
         const container = document.querySelector(".inside_tools_container");
 
+        if (canvas_content.portal_count == 2) {
+          return;
+        }
+
+        addLabelToInsideToolsContainer("Upload");
+
         const dragDropArea = document.createElement("div");
         dragDropArea.classList.add("drag-drop-area");
         dragDropArea.textContent = "Drag and drop files here";
         container.appendChild(dragDropArea);
-
-        // Image to change
-        if (canvas_content.portal_count > 0) {
-          // Only show if there are images
-          let select_image = createDropdownMenu(
-            ["0", "1"],
-            "portal_image",
-            canvas_content.portal_upload_image_number
-          );
-          changeDropdownMenuText(select_image, "0", "Primary Portal");
-          changeDropdownMenuText(select_image, "1", "Secondary Portal");
-
-          select_image.style.marginTop = "8px";
-          select_image.style.marginRight = "16px";
-          select_image.style.display = "inline-block";
-          select_image.style.width = "68%";
-        }
 
         const fileInput = document.createElement("input");
         fileInput.type = "file";
@@ -1318,6 +1308,12 @@
         container.appendChild(browseButton);
 
         browseButton.addEventListener("click", function () {
+          // Image to change
+          canvas_content.portal_upload_image_number =
+            canvas_content.portal_count;
+          console.log(
+            `upload number : ${canvas_content.portal_upload_image_number}`
+          );
           fileInput.click();
         });
 
@@ -1349,14 +1345,45 @@
       function removeImageButton(image_id) {
         const container = document.querySelector(".inside_tools_container");
 
-        // Otherwise create the button
-        const deleteButton = document.createElement("button");
         let buttonText = ["primary image", "secondary image"];
-        deleteButton.textContent = "Delete " + buttonText[image_id];
+
+        // Input text
+        const fileInput = document.createElement("input");
+        fileInput.type = "file";
+        fileInput.accept = "image/png, image/jpeg";
+        fileInput.style.display = "none";
+        container.appendChild(fileInput);
+
+        // Create the upload button
+        const addButton = document.createElement("button");
+        addButton.textContent = "Replace image";
+        addButton.name = image_id;
+        addButton.id = "add_" + image_id;
+        container.appendChild(addButton);
+
+        // Create the delete button
+        const deleteButton = document.createElement("button");
+        deleteButton.textContent = "Delete";
         deleteButton.name = image_id;
         deleteButton.id = "delete_" + image_id;
         deleteButton.classList.add("secondary");
+        deleteButton.style.padding = "9px 8px";
+        deleteButton.style.marginLeft = "12px";
         container.appendChild(deleteButton);
+
+        addButton.addEventListener("click", function () {
+          canvas_content.portal_upload_image_number = parseInt(
+            event.target.name
+          );
+          fileInput.click();
+        });
+
+        fileInput.addEventListener("change", function () {
+          if (fileInput.files.length > 0) {
+            add_user_image(fileInput.files[0]);
+            fileInput.value = ""; // Reset the file input value to allow the same file to be selected again.
+          }
+        });
 
         deleteButton.addEventListener("click", function () {
           let button_label = event.target.name;
@@ -1369,8 +1396,18 @@
             // If you delete the primary image, move the secondary focal point to the primary
             if (n == 0) {
               // Transfer focal point information over
-              canvas_content.portal_focal_point[0] =
-                canvas_content.portal_focal_point[1];
+              canvas_content.portal_focal_point[0].x = parseFloat(
+                canvas_content.portal_focal_point[1].x
+              );
+              canvas_content.portal_focal_point[0].y = parseFloat(
+                canvas_content.portal_focal_point[1].y
+              );
+              canvas_content.portal_focal_point[0].relative_x = parseFloat(
+                canvas_content.portal_focal_point[1].relative_x
+              );
+              canvas_content.portal_focal_point[0].relative_y = parseFloat(
+                canvas_content.portal_focal_point[1].relative_y
+              );
               // Transfer mirroring information over
               canvas_content.portal_image_flip[0] =
                 canvas_content.portal_image_flip[1];
@@ -1590,6 +1627,8 @@
                 userImageContainer.appendChild(primary_image);
 
                 // Transfer attributes
+                console.log("Trasfer the information to flip image position");
+                console.log(canvas_content.portal_focal_point);
                 let primary_focal_point = canvas_content.portal_focal_point[0];
                 let secondary_focal_point =
                   canvas_content.portal_focal_point[1];
@@ -1601,6 +1640,8 @@
                 canvas_content.portal_focal_point[1] = primary_focal_point;
                 canvas_content.portal_image_flip[0] = secondary_mirror;
                 canvas_content.portal_image_flip[1] = primary_mirror;
+
+                console.log(canvas_content.portal_focal_point);
 
                 // Update panel
                 update_toolbox_panel("image_button");
@@ -1986,7 +2027,6 @@
           current_panel_open = "Image";
 
           // Portal upload
-          addLabelToInsideToolsContainer("Upload");
           addFileUploadArea();
 
           // Show margins
@@ -2024,6 +2064,7 @@
                 let label = addLabelToInsideToolsContainer(portal_label);
                 label.classList.add("portal_label");
                 // Focal point setter
+                console.log("create image focal point: " + i);
                 createImagePreviewWithFocalPoint(img, i);
                 // Add make primary button
                 if (i == 1) {
@@ -2238,7 +2279,7 @@
           const scaleFactor = Math.min(width_scale, height_scale); // Smallest scale wins
 
           let scale = 1 + canvas_content.portal_image_scale[image_number] * 0.2;
-          console.log(`inside canvas: ${scale}`);
+          //console.log(`inside canvas: ${scale}`);
           // Calculate the scale of the change
           let scaledWidth = (image.width / scaleFactor) * scale;
           let scaledHeight = (image.height / scaleFactor) * scale;
@@ -2247,6 +2288,8 @@
 
           let canvas_margin_x = Math.abs(maskRectWidth - scaledWidth);
           let canvas_margin_y = Math.abs(maskRectHeight - scaledHeight);
+
+          console.log(`image number loaded: ${image_number}`);
 
           let relative_x =
             canvas_content.portal_focal_point[image_number].relative_x;
@@ -2754,7 +2797,7 @@
           text_area.width < 500 && text_area.height < 500 ? 48 : font_size_max;
         font_size = font_size_max; //Math.min(font_size_max, font_size);
 
-        console.log(`Initial font size ${font_size}px`);
+        //console.log(`Initial font size ${font_size}px`);
 
         //console.log("Initial calculated font size: " + font_size);
 
@@ -3062,6 +3105,7 @@
         });
 
         function calculate_focal_point_within_image_boundary() {
+          console.log(n);
           const rect = portal_canvas.getBoundingClientRect();
 
           // Move focal point to mouse but constrain inside the image
@@ -3397,7 +3441,7 @@
 
         // Step scale
         fontSize = Math.floor(fontSize / 4) * 4;
-        console.log(`Final font size ${fontSize}px.`);
+        //console.log(`Final font size ${fontSize}px.`);
 
         // Only render font sizes larger than 16
         if (fontSize < 14) {

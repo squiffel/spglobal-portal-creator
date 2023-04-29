@@ -3,11 +3,6 @@ Some built in Features
 Automatic capitalization of divisions, products, countries
 We can add character limits and warn people about bad practices
 
-Image
---- Add replace button next to the Delete Button
---- Move the Drag and drop below the Primary portal after you add an image
---- Disapear the drag and drop when there are two portals
-
 -- Logo
 ---- Each logo needs its own unique minimum size
 
