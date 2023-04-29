@@ -4,18 +4,21 @@ Automatic capitalization of products and countries can be set
 We can add character limits and warn people about bad practices
 We could add in prexisting brand tag lines
 
-The text split is NO LONGER WORKING
+
+Image
+--- Add replace button next to the Delete Button
+Move the Drag and drop below the Primary portal after you add an image
+Disapear the drag and drop when there are two portals
 
 -- Logo
 ---- Each logo needs its own unique minimum size
 
 -- Copy
----- Need to prevent the word "S&P Global Market Intelligence" being split up on two lines if its in the copy.
---------- Maybe there is a function that shrinks the text to fit "Enginnering Solutions" on one line
----- Better font size settings by tailoring specific font sizes at specific breakpoints
+---- Flag if the headline + copy is taking up almost no space?
 ---- Description + CTA + Button
----- Character count limits ? -- Maybe I just flag it like Twitter does. Red warning label
----0 N
+---- Character count limits ? -- Maybe I just flag it like Twitter does. Red warning label -- 
+---------- HEADLINES should be 60-80 characters. Cap at 120?
+Bottom aligned text may have an issue with descenders on small margins when the text is fixed at 16px but wanted to be smaller
 
 -- Layouts
 ---- When the canvas is super wide, move the text to the right of the logo

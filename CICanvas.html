@@ -404,6 +404,45 @@
       label {
         margin-right: 8px;
       }
+
+      .slider {
+        position: relative;
+        width: 100%;
+        height: 16px;
+      }
+
+      .slider-line {
+        position: absolute;
+        top: 50%;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background-color: #999;
+      }
+
+      .slider-handle {
+        position: absolute;
+        top: 50%;
+        width: 16px;
+        height: 16px;
+        margin-top: -8px;
+        margin-left: -8px;
+        border-radius: 50%;
+        background-color: #00f;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        cursor: pointer;
+      }
+
+      .range-slider {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        margin-bottom: 15px;
+      }
+
+      .range-slider input[type="range"] {
+        width: 100%;
+      }
     </style>
   </head>
   <body>
@@ -555,6 +594,8 @@
     <!-- ---------------------- SCRIPTS ---------------------- -->
     <script>
       var canvas, ctx;
+
+      createFooterText();
 
       // Brand words for Title Case
       const capitalizationArray = [
@@ -880,9 +921,10 @@
       // Set to default
       canvas_content.logo = { name: "spg_corporate", corner: "bottom_left" };
       canvas_content.text_bottom_aligned = false;
-      canvas_content.ignore_line_breaks = { headline: true };
+      canvas_content.ignore_line_breaks = { headline: false };
 
       canvas_content.text_container_minimum_character_width = "";
+      canvas_content.fit_by_word = { headline: 0 };
 
       canvas_content.portal_image_flip = [false, false];
       canvas_content.portal_size_percent = 50;
@@ -902,12 +944,39 @@
         };
       }
 
-      canvas_content.headline = "Powering the Markets of the Future";
+      // Random initial headline
+      const random_headlines = [
+        "Powering the Markets of the Future.",
+        "Data, technology, people. That's the path to progress.",
+        "Decisive action depends on Essential Intelligence.",
+        "Life behind the data.",
+        "Powerful impact.",
+        "Placing risk and performance in a greater context is Essential Intelligence.",
+      ];
+
+      canvas_content.headline =
+        random_headlines[Math.floor(Math.random() * random_headlines.length)];
+
       // Set default color scheme
       update_color_scheme("white");
 
       // UI States
       let current_panel_open = "None";
+
+      function getRandomValueFromArray(array, currentString) {
+        // check if the current string exists in the array
+        const index = array.indexOf(currentString);
+        if (index === -1) {
+          // if the current string doesn't exist in the array, return an empty string
+          return "";
+        } else {
+          // if the current string exists in the array, remove it and pick a random value from the remaining values
+          const newArray = array.slice(0);
+          newArray.splice(index, 1);
+          const randomIndex = Math.floor(Math.random() * newArray.length);
+          return newArray[randomIndex];
+        }
+      }
 
       // Functions
       function createCanvas() {
@@ -980,6 +1049,21 @@
         if (canvas_content.orientation == "vertical") {
           canvas_content.portal_side = "top";
         }
+
+        // Replace random headline if it is one
+        let random_headline_generator = getRandomValueFromArray(
+          random_headlines,
+          canvas_content.headline
+        );
+        if (random_headline_generator != "") {
+          canvas_content.headline = random_headline_generator;
+        }
+
+        canvas_content.text_container_minimum_character_width =
+          findLongestWordsByWidth(
+            canvas_content.headline,
+            canvas_content.fit_by_word.headline + 1
+          );
 
         // Update panel
         if (current_panel_open == "Layout") {
@@ -1298,6 +1382,67 @@
         return deleteButton;
       }
 
+      function findLongestWordsByWidth(inputString, consecutiveWords = 1) {
+        // Split the input string into words
+        const words = inputString.split(/\s+/);
+
+        if (consecutiveWords > words.length) {
+          return inputString;
+        }
+
+        // Initialize variables to store the longest substring and its width
+        let longestSubstring = "";
+        let maxWidth = 0;
+
+        // Create a temporary canvas for measuring text width
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d");
+
+        // Set the font for the context; adjust the font size and family as needed
+        ctx.font = "16px Akkurat LL";
+
+        // Iterate through the words, checking the width of consecutive words
+        for (let i = 0; i <= words.length - consecutiveWords; i++) {
+          const substringWords = words.slice(i, i + consecutiveWords);
+          const substring = substringWords.join(" ");
+          const width = ctx.measureText(substring).width;
+
+          // If the current substring has a larger width, update the longest substring and maxWidth
+          if (width > maxWidth) {
+            longestSubstring = substring;
+            maxWidth = width;
+          }
+        }
+
+        // Return the longest substring
+        return longestSubstring;
+      }
+
+      function createFooterText() {
+        // create a new element for the footer text
+        const footerText = document.createElement("div");
+
+        // set the text and styles for the footer text
+        footerText.innerHTML =
+          '<span style="font-weight: bold;">S&amp;P Global</span> | Portal Creator';
+        footerText.style.position = "fixed";
+        footerText.style.bottom = "16px";
+        footerText.style.right = "16px";
+        footerText.style.fontSize = "16px";
+        footerText.style.color = "#777777";
+        footerText.style.userSelect = "none"; // disable text selection
+
+        // add the footer text to the document body
+        document.body.appendChild(footerText);
+
+        // handle window resize events to keep the footer text at the bottom right corner
+        function handleResize() {
+          footerText.style.bottom = "16px";
+          footerText.style.right = "16px";
+        }
+        window.addEventListener("resize", handleResize);
+      }
+
       function update_toolbox_panel(button_label) {
         let image_button = document.getElementsByName(button_label)[0];
         image_button.click();
@@ -1369,6 +1514,7 @@
         textContainer.classList.add("text-container");
         textContainer.textContent = text;
         insideToolsContainer.appendChild(textContainer);
+        return textContainer;
       }
 
       //Input box modified
@@ -1378,11 +1524,6 @@
 
         if (button_label == "input_headline") {
           canvas_content.headline = string_value;
-        }
-
-        if (button_label == "input_fit_word") {
-          console.log(string_value);
-          canvas_content.text_container_minimum_character_width = string_value;
         }
 
         updateCanvas();
@@ -1515,15 +1656,6 @@
           if (button_label.includes("Text bottom aligned")) {
             canvas_content.text_bottom_aligned = toggleValue;
           }
-
-          if (button_label.includes("Portal visible margins")) {
-            canvas_content.portal_override_margins =
-              !canvas_content.portal_override_margins;
-          }
-          if (button_label.includes("Primary image side")) {
-            canvas_content.portal_primary_image_side =
-              !canvas_content.portal_primary_image_side;
-          }
         }
 
         if (current_panel_open == "Image") {
@@ -1532,6 +1664,14 @@
             let n = parseInt(element.name);
             canvas_content.portal_image_flip[n] =
               !canvas_content.portal_image_flip[n];
+          }
+          if (button_label.includes("Portal visible margins")) {
+            canvas_content.portal_override_margins =
+              !canvas_content.portal_override_margins;
+          }
+          if (button_label.includes("Primary image side")) {
+            canvas_content.portal_primary_image_side =
+              !canvas_content.portal_primary_image_side;
           }
         }
 
@@ -1627,6 +1767,8 @@
           addButtonToInsideToolsContainer("Commodity Insights");
           addButtonToInsideToolsContainer("Market Intelligence");
           addButtonToInsideToolsContainer("Mobility");
+
+          //createRangeSlider(5); // Creates a slider with 5 increments.
         }
 
         if (buttonName === "text_button") {
@@ -1639,19 +1781,26 @@
             canvas_content.headline
           );
           headline_button.style.height = "100px";
-          addButtonToInsideToolsContainer("Clear formating", "headline");
+          addButtonToInsideToolsContainer("Clear all formating", "headline");
+          /*
           addToggleSwitchWithLabel(
             "Automatic line breaks",
             canvas_content.ignore_line_breaks.headline
           );
-
-          addLabelToInsideToolsContainer("Dynamic font size");
-          let fit_word = addInputBoxToInsideToolsContainer(
-            "fit_word",
-            canvas_content.text_container_minimum_character_width
+*/
+          // Fit the text by the longest words
+          addLabelToInsideToolsContainer("Fit by word");
+          createRangeSlider(
+            4,
+            canvas_content.fit_by_word.headline,
+            "fit_by_words"
           );
-          fit_word.placeholder = "Fit these words on one line...";
-          fit_word.classList.add("input_fixed_height");
+          let text_description = addTextToInsideToolsContainer(
+            `${
+              canvas_content.fit_by_word.headline + 1
+            } Longest word(s): "${canvas_content.text_container_minimum_character_width.toLocaleUpperCase()}"`
+          );
+          text_description.id = "headline_fit_by_word";
 
           addLabelToInsideToolsContainer("Body");
           let description_button =
@@ -1724,20 +1873,6 @@
               changeDropdownMenuText(select_size, "50%", "50% Portal 50% Text");
               changeDropdownMenuText(select_size, "33%", "33% Portal 66% Text");
               changeDropdownMenuText(select_size, "0%", "No Portal 100% Text");
-
-              // Show marginss
-              if (canvas_content.portal_count == 1) {
-                addToggleSwitchWithLabel(
-                  "Portal visible margins",
-                  canvas_content.portal_override_margins
-                );
-              }
-              if (canvas_content.portal_count == 2) {
-                addToggleSwitchWithLabel(
-                  "Primary image side",
-                  canvas_content.portal_primary_image_side
-                );
-              }
             }
           }
 
@@ -1839,6 +1974,20 @@
           // Portal upload
           addLabelToInsideToolsContainer("Upload");
           addFileUploadArea();
+
+          // Show marginss
+          if (canvas_content.portal_count == 1) {
+            addToggleSwitchWithLabel(
+              "Portal visible margins",
+              canvas_content.portal_override_margins
+            );
+          }
+          if (canvas_content.portal_count == 2) {
+            addToggleSwitchWithLabel(
+              "Primary image side",
+              canvas_content.portal_primary_image_side
+            );
+          }
 
           // Add Focal Point controls
           let user_image_container = document.getElementById(
@@ -2544,22 +2693,21 @@
         }
 
         // Dynamic font size (Default)
+        /*
         let longest_side = Math.max(text_area.width, text_area.height);
         let font_size = Math.floor(longest_side / 160) * 16;
 
         let font_size_width = Math.floor(text_area.width / 150) * 16;
         let font_size_height = Math.floor(text_area.height / 110) * 16;
         font_size = Math.max(32, (font_size_width + font_size_height) / 2);
-
+        */
         let font_size_max =
           text_area.width > 700 && text_area.height > 700 ? 96 : 72;
-        font_size = Math.min(font_size_max, font_size);
 
-        // Smaller fonts on vertical text areas
-        if (longest_side == text_area.height) {
-          //console.log(`Shrunk text  ${font_size}  >  ${font_size - 8}`);
-          //font_size -= 8;
-        }
+        font_size_max =
+          text_area.width < 700 && text_area.height < 700 ? 48 : font_size_max;
+        font_size = font_size_max; //Math.min(font_size_max, font_size);
+        console.log(font_size);
 
         //console.log("Initial calculated font size: " + font_size);
 
@@ -2929,7 +3077,7 @@
       // Remove line breaks
       function removeNewAndReturnLines(str, remove = true) {
         if (remove) {
-          return str.replace(/[\n\r]/g, " "); // Remove new lines
+          return str.replace(/[\n\r]/g, " ").replace(/\s+/g, " "); // Remove new lines && consecutive spaces
         }
         return str;
       }
@@ -3014,9 +3162,9 @@
             if (
               i + 1 < words.length &&
               words[i] === "S&P" &&
-              words[i + 1] === "Global"
+              (words[i + 1] === "Global" || words[i + 1] === "Dow")
             ) {
-              result.push("S&P Global");
+              result.push("S&P " + words[i + 1]);
               i += 2;
             } else {
               result.push(words[i]);
@@ -3053,9 +3201,7 @@
           let words = text.split(" ");
           words = mergeSPGlobal(words); // Merges S&P Global into one word
 
-          console.log(`font size ${fontSize}`);
           lineHeight = calculateLineHeight(fontSize);
-          console.log(lineHeight);
 
           // If ONE word is wider than the container (with custom string) shrink the font size until it fits
           while (isAnyWordWiderThanRect(words, customString)) {
@@ -3187,10 +3333,10 @@
         }
 
         // Only render font sizes larger than 16
-        if (fontSize < 16) {
+        if (fontSize < 14) {
           console.log("Too small " + fontSize + "px");
         }
-        fontSize = Math.max(16, fontSize);
+        fontSize = Math.max(14, fontSize);
 
         // Render font
         ctx.fillStyle = fontColor;
@@ -3309,6 +3455,56 @@
         });
 
         return result;
+      }
+
+      // SLider
+      function createRangeSlider(incrementCount, initial_value = 0, name) {
+        const container = document.querySelector(".inside_tools_container");
+        const sliderWrapper = document.createElement("div");
+        const slider = document.createElement("input");
+        const stepSize = 100 / (incrementCount - 1);
+
+        sliderWrapper.classList.add("range-slider");
+        slider.type = "range";
+        slider.min = "0";
+        slider.max = "100.1";
+        slider.step = stepSize;
+        slider.value = initial_value * stepSize;
+        slider.name = name;
+
+        slider.addEventListener("mouseup", (event) => {
+          const value = parseFloat(event.target.value);
+          const incrementPosition = Math.round(value / stepSize);
+          reportSliderValue(event.target, incrementPosition);
+        });
+
+        sliderWrapper.appendChild(slider);
+        container.appendChild(sliderWrapper);
+      }
+
+      function reportSliderValue(slider, incrementPosition) {
+        //console.log("Slider moved:", slider);
+        //console.log("Increment position:", incrementPosition);
+
+        if (slider.name == "fit_by_words") {
+          let consecutive_word_count = incrementPosition + 1; // First value is 0 so it's useless
+          // Look for the longest consecutive words
+          canvas_content.text_container_minimum_character_width =
+            findLongestWordsByWidth(
+              canvas_content.headline,
+              consecutive_word_count
+            );
+          // Update word
+          canvas_content.fit_by_word.headline = incrementPosition;
+
+          let label = document.getElementById("headline_fit_by_word");
+          label.innerText = `${
+            canvas_content.fit_by_word.headline + 1
+          } Longest word(s): "${canvas_content.text_container_minimum_character_width.toLocaleUpperCase()}"`;
+        }
+
+        // Update canvas
+        updateCanvas();
       }
     </script>
 
