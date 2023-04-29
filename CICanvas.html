@@ -1311,9 +1311,6 @@
           // Image to change
           canvas_content.portal_upload_image_number =
             canvas_content.portal_count;
-          console.log(
-            `upload number : ${canvas_content.portal_upload_image_number}`
-          );
           fileInput.click();
         });
 
@@ -1627,8 +1624,6 @@
                 userImageContainer.appendChild(primary_image);
 
                 // Transfer attributes
-                console.log("Trasfer the information to flip image position");
-                console.log(canvas_content.portal_focal_point);
                 let primary_focal_point = canvas_content.portal_focal_point[0];
                 let secondary_focal_point =
                   canvas_content.portal_focal_point[1];
@@ -1640,8 +1635,6 @@
                 canvas_content.portal_focal_point[1] = primary_focal_point;
                 canvas_content.portal_image_flip[0] = secondary_mirror;
                 canvas_content.portal_image_flip[1] = primary_mirror;
-
-                console.log(canvas_content.portal_focal_point);
 
                 // Update panel
                 update_toolbox_panel("image_button");
@@ -2064,7 +2057,6 @@
                 let label = addLabelToInsideToolsContainer(portal_label);
                 label.classList.add("portal_label");
                 // Focal point setter
-                console.log("create image focal point: " + i);
                 createImagePreviewWithFocalPoint(img, i);
                 // Add make primary button
                 if (i == 1) {
@@ -2154,8 +2146,6 @@
           if (button_label == "portal_image") {
             canvas_content.portal_upload_image_number =
               parseInt(selected_value);
-
-            update_canvas_highlight();
           }
         }
 
@@ -2279,7 +2269,7 @@
           const scaleFactor = Math.min(width_scale, height_scale); // Smallest scale wins
 
           let scale = 1 + canvas_content.portal_image_scale[image_number] * 0.2;
-          //console.log(`inside canvas: ${scale}`);
+
           // Calculate the scale of the change
           let scaledWidth = (image.width / scaleFactor) * scale;
           let scaledHeight = (image.height / scaleFactor) * scale;
@@ -2288,8 +2278,6 @@
 
           let canvas_margin_x = Math.abs(maskRectWidth - scaledWidth);
           let canvas_margin_y = Math.abs(maskRectHeight - scaledHeight);
-
-          console.log(`image number loaded: ${image_number}`);
 
           let relative_x =
             canvas_content.portal_focal_point[image_number].relative_x;
@@ -2797,9 +2785,7 @@
           text_area.width < 500 && text_area.height < 500 ? 48 : font_size_max;
         font_size = font_size_max; //Math.min(font_size_max, font_size);
 
-        //console.log(`Initial font size ${font_size}px`);
-
-        //console.log("Initial calculated font size: " + font_size);
+        console.log(`Initial font size ${font_size}px`);
 
         // Largest font size (Manual override)
         // Not coded yet
@@ -2818,8 +2804,6 @@
           1.05,
           700
         );
-
-        //console.log("Dynamic calculated font size: " + headline.fontSize);
       }
 
       function get_portal_specs(portal_size, portal_side) {
@@ -3075,12 +3059,6 @@
             if (slider_range) {
               slider_range.value = 0;
             }
-
-            console.log(
-              `Image reset scale: ${canvas_content.portal_image_scale[n]}`
-            );
-
-            update_canvas_highlight();
           }
 
           // Clear the canvas
@@ -3105,7 +3083,6 @@
         });
 
         function calculate_focal_point_within_image_boundary() {
-          console.log(n);
           const rect = portal_canvas.getBoundingClientRect();
 
           // Move focal point to mouse but constrain inside the image
@@ -3200,28 +3177,6 @@
         str = removeNewAndReturnLines(str); // Remove new lines
         str = str.replace(/\s+/g, " "); // Remove double spaces
         return capitalizeAfterPeriod(str);
-      }
-
-      // Focal point canvas highlight
-      function update_canvas_highlight() {
-        // Add highlights
-        let focal_canvas =
-          document.getElementsByClassName("focal_point_canvas");
-        let focal_label = document.getElementsByClassName("portal_label");
-
-        if (focal_canvas) {
-          // Remove highlighted canvas
-          for (var i = 0; i < focal_canvas.length; i++) {
-            focal_canvas[i].classList.remove("focal_point_highlight");
-            focal_label[i].classList.remove("active");
-          }
-          let q = parseInt(canvas_content.portal_upload_image_number);
-          // Add highlighted canvas
-          if (focal_canvas[q]) {
-            focal_canvas[q].classList.add("focal_point_highlight");
-            focal_label[q].classList.add("active");
-          }
-        }
       }
 
       // Add text to canvas
@@ -3439,9 +3394,11 @@
           snap_y = rectHeight - textHeight;
         }
 
-        // Step scale
-        fontSize = Math.floor(fontSize / 4) * 4;
-        //console.log(`Final font size ${fontSize}px.`);
+        // Snap down fonts above 24px (24, 28, 32)
+        if (fontSize > 24) {
+          fontSize = Math.floor(fontSize / 4) * 4;
+        }
+        console.log(`Final font size ${fontSize}px.`);
 
         // Only render font sizes larger than 16
         if (fontSize < 14) {
@@ -3594,12 +3551,8 @@
       }
 
       function reportSliderValue(slider, incrementPosition) {
-        //console.log("Slider moved:", slider);
-        //console.log("Increment position:", incrementPosition);
-
         if (slider.name.includes("image_scale")) {
           let i = parseInt(slider.name.replace("image_scale_", ""));
-          console.log(i);
           canvas_content.portal_image_scale[i] = incrementPosition;
         }
 
