@@ -1,25 +1,23 @@
 Some built in Features
 
-Automatic capitalization of products and countries can be set
+Automatic capitalization of divisions, products, countries
 We can add character limits and warn people about bad practices
-We could add in prexisting brand tag lines
 
 Image
---- Image scale
 --- Add replace button next to the Delete Button
-Move the Drag and drop below the Primary portal after you add an image
-Disapear the drag and drop when there are two portals
+--- Move the Drag and drop below the Primary portal after you add an image
+--- Disapear the drag and drop when there are two portals
 
 -- Logo
 ---- Each logo needs its own unique minimum size
 
 -- Copy
 ---- HEADLINE Left DESCRIPTION Right (A design option that should exist)
----- Flag if the headline + copy is taking up almost no space?
+---- Flag if the headline + copy is taking up almost no space. Aka the font is TINY for no reason.
 ---- Description + CTA + Button
----- Character count limits ? -- Maybe I just flag it like Twitter does. Red warning label -- 
+---- Character count limits — Red warnings when over and cut off points super over.
 ---------- HEADLINES should be 60-80 characters. Cap at 120?
-Bottom aligned text may have an issue with descenders on small margins when the text is fixed at 16px but wanted to be smaller
+---- Bottom aligned text, if the last line has no descenders then it is offset.
 
 -- Layouts
 ---- When the canvas is super wide, move the text to the right of the logo
