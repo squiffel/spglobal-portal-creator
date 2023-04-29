@@ -437,7 +437,7 @@
         width: 100%;
         display: flex;
         justify-content: center;
-        margin-bottom: 15px;
+        margin: 8px 0px 8px 0px;
       }
 
       .range-slider input[type="range"] {
@@ -926,11 +926,15 @@
       canvas_content.text_container_minimum_character_width = "";
       canvas_content.fit_by_word = { headline: 0 };
 
+      canvas_content.portal_color_overlay = false;
+
       canvas_content.portal_image_flip = [false, false];
       canvas_content.portal_size_percent = 50;
       canvas_content.portal_upload_image_number = 0;
       canvas_content.portal_override_margins = false;
       canvas_content.portal_primary_image_side = true;
+      canvas_content.portal_image_scale = [0, 0];
+
       // Default focal point
       canvas_content.portal_focal_point = [];
       for (var i = 0; i < 2; i++) {
@@ -1266,6 +1270,7 @@
           resetFocalPoint[n] = true;
 
           // Update canvas once image has loaded
+
           updateCanvas();
           // Upload panel
           if (current_panel_open == "Image") {
@@ -1369,6 +1374,9 @@
               // Transfer mirroring information over
               canvas_content.portal_image_flip[0] =
                 canvas_content.portal_image_flip[1];
+              // Transfer scale over
+              canvas_content.portal_image_scale[0] =
+                canvas_content.portal_image_scale[1];
             }
             image_container.removeChild(img);
           }
@@ -1494,13 +1502,17 @@
       }
 
       // Add labels
-      function addLabelToInsideToolsContainer(label_string) {
+      function addLabelToInsideToolsContainer(
+        label_string,
+        padding_bottom = 11
+      ) {
         const insideToolsContainer = document.querySelector(
           ".inside_tools_container"
         );
         const label = document.createElement("div");
         label.className = "toolbox_expanded_label";
         label.textContent = label_string;
+        label.style.paddingBottom = `${padding_bottom}px`;
         insideToolsContainer.appendChild(label);
         return label;
       }
@@ -1665,6 +1677,10 @@
             canvas_content.portal_image_flip[n] =
               !canvas_content.portal_image_flip[n];
           }
+          if (button_label.includes("Full image color overlay")) {
+            canvas_content.portal_color_overlay =
+              !canvas_content.portal_color_overlay;
+          }
           if (button_label.includes("Portal visible margins")) {
             canvas_content.portal_override_margins =
               !canvas_content.portal_override_margins;
@@ -1767,8 +1783,6 @@
           addButtonToInsideToolsContainer("Commodity Insights");
           addButtonToInsideToolsContainer("Market Intelligence");
           addButtonToInsideToolsContainer("Mobility");
-
-          //createRangeSlider(5); // Creates a slider with 5 increments.
         }
 
         if (buttonName === "text_button") {
@@ -1789,7 +1803,7 @@
           );
 */
           // Fit the text by the longest words
-          addLabelToInsideToolsContainer("Fit by word");
+          addLabelToInsideToolsContainer("Fit by word count", 0);
           createRangeSlider(
             4,
             canvas_content.fit_by_word.headline,
@@ -1975,12 +1989,20 @@
           addLabelToInsideToolsContainer("Upload");
           addFileUploadArea();
 
-          // Show marginss
+          // Show margins
           if (canvas_content.portal_count == 1) {
+            // Margins
             addToggleSwitchWithLabel(
               "Portal visible margins",
               canvas_content.portal_override_margins
             );
+            // Overlay
+            if (is_fullscreen_image()) {
+              addToggleSwitchWithLabel(
+                "Full image color overlay",
+                canvas_content.portal_color_overlay
+              );
+            }
           }
           if (canvas_content.portal_count == 2) {
             addToggleSwitchWithLabel(
@@ -2008,6 +2030,13 @@
                   let makePrimaryButton =
                     addButtonToInsideToolsContainer("Convert to primary");
                 }
+                // Show scale
+                addLabelToInsideToolsContainer("Scale", 0);
+                createRangeSlider(
+                  4,
+                  canvas_content.portal_image_scale[i],
+                  "image_scale_" + i
+                );
                 // Show Grid
                 let toggle_switch = addToggleSwitchWithLabel(
                   "Mirror horizontally",
@@ -2208,9 +2237,11 @@
           // The side that is a smaller scale is set to 100%
           const scaleFactor = Math.min(width_scale, height_scale); // Smallest scale wins
 
+          let scale = 1 + canvas_content.portal_image_scale[image_number] * 0.2;
+          console.log(`inside canvas: ${scale}`);
           // Calculate the scale of the change
-          let scaledWidth = image.width / scaleFactor;
-          let scaledHeight = image.height / scaleFactor;
+          let scaledWidth = (image.width / scaleFactor) * scale;
+          let scaledHeight = (image.height / scaleFactor) * scale;
 
           // Calculate the focal point of the image -- Currently not quite centering it
 
@@ -2229,11 +2260,13 @@
 
           // Center image exactly in canvas mask
           let img_x_position = scaledWidth * relative_x - maskRectWidth * 0.5;
-          img_x_position = Math.max(0, img_x_position); // Constraints
+          // Constraints where the image can't be positioned so that the edge is visible
+          img_x_position = Math.max(0, img_x_position);
           img_x_position = Math.min(canvas_margin_x, img_x_position);
 
           let img_y_position = scaledHeight * relative_y - maskRectHeight * 0.5;
-          img_y_position = Math.max(0, img_y_position); // Constraints
+          // Constraints where the image can't be positioned so that the edge is visible
+          img_y_position = Math.max(0, img_y_position);
           img_y_position = Math.min(canvas_margin_y, img_y_position);
 
           // Draw the clipping mask in the center of the canvas
@@ -2242,9 +2275,10 @@
           ctx.rect(pos_x, pos_y, maskRectWidth, maskRectHeight);
           ctx.clip();
 
-          // Draw the image in the center of the mask
+          // Flip the image horizontally
           let transformed_image = flipImageHorizontally(image, image_flip);
 
+          // Draw the image in the center of the mask (Constrained by the edges of the image)
           ctx.drawImage(
             transformed_image,
             pos_x - img_x_position,
@@ -2265,6 +2299,15 @@
 
           // Render text over image if there is one full screen image
           if (is_fullscreen_image()) {
+            // Render transparent overlay
+            if (canvas_content.portal_color_overlay && is_fullscreen_image()) {
+              let color =
+                canvas_content.color_font != spglobal_colors.black
+                  ? "#000000"
+                  : "#ffffff";
+              drawBackground(color, 0.3);
+            }
+            // Render text overlay
             renderText();
           }
         };
@@ -2581,7 +2624,7 @@
         text_has_been_rendered = false;
 
         // Update color scheme
-        drawBackground();
+        drawBackground(canvas_content.background_color);
 
         // Add image
         let userImageContainer = document.getElementById(
@@ -2705,9 +2748,13 @@
           text_area.width > 700 && text_area.height > 700 ? 96 : 72;
 
         font_size_max =
-          text_area.width < 700 && text_area.height < 700 ? 48 : font_size_max;
+          text_area.width < 600 && text_area.height < 600 ? 64 : font_size_max;
+
+        font_size_max =
+          text_area.width < 500 && text_area.height < 500 ? 48 : font_size_max;
         font_size = font_size_max; //Math.min(font_size_max, font_size);
-        console.log(font_size);
+
+        console.log(`Initial font size ${font_size}px`);
 
         //console.log("Initial calculated font size: " + font_size);
 
@@ -2863,12 +2910,15 @@
       }
 
       // Set the background color
-      function drawBackground() {
+      function drawBackground(color = "#ffffff", opacity = 1) {
+        // Opacity ranges from 0.0 — 1.0
         const width = canvas.width;
         const height = canvas.height;
 
-        ctx.fillStyle = canvas_content.background_color;
+        ctx.globalAlpha = opacity;
+        ctx.fillStyle = color;
         ctx.fillRect(0, 0, width, height);
+        ctx.globalAlpha = 1; // Reset the globalAlpha to 1 after drawing
       }
 
       // Draw portal line
@@ -2973,6 +3023,19 @@
 
             // Reset mirror image
             canvas_content.portal_image_flip[n] = false;
+
+            // Reset scale
+            canvas_content.portal_image_scale[n] = 0;
+            let slider_range = document.getElementsByName(
+              "image_scale_" + n
+            )[0];
+            if (slider_range) {
+              slider_range.value = 0;
+            }
+
+            console.log(
+              `Image reset scale: ${canvas_content.portal_image_scale[n]}`
+            );
 
             update_canvas_highlight();
           }
@@ -3332,9 +3395,13 @@
           snap_y = rectHeight - textHeight;
         }
 
+        // Step scale
+        fontSize = Math.floor(fontSize / 4) * 4;
+        console.log(`Final font size ${fontSize}px.`);
+
         // Only render font sizes larger than 16
         if (fontSize < 14) {
-          console.log("Too small " + fontSize + "px");
+          console.log(`Increased size to 14px`);
         }
         fontSize = Math.max(14, fontSize);
 
@@ -3485,6 +3552,12 @@
       function reportSliderValue(slider, incrementPosition) {
         //console.log("Slider moved:", slider);
         //console.log("Increment position:", incrementPosition);
+
+        if (slider.name.includes("image_scale")) {
+          let i = parseInt(slider.name.replace("image_scale_", ""));
+          console.log(i);
+          canvas_content.portal_image_scale[i] = incrementPosition;
+        }
 
         if (slider.name == "fit_by_words") {
           let consecutive_word_count = incrementPosition + 1; // First value is 0 so it's useless

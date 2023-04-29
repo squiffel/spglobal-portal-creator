@@ -4,8 +4,8 @@ Automatic capitalization of products and countries can be set
 We can add character limits and warn people about bad practices
 We could add in prexisting brand tag lines
 
-
 Image
+--- Image scale
 --- Add replace button next to the Delete Button
 Move the Drag and drop below the Primary portal after you add an image
 Disapear the drag and drop when there are two portals
@@ -14,6 +14,7 @@ Disapear the drag and drop when there are two portals
 ---- Each logo needs its own unique minimum size
 
 -- Copy
+---- HEADLINE Left DESCRIPTION Right (A design option that should exist)
 ---- Flag if the headline + copy is taking up almost no space?
 ---- Description + CTA + Button
 ---- Character count limits ? -- Maybe I just flag it like Twitter does. Red warning label -- 
