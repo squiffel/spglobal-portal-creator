@@ -2886,7 +2886,8 @@
       }
 
       function balanceTextWrap(text, numberOfLines) {
-        const words = text.split(" ");
+        let split_words = text.split(" ");
+        const words = mergeSPGlobal(split_words); // Merges S&P Global into one word
         const avgCharsPerLine = text.length / numberOfLines;
 
         let lines = [];
@@ -2927,6 +2928,7 @@
             0
           );
           let longestLineWords = lines[longestLineIndex].split(" ");
+          longestLineWords = mergeSPGlobal(longestLineWords);
           let wordToMove = longestLineWords.pop();
           lines[longestLineIndex] = longestLineWords.join(" ");
 
@@ -3078,6 +3080,28 @@
           width: content_width,
           height: content_height,
         };
+      }
+
+      // Merge S&P Global and S&P Dow
+      function mergeSPGlobal(words) {
+        const result = [];
+        let i = 0;
+
+        while (i < words.length) {
+          if (
+            i + 1 < words.length &&
+            words[i] === "S&P" &&
+            (words[i + 1] === "Global" || words[i + 1] === "Dow")
+          ) {
+            result.push("S&P " + words[i + 1]);
+            i += 2;
+          } else {
+            result.push(words[i]);
+            i++;
+          }
+        }
+
+        return result;
       }
 
       function get_canvas_type() {
@@ -3377,27 +3401,6 @@
               (word) => getTextWidth(word, fontSize, letterSpacing) > rectWidth
             ) || getTextWidth(customString, fontSize, letterSpacing) > rectWidth
           );
-        }
-
-        function mergeSPGlobal(words) {
-          const result = [];
-          let i = 0;
-
-          while (i < words.length) {
-            if (
-              i + 1 < words.length &&
-              words[i] === "S&P" &&
-              (words[i + 1] === "Global" || words[i + 1] === "Dow")
-            ) {
-              result.push("S&P " + words[i + 1]);
-              i += 2;
-            } else {
-              result.push(words[i]);
-              i++;
-            }
-          }
-
-          return result;
         }
 
         function calculateLineHeight(fontSize) {
