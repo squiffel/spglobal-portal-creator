@@ -1831,11 +1831,11 @@
           headline_button.style.height = "100px";
           addButtonToInsideToolsContainer("Clear all formating", "headline");
           /*
-          addToggleSwitchWithLabel(
-            "Automatic line breaks",
-            canvas_content.ignore_line_breaks.headline
-          );
-*/
+                addToggleSwitchWithLabel(
+                  "Automatic line breaks",
+                  canvas_content.ignore_line_breaks.headline
+                );
+      */
           // Fit the text by the longest words
           addLabelToInsideToolsContainer("Fit by word count", 0);
           createRangeSlider(
@@ -1925,50 +1925,50 @@
           }
 
           /*
-                // Layout buttons
-                addLabelToInsideToolsContainer("Layout");
-                addSquareButtonsToInsideToolsContainer(
-                  "layout_buttons",
-                  "layout_4_split_assymetrical"
-                );
-                addSquareButtonsToInsideToolsContainer(
-                  "layout_buttons",
-                  "layout_4_split_symetrical"
-                );
-                addSquareButtonsToInsideToolsContainer(
-                  "layout_buttons",
-                  "layout_bottom_split_assymetrical"
-                );
-                addSquareButtonsToInsideToolsContainer(
-                  "layout_buttons",
-                  "layout_bottom_split_symetrical"
-                );
-                addSquareButtonsToInsideToolsContainer(
-                  "layout_buttons",
-                  "layout_side_split_assymetrical"
-                );
-                addSquareButtonsToInsideToolsContainer(
-                  "layout_buttons",
-                  "layout_side_split_symetrical"
-                );
-                addSquareButtonsToInsideToolsContainer(
-                  "layout_buttons",
-                  "layout_3_row"
-                );
-                addSquareButtonsToInsideToolsContainer(
-                  "layout_buttons",
-                  "layout_3_col"
-                );
-                addSquareButtonsToInsideToolsContainer(
-                  "layout_buttons",
-                  "layout_2_row"
-                );
-                addSquareButtonsToInsideToolsContainer(
-                  "layout_buttons",
-                  "layout_2_col"
-                );
+                      // Layout buttons
+                      addLabelToInsideToolsContainer("Layout");
+                      addSquareButtonsToInsideToolsContainer(
+                        "layout_buttons",
+                        "layout_4_split_assymetrical"
+                      );
+                      addSquareButtonsToInsideToolsContainer(
+                        "layout_buttons",
+                        "layout_4_split_symetrical"
+                      );
+                      addSquareButtonsToInsideToolsContainer(
+                        "layout_buttons",
+                        "layout_bottom_split_assymetrical"
+                      );
+                      addSquareButtonsToInsideToolsContainer(
+                        "layout_buttons",
+                        "layout_bottom_split_symetrical"
+                      );
+                      addSquareButtonsToInsideToolsContainer(
+                        "layout_buttons",
+                        "layout_side_split_assymetrical"
+                      );
+                      addSquareButtonsToInsideToolsContainer(
+                        "layout_buttons",
+                        "layout_side_split_symetrical"
+                      );
+                      addSquareButtonsToInsideToolsContainer(
+                        "layout_buttons",
+                        "layout_3_row"
+                      );
+                      addSquareButtonsToInsideToolsContainer(
+                        "layout_buttons",
+                        "layout_3_col"
+                      );
+                      addSquareButtonsToInsideToolsContainer(
+                        "layout_buttons",
+                        "layout_2_row"
+                      );
+                      addSquareButtonsToInsideToolsContainer(
+                        "layout_buttons",
+                        "layout_2_col"
+                      );
 
-                */
+                      */
 
           // Templates
           addLabelToInsideToolsContainer("Templates");
@@ -2764,6 +2764,8 @@
           }
         }
 
+        calculateBreakpoints(text_area.width, text_area.height);
+
         // Dynamic font size
         let font_size_max =
           text_area.width > 700 && text_area.height > 700 ? 96 : 72;
@@ -2785,7 +2787,7 @@
               : font_size_max;
         }
 
-        font_size = font_size_max; //Math.min(font_size_max, font_size);
+        font_size = font_size_max;
 
         console.log(`Initial font size ${font_size}px`);
 
@@ -2806,6 +2808,109 @@
           1.05,
           700
         );
+      }
+
+      function balanceTextWrap(text, numberOfLines) {
+        const words = text.split(" ");
+        const avgCharsPerLine = text.length / numberOfLines;
+
+        let lines = [];
+        let currentLine = "";
+
+        words.forEach((word, index) => {
+          let potentialLine =
+            currentLine + (currentLine.length ? " " : "") + word;
+
+          if (potentialLine.length <= avgCharsPerLine || !currentLine) {
+            currentLine = potentialLine;
+          } else {
+            let diff1 = Math.abs(currentLine.length - avgCharsPerLine);
+            let diff2 = Math.abs(potentialLine.length - avgCharsPerLine);
+
+            if (diff1 < diff2) {
+              lines.push(currentLine);
+              currentLine = word;
+            } else {
+              lines.push(potentialLine);
+              currentLine = "";
+            }
+          }
+
+          if (index === words.length - 1 && currentLine) {
+            lines.push(currentLine);
+          }
+        });
+
+        // Distribute remaining words if numberOfLines is greater than the lines generated
+        while (lines.length < numberOfLines) {
+          let longestLineIndex = lines.reduce(
+            (maxIndex, currentLine, currentIndex, array) => {
+              return currentLine.length > array[maxIndex].length
+                ? currentIndex
+                : maxIndex;
+            },
+            0
+          );
+          let longestLineWords = lines[longestLineIndex].split(" ");
+          let wordToMove = longestLineWords.pop();
+          lines[longestLineIndex] = longestLineWords.join(" ");
+
+          if (longestLineIndex < lines.length - 1) {
+            lines[longestLineIndex + 1] =
+              wordToMove + " " + lines[longestLineIndex + 1];
+          } else {
+            lines.push(wordToMove);
+          }
+        }
+
+        // Remove any lines that don't have words
+        lines = lines.filter((line) => line.trim().length > 0);
+
+        return lines.join("\n");
+      }
+
+      const text = canvas_content.headline;
+      const numberOfLines = 3;
+      console.log(balanceTextWrap(text, numberOfLines));
+
+      function findBreakpoint(size) {
+        // x-large > 1200+
+        // large > 900 > 1200
+        // lg-medium > 700 > 900
+        // medium > 500 > 700
+        // sm-medium > 300 > 500
+        // small: 180 > 300
+        // x-small < 180
+
+        let breakpoint_size = {
+          180: "x-small",
+          300: "small",
+          500: "sm-medium",
+          700: "medium",
+          900: "lg-medium",
+          1200: "large",
+          1920: "x-large",
+        };
+
+        let keys = Object.keys(breakpoint_size)
+          .map(Number)
+          .sort((a, b) => a - b);
+        let breakpoint = keys.reverse().find((key) => key < size);
+
+        //console.log(breakpoint_size[breakpoint]);
+
+        if (breakpoint) {
+          return breakpoint_size[breakpoint];
+        } else {
+          return null;
+        }
+      }
+
+      function calculateBreakpoints(width, height) {
+        let width_breakpoint_name = findBreakpoint(width);
+        let height_breakpoint_name = findBreakpoint(height);
+        console.log(width_breakpoint_name);
+        console.log(height_breakpoint_name);
       }
 
       function get_portal_specs(portal_size, portal_side) {
