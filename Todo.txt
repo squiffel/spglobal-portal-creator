@@ -3,7 +3,6 @@ Some built in Features
 Automatic capitalization of divisions, products, countries
 We can add character limits and warn people about bad practices
 
-
 -- Logo
 ---- Need to create custom breakpoints for determining logo size like I did for the fonts
 
