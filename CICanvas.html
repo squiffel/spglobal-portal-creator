@@ -279,11 +279,13 @@
         background-color: lightgray;
         background: none;
         font-size: 11px;
+        color: #707070;
       }
 
       .number-input {
-        width: 40px;
+        width: 36px;
         height: 24px;
+        font-size: 12px;
       }
 
       .toolbox_icon_button_container {
@@ -977,6 +979,7 @@
 
       canvas_content.headline =
         random_headlines[Math.floor(Math.random() * random_headlines.length)];
+      //random_headlines[Math.floor(Math.random() * random_headlines.length)];
 
       // Set default color scheme
       update_color_scheme("white");
@@ -1611,6 +1614,14 @@
               canvas_content.headline;
             update_toolbox_panel("text_button");
           }
+          // Generate random headline
+          if (event.target.name == "random_headline") {
+            canvas_content.headline = getRandomValueFromArray(
+              random_headlines,
+              canvas_content.headline
+            );
+            update_toolbox_panel("text_button");
+          }
         }
 
         // Logo type
@@ -1840,6 +1851,11 @@
           expandLeftPanel();
           current_panel_open = "Text";
 
+          addButtonToInsideToolsContainer(
+            "Generate random headline",
+            "random_headline"
+          );
+
           addLabelToInsideToolsContainer("Headline");
           let headline_button = addInputBoxToInsideToolsContainer(
             "headline",
@@ -1849,26 +1865,27 @@
 
           addButtonToInsideToolsContainer("Clear all formating", "headline");
           /*
-                addToggleSwitchWithLabel(
-                  "Automatic line breaks",
-                  canvas_content.ignore_line_breaks.headline
-                );
-      */
+                      addToggleSwitchWithLabel(
+                        "Automatic line breaks",
+                        canvas_content.ignore_line_breaks.headline
+                      );
+            */
           addTextWrapButtonAndInput();
-          // Fit the text by the longest words
-          addLabelToInsideToolsContainer("Fit by word count", 0);
-          createRangeSlider(
-            4,
-            canvas_content.fit_by_word.headline,
-            "fit_by_words"
-          );
-          let text_description = addTextToInsideToolsContainer(
-            `${
-              canvas_content.fit_by_word.headline + 1
-            } Longest word(s): "${canvas_content.text_container_minimum_character_width.toLocaleUpperCase()}"`
-          );
-          text_description.id = "headline_fit_by_word";
-
+          /*
+                // Fit the text by the longest words
+                addLabelToInsideToolsContainer("Fit by word count", 0);
+                createRangeSlider(
+                  4,
+                  canvas_content.fit_by_word.headline,
+                  "fit_by_words"
+                );
+                let text_description = addTextToInsideToolsContainer(
+                  `${
+                    canvas_content.fit_by_word.headline + 1
+                  } Longest word(s): "${canvas_content.text_container_minimum_character_width.toLocaleUpperCase()}"`
+                );
+                text_description.id = "headline_fit_by_word";
+      */
           addLabelToInsideToolsContainer("Body");
           let description_button =
             addInputBoxToInsideToolsContainer("Description");
@@ -1944,50 +1961,50 @@
           }
 
           /*
-                      // Layout buttons
-                      addLabelToInsideToolsContainer("Layout");
-                      addSquareButtonsToInsideToolsContainer(
-                        "layout_buttons",
-                        "layout_4_split_assymetrical"
-                      );
-                      addSquareButtonsToInsideToolsContainer(
-                        "layout_buttons",
-                        "layout_4_split_symetrical"
-                      );
-                      addSquareButtonsToInsideToolsContainer(
-                        "layout_buttons",
-                        "layout_bottom_split_assymetrical"
-                      );
-                      addSquareButtonsToInsideToolsContainer(
-                        "layout_buttons",
-                        "layout_bottom_split_symetrical"
-                      );
-                      addSquareButtonsToInsideToolsContainer(
-                        "layout_buttons",
-                        "layout_side_split_assymetrical"
-                      );
-                      addSquareButtonsToInsideToolsContainer(
-                        "layout_buttons",
-                        "layout_side_split_symetrical"
-                      );
-                      addSquareButtonsToInsideToolsContainer(
-                        "layout_buttons",
-                        "layout_3_row"
-                      );
-                      addSquareButtonsToInsideToolsContainer(
-                        "layout_buttons",
-                        "layout_3_col"
-                      );
-                      addSquareButtonsToInsideToolsContainer(
-                        "layout_buttons",
-                        "layout_2_row"
-                      );
-                      addSquareButtonsToInsideToolsContainer(
-                        "layout_buttons",
-                        "layout_2_col"
-                      );
+                            // Layout buttons
+                            addLabelToInsideToolsContainer("Layout");
+                            addSquareButtonsToInsideToolsContainer(
+                              "layout_buttons",
+                              "layout_4_split_assymetrical"
+                            );
+                            addSquareButtonsToInsideToolsContainer(
+                              "layout_buttons",
+                              "layout_4_split_symetrical"
+                            );
+                            addSquareButtonsToInsideToolsContainer(
+                              "layout_buttons",
+                              "layout_bottom_split_assymetrical"
+                            );
+                            addSquareButtonsToInsideToolsContainer(
+                              "layout_buttons",
+                              "layout_bottom_split_symetrical"
+                            );
+                            addSquareButtonsToInsideToolsContainer(
+                              "layout_buttons",
+                              "layout_side_split_assymetrical"
+                            );
+                            addSquareButtonsToInsideToolsContainer(
+                              "layout_buttons",
+                              "layout_side_split_symetrical"
+                            );
+                            addSquareButtonsToInsideToolsContainer(
+                              "layout_buttons",
+                              "layout_3_row"
+                            );
+                            addSquareButtonsToInsideToolsContainer(
+                              "layout_buttons",
+                              "layout_3_col"
+                            );
+                            addSquareButtonsToInsideToolsContainer(
+                              "layout_buttons",
+                              "layout_2_row"
+                            );
+                            addSquareButtonsToInsideToolsContainer(
+                              "layout_buttons",
+                              "layout_2_col"
+                            );
 
-                      */
+                            */
 
           // Templates
           addLabelToInsideToolsContainer("Templates");
@@ -2116,7 +2133,7 @@
         textBalance.classList.add("text_balance");
 
         const label1 = document.createElement("label");
-        label1.textContent = "Balance text on";
+        label1.textContent = "Convert to line count";
 
         const inputBox = document.createElement("input");
         inputBox.type = "number";
@@ -2124,11 +2141,11 @@
         inputBox.min = 1;
         inputBox.classList.add("number-input");
 
-        const label2 = document.createElement("label");
-        label2.textContent = "line(s)";
-
         const button = document.createElement("button");
-        button.textContent = "Wrap";
+        button.style.padding = "8px";
+        button.style.marginBottom = "0px";
+        button.textContent = "Ok";
+
         button.addEventListener("click", () => {
           const inputValue = inputBox.value ? parseInt(inputBox.value) : 1;
           inputBox.value = inputValue;
@@ -2140,13 +2157,14 @@
           let longestLine = findLongestLine(textWrap);
 
           canvas_content.headline = removeBreakpoints;
-          canvas_content.text_container_minimum_character_width =
-            findLongestWordsByWidth(canvas_content.headline, 1);
 
           if (longestLine.oneLine == false) {
             canvas_content.headline = textWrap;
             canvas_content.text_container_minimum_character_width =
               longestLine.longestLine;
+          } else {
+            canvas_content.text_container_minimum_character_width =
+              findLongestWordsByWidth(canvas_content.headline, 1);
           }
 
           update_toolbox_panel("text_button");
@@ -2158,7 +2176,7 @@
 
         textBalance.appendChild(label1);
         textBalance.appendChild(inputBox);
-        textBalance.appendChild(label2);
+        //textBalance.appendChild(label2);
         textBalance.appendChild(button);
 
         insideToolsContainer.appendChild(textBalance);
@@ -2929,6 +2947,7 @@
           );
           let longestLineWords = lines[longestLineIndex].split(" ");
           longestLineWords = mergeSPGlobal(longestLineWords);
+
           let wordToMove = longestLineWords.pop();
           lines[longestLineIndex] = longestLineWords.join(" ");
 
