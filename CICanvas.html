@@ -620,6 +620,7 @@
       const capitalizationArray = [
         "Dow Jones Indices",
         "Platts",
+        "Platts LIVE",
         "S&P Cheese Ratings",
         "S&P",
         "S&P Global",
@@ -943,7 +944,7 @@
       canvas_content.ignore_line_breaks = { headline: false };
 
       canvas_content.text_container_minimum_character_width = "";
-      canvas_content.fit_by_word = { headline: 0 };
+      canvas_content.fit_by_word = { headline: false };
 
       canvas_content.portal_color_overlay = false;
 
@@ -1084,10 +1085,7 @@
         }
 
         canvas_content.text_container_minimum_character_width =
-          findLongestWordsByWidth(
-            canvas_content.headline,
-            canvas_content.fit_by_word.headline + 1
-          );
+          findLongestWordsByWidth(canvas_content.headline, 1);
 
         // Update panel
         if (current_panel_open == "Layout") {
@@ -1582,6 +1580,17 @@
         return textContainer;
       }
 
+      function update_text_fit() {
+        let longestLine = findLongestLine(canvas_content.headline);
+        if (longestLine.oneLine == false) {
+          canvas_content.text_container_minimum_character_width =
+            longestLine.longestLine;
+        } else {
+          canvas_content.text_container_minimum_character_width =
+            findLongestWordsByWidth(canvas_content.headline, 1);
+        }
+      }
+
       //Input box modified
       function inputbox_modified(event) {
         let button_label = event.target.name;
@@ -1589,6 +1598,7 @@
 
         if (button_label == "input_headline") {
           canvas_content.headline = string_value;
+          update_text_fit();
         }
 
         updateCanvas();
@@ -1612,14 +1622,17 @@
             );
             document.getElementsByName("input_headline")[0].value =
               canvas_content.headline;
+            // Fit the text in the space
+            update_text_fit();
+            // Update the panel
             update_toolbox_panel("text_button");
           }
           // Generate random headline
           if (event.target.name == "random_headline") {
-            canvas_content.headline = getRandomValueFromArray(
-              random_headlines,
-              canvas_content.headline
-            );
+            canvas_content.headline =
+              random_headlines[
+                Math.floor(Math.random() * random_headlines.length)
+              ];
             update_toolbox_panel("text_button");
           }
         }
@@ -1714,13 +1727,6 @@
 
       function toggleSwitchValueChanged(element, toggleValue) {
         let button_label = element.innerText;
-
-        if (current_panel_open == "Text") {
-          if (button_label.includes("Automatic line breaks")) {
-            canvas_content.ignore_line_breaks.headline =
-              !canvas_content.ignore_line_breaks.headline;
-          }
-        }
 
         if (current_panel_open == "Layout") {
           if (button_label.includes("Show Grid")) {
@@ -1857,6 +1863,10 @@
           );
 
           addLabelToInsideToolsContainer("Headline");
+          addTextToInsideToolsContainer(
+            "Text size is determined by trying to fit the longest line of text"
+          );
+
           let headline_button = addInputBoxToInsideToolsContainer(
             "headline",
             canvas_content.headline
@@ -1864,28 +1874,9 @@
           headline_button.style.height = "100px";
 
           addButtonToInsideToolsContainer("Clear all formating", "headline");
-          /*
-                      addToggleSwitchWithLabel(
-                        "Automatic line breaks",
-                        canvas_content.ignore_line_breaks.headline
-                      );
-            */
+
           addTextWrapButtonAndInput();
-          /*
-                // Fit the text by the longest words
-                addLabelToInsideToolsContainer("Fit by word count", 0);
-                createRangeSlider(
-                  4,
-                  canvas_content.fit_by_word.headline,
-                  "fit_by_words"
-                );
-                let text_description = addTextToInsideToolsContainer(
-                  `${
-                    canvas_content.fit_by_word.headline + 1
-                  } Longest word(s): "${canvas_content.text_container_minimum_character_width.toLocaleUpperCase()}"`
-                );
-                text_description.id = "headline_fit_by_word";
-      */
+
           addLabelToInsideToolsContainer("Body");
           let description_button =
             addInputBoxToInsideToolsContainer("Description");
@@ -1961,50 +1952,50 @@
           }
 
           /*
-                            // Layout buttons
-                            addLabelToInsideToolsContainer("Layout");
-                            addSquareButtonsToInsideToolsContainer(
-                              "layout_buttons",
-                              "layout_4_split_assymetrical"
-                            );
-                            addSquareButtonsToInsideToolsContainer(
-                              "layout_buttons",
-                              "layout_4_split_symetrical"
-                            );
-                            addSquareButtonsToInsideToolsContainer(
-                              "layout_buttons",
-                              "layout_bottom_split_assymetrical"
-                            );
-                            addSquareButtonsToInsideToolsContainer(
-                              "layout_buttons",
-                              "layout_bottom_split_symetrical"
-                            );
-                            addSquareButtonsToInsideToolsContainer(
-                              "layout_buttons",
-                              "layout_side_split_assymetrical"
-                            );
-                            addSquareButtonsToInsideToolsContainer(
-                              "layout_buttons",
-                              "layout_side_split_symetrical"
-                            );
-                            addSquareButtonsToInsideToolsContainer(
-                              "layout_buttons",
-                              "layout_3_row"
-                            );
-                            addSquareButtonsToInsideToolsContainer(
-                              "layout_buttons",
-                              "layout_3_col"
-                            );
-                            addSquareButtonsToInsideToolsContainer(
-                              "layout_buttons",
-                              "layout_2_row"
-                            );
-                            addSquareButtonsToInsideToolsContainer(
-                              "layout_buttons",
-                              "layout_2_col"
-                            );
+                                  // Layout buttons
+                                  addLabelToInsideToolsContainer("Layout");
+                                  addSquareButtonsToInsideToolsContainer(
+                                    "layout_buttons",
+                                    "layout_4_split_assymetrical"
+                                  );
+                                  addSquareButtonsToInsideToolsContainer(
+                                    "layout_buttons",
+                                    "layout_4_split_symetrical"
+                                  );
+                                  addSquareButtonsToInsideToolsContainer(
+                                    "layout_buttons",
+                                    "layout_bottom_split_assymetrical"
+                                  );
+                                  addSquareButtonsToInsideToolsContainer(
+                                    "layout_buttons",
+                                    "layout_bottom_split_symetrical"
+                                  );
+                                  addSquareButtonsToInsideToolsContainer(
+                                    "layout_buttons",
+                                    "layout_side_split_assymetrical"
+                                  );
+                                  addSquareButtonsToInsideToolsContainer(
+                                    "layout_buttons",
+                                    "layout_side_split_symetrical"
+                                  );
+                                  addSquareButtonsToInsideToolsContainer(
+                                    "layout_buttons",
+                                    "layout_3_row"
+                                  );
+                                  addSquareButtonsToInsideToolsContainer(
+                                    "layout_buttons",
+                                    "layout_3_col"
+                                  );
+                                  addSquareButtonsToInsideToolsContainer(
+                                    "layout_buttons",
+                                    "layout_2_row"
+                                  );
+                                  addSquareButtonsToInsideToolsContainer(
+                                    "layout_buttons",
+                                    "layout_2_col"
+                                  );
 
-                            */
+                                  */
 
           // Templates
           addLabelToInsideToolsContainer("Templates");
@@ -2153,25 +2144,25 @@
           const text = canvas_content.headline;
           const numberOfLines = inputBox.value;
           let removeBreakpoints = removeNewAndReturnLines(text, true);
-          let textWrap = balanceTextWrap(removeBreakpoints, numberOfLines);
-          let longestLine = findLongestLine(textWrap);
 
+          // Turn off fit by longest line
+          canvas_content.fit_by_word.headline = false;
+
+          // Remove all break points and find the longest word
           canvas_content.headline = removeBreakpoints;
 
+          // If the copy has more than one line use the longest word
+          let textWrap = balanceTextWrap(removeBreakpoints, numberOfLines);
+          let longestLine = findLongestLine(textWrap);
           if (longestLine.oneLine == false) {
             canvas_content.headline = textWrap;
-            canvas_content.text_container_minimum_character_width =
-              longestLine.longestLine;
-          } else {
-            canvas_content.text_container_minimum_character_width =
-              findLongestWordsByWidth(canvas_content.headline, 1);
           }
+
+          // Fit the text in the space
+          update_text_fit();
 
           update_toolbox_panel("text_button");
           updateCanvas();
-          console.log(textWrap);
-          console.log("longest line");
-          console.log(longestLine);
         });
 
         textBalance.appendChild(label1);
@@ -2979,7 +2970,8 @@
             result.longestLine = lines[i];
           }
         }
-
+        // Additional space to protect against too small text
+        result.longestLine += " ";
         return result;
       }
 
@@ -3517,25 +3509,6 @@
           return lines;
         }
 
-        function removeWidows(arr) {
-          if (arr.length < 2) return arr; // If there's only one element or none, no need to process.
-
-          const lastElem = arr[arr.length - 1];
-          const secondLastElem = arr[arr.length - 2];
-
-          if (lastElem.split(" ").length === 1) {
-            const secondLastElemWords = secondLastElem.split(" ");
-            if (secondLastElemWords.length > 1) {
-              const movedWord = secondLastElemWords.pop();
-              arr[arr.length - 2] = secondLastElemWords.join(" ");
-              arr[arr.length - 1] = `${movedWord} ${lastElem}`;
-              console.log("Removed widow");
-            }
-          }
-
-          return arr;
-        }
-
         function drawTextWithSuperscript(text, x, y) {
           const specialChars = ["™", "®", "©"];
           const originalFontSize = parseInt(ctx.font.match(/\d+/)[0]);
@@ -3739,23 +3712,6 @@
         if (slider.name.includes("image_scale")) {
           let i = parseInt(slider.name.replace("image_scale_", ""));
           canvas_content.portal_image_scale[i] = incrementPosition;
-        }
-
-        if (slider.name == "fit_by_words") {
-          let consecutive_word_count = incrementPosition + 1; // First value is 0 so it's useless
-          // Look for the longest consecutive words
-          canvas_content.text_container_minimum_character_width =
-            findLongestWordsByWidth(
-              canvas_content.headline,
-              consecutive_word_count
-            );
-          // Update word
-          canvas_content.fit_by_word.headline = incrementPosition;
-
-          let label = document.getElementById("headline_fit_by_word");
-          label.innerText = `${
-            canvas_content.fit_by_word.headline + 1
-          } Longest word(s): "${canvas_content.text_container_minimum_character_width.toLocaleUpperCase()}"`;
         }
 
         // Update canvas
