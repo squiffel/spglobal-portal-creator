@@ -23,7 +23,8 @@ Internal feed,
 --------- 
 
 Need to improve the image downscaling
-Need to only download the image when everything is doesn
+Only downscale the image when the canvas changes.
+Save the portals to a canvas and reapply the image when the portal image, size, scale or focal point changes
 Only do slow downscaling when you download the image
 
 https://stackoverflow.com/questions/18922880/html5-canvas-resize-downscale-image-high-quality#:~:text=To%20downsample%20an%20image%2C%20we,its%20value%20for%20the%20destination.

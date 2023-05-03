@@ -2450,6 +2450,7 @@
           // Downscale image
           let downscale_ratio = 1 / scaleFactor;
           let downscaled_image = transformed_image;
+          // Only downscale if the image is larger than the canvas
           if (downscale_ratio < 1) {
             // High resolution downscale
             downscaled_image = downScaleImage(
@@ -2460,7 +2461,6 @@
 
           // Draw the image in the center of the mask (Constrained by the edges of the image)
           ctx.drawImage(
-            //transformed_image,
             downscaled_image,
             pos_x - img_x_position,
             pos_y - img_y_position,
