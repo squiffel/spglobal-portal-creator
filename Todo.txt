@@ -1,18 +1,33 @@
 Some built in Features
 
+PPT files fonts are inconsitent
+Adobe tools are too complicated
+
+Id like to make this an offical project
+Immediate goals -- functioning prototype and get our team and provide feedback
+Then roll out to company
+
 Automatic capitalization of divisions, products, countries
-We can add character limits and warn people about bad practices
+Character limits
+Force best practices through the interface
+Image library integration through he media portal
+Keep track of content created and how created it (Maybe in the future)
 
-Placing risk and 
-performance in a 
-greater context is 
-Essential Intelligence.
+--- Seek & Prosper text highlighting
+--- CI Events content with the Event Names
+--- Podcasts
+--- Speakers
 
-Placing risk and 
-performance in a 
-greater context 
-is Essential Intelligence.
-Hello
+
+Internal feed, 
+--------- 
+
+Need to improve the image downscaling
+Need to only download the image when everything is doesn
+Only do slow downscaling when you download the image
+
+https://stackoverflow.com/questions/18922880/html5-canvas-resize-downscale-image-high-quality#:~:text=To%20downsample%20an%20image%2C%20we,its%20value%20for%20the%20destination.
+
 
 --------- Can fill the text boxes with crazy number of spaces
 --------- FIT BY LARGEST LINE OF TEXT IS NOT THAT OBVIOUS, maybe make it a toggle. --- Auto-Font Resize
@@ -38,6 +53,11 @@ Hello
 -- Layouts
 ---- When the canvas is super wide, move the text to the right of the logo
 ---- If there is enough room like 1800x300 then the font size will need some work
+
+
+-- Saving
+----
+---- 
 
 -- Styles
 ---- Seek & Prosper
