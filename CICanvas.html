@@ -1748,7 +1748,7 @@
         let button_label = element.innerText;
 
         if (current_panel_open == "Text") {
-          if (button_label.includes("Auto Font Resize")) {
+          if (button_label.includes("Auto-fit longest line")) {
             canvas_content.auto_font_resize = !canvas_content.auto_font_resize;
             update_auto_text_resize();
           }
@@ -1903,9 +1903,10 @@
 
           // Show Grid
           let toggle_auto_font_switch = addToggleSwitchWithLabel(
-            "Auto Font Resize",
+            "Auto-fit longest line",
             canvas_content.auto_font_resize
           );
+          toggle_auto_font_switch.id = "fit-text-auto";
 
           addTextWrapButtonAndInput();
 
@@ -2191,6 +2192,7 @@
           }
 
           // Fit the text in the space
+          canvas_content.auto_font_resize = true;
           update_auto_text_resize();
 
           update_toolbox_panel("text_button");
@@ -3433,7 +3435,6 @@
         fontWeight,
         textWrap
       ) {
-        console.log(`Edited: ${text}`);
         // Get the width of the text
         function getTextWidth(text, fontSize, letterSpacing) {
           // Start the width as 0
@@ -3548,10 +3549,25 @@
           }
         }
 
+        // Clean up input text -- Remove multiple new lines and replace return lines with new lines
+        text = processInputString(text);
+
         // Fit text
         let fittedTextLines = fitText(
           canvas_content.text_container_minimum_character_width
         );
+
+        // Remove unwanted text new lines -- Sometimes the text breaks onto a new line then it registers the new line
+        fittedTextLines = removeUnwantedEmptyLines(text, fittedTextLines);
+        console.log("original text");
+        console.log(JSON.stringify(text));
+
+        console.log("Fitted text lines");
+        console.log(fittedTextLines);
+        fittedTextLines = addNewLinesAndRemoveDuplicates(text, fittedTextLines);
+
+        console.log("Add empty lines");
+        console.log(fittedTextLines);
 
         // Get text size
         const textWidth = getTextWidth(
@@ -3614,6 +3630,95 @@
           textWidth,
           textHeight,
         };
+      }
+
+      // Remove empty strings
+      function removeUnwantedEmptyLines(originalString, modifiedArray) {
+        const result = [];
+        const originalLines = originalString.split(/\r?\n/);
+
+        let originalLineIndex = 0;
+        let originalLine = originalLines[originalLineIndex];
+        let originalLinePos = 0;
+
+        for (let i = 0; i < modifiedArray.length; i++) {
+          const modifiedLine = modifiedArray[i];
+
+          if (modifiedLine === "") {
+            // Check if the original string has a newline character at the current position
+            if (originalLinePos === originalLine.length) {
+              // Newline found in the original string, keep the empty line in the result
+              result.push(modifiedLine);
+
+              // Move to the next line in the original string
+              originalLineIndex++;
+              originalLine = originalLines[originalLineIndex];
+              originalLinePos = 0;
+            }
+            // If no newline found in the original string, ignore the empty line in the modified array
+          } else {
+            // Add the non-empty line to the result array
+            result.push(modifiedLine);
+
+            // Update the position in the original line
+            originalLinePos += modifiedLine.length;
+          }
+        }
+
+        return result; //result;
+      }
+
+      function addNewLinesAndRemoveDuplicates(inputString, inputArray) {
+        let outputArray = [];
+        let stringIndex = 0;
+
+        for (let i = 0; i < inputArray.length; i++) {
+          let currentWord = inputArray[i];
+
+          // Check for two or more new line characters before the current word
+          let newLineCount = 0;
+          while (
+            stringIndex < inputString.length &&
+            inputString[stringIndex] === "\n"
+          ) {
+            newLineCount++;
+            stringIndex++;
+          }
+
+          // Add an empty string to the output array if two or more new line characters were found
+          if (newLineCount >= 2) {
+            outputArray.push("");
+          }
+
+          // Add the current word to the output array and update the string index
+          outputArray.push(currentWord.trim());
+          stringIndex += currentWord.length;
+        }
+
+        // Merge consecutive blank strings in the output array
+        let mergedOutputArray = [];
+        for (let i = 0; i < outputArray.length; i++) {
+          if (
+            outputArray[i] === "" &&
+            mergedOutputArray[mergedOutputArray.length - 1] !== ""
+          ) {
+            mergedOutputArray.push("");
+          } else if (outputArray[i] !== "") {
+            mergedOutputArray.push(outputArray[i]);
+          }
+        }
+
+        return mergedOutputArray;
+      }
+
+      function processInputString(inputString) {
+        // Replace all \r with \n
+        let stringWithReplacedLines = inputString.replace(/\r/g, "\n");
+
+        // Replace any consecutive new lines above 3 instances with 2 instances
+        let outputString = stringWithReplacedLines.replace(/(\n){3,}/g, "\n\n");
+
+        return outputString;
       }
 
       function escapeRegExp(string) {
