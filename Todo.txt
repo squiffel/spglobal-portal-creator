@@ -3,8 +3,8 @@ Some built in Features
 Automatic capitalization of divisions, products, countries
 We can add character limits and warn people about bad practices
 
-
---------- FIT BY LARGEST LINE OF TEXT IS NOT THAT OBVIOUS, maybe make it a toggle.
+--------- Can fill the text boxes with crazy number of spaces
+--------- FIT BY LARGEST LINE OF TEXT IS NOT THAT OBVIOUS, maybe make it a toggle. --- Auto-Font Resize
 --------- AUTOMATED TEXT SIZE could be just fitting the text by one line
 --------- CUSTOM TEXT SIZE COULD MAKE THE TEXT BALANCE VISIBLE AND FIT TO LONGEST LINE
 

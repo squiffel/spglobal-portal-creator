@@ -945,6 +945,7 @@
 
       canvas_content.text_container_minimum_character_width = "";
       canvas_content.fit_by_word = { headline: false };
+      canvas_content.auto_font_resize = false;
 
       canvas_content.portal_color_overlay = false;
 
@@ -976,9 +977,6 @@
         "Life behind the data.",
         "Powerful impact.",
         "Placing risk and performance in a greater context is Essential Intelligence.",
-      ];
-
-      random_headlines = [
         "Embracing resilience and growth",
         "Navigating energy in transition",
         "Innovating energy for growth",
@@ -1599,12 +1597,14 @@
         return textContainer;
       }
 
-      function update_text_fit() {
+      function update_auto_text_resize() {
         let longestLine = findLongestLine(canvas_content.headline);
-        if (longestLine.oneLine == false) {
+        // Resize to longest line -- Auto resize
+        if (canvas_content.auto_font_resize) {
           canvas_content.text_container_minimum_character_width =
             longestLine.longestLine;
         } else {
+          // Resize to longest word -- Default
           canvas_content.text_container_minimum_character_width =
             findLongestWordsByWidth(canvas_content.headline, 1);
         }
@@ -1617,7 +1617,7 @@
 
         if (button_label == "input_headline") {
           canvas_content.headline = string_value;
-          update_text_fit();
+          update_auto_text_resize();
         }
 
         updateCanvas();
@@ -1642,7 +1642,7 @@
             document.getElementsByName("input_headline")[0].value =
               canvas_content.headline;
             // Fit the text in the space
-            update_text_fit();
+            update_auto_text_resize();
             // Update the panel
             update_toolbox_panel("text_button");
           }
@@ -1746,6 +1746,13 @@
 
       function toggleSwitchValueChanged(element, toggleValue) {
         let button_label = element.innerText;
+
+        if (current_panel_open == "Text") {
+          if (button_label.includes("Auto Font Resize")) {
+            canvas_content.auto_font_resize = !canvas_content.auto_font_resize;
+            update_auto_text_resize();
+          }
+        }
 
         if (current_panel_open == "Layout") {
           if (button_label.includes("Show Grid")) {
@@ -1894,6 +1901,12 @@
 
           addButtonToInsideToolsContainer("Clear all formating", "headline");
 
+          // Show Grid
+          let toggle_auto_font_switch = addToggleSwitchWithLabel(
+            "Auto Font Resize",
+            canvas_content.auto_font_resize
+          );
+
           addTextWrapButtonAndInput();
 
           addLabelToInsideToolsContainer("Body");
@@ -1971,50 +1984,50 @@
           }
 
           /*
-                                  // Layout buttons
-                                  addLabelToInsideToolsContainer("Layout");
-                                  addSquareButtonsToInsideToolsContainer(
-                                    "layout_buttons",
-                                    "layout_4_split_assymetrical"
-                                  );
-                                  addSquareButtonsToInsideToolsContainer(
-                                    "layout_buttons",
-                                    "layout_4_split_symetrical"
-                                  );
-                                  addSquareButtonsToInsideToolsContainer(
-                                    "layout_buttons",
-                                    "layout_bottom_split_assymetrical"
-                                  );
-                                  addSquareButtonsToInsideToolsContainer(
-                                    "layout_buttons",
-                                    "layout_bottom_split_symetrical"
-                                  );
-                                  addSquareButtonsToInsideToolsContainer(
-                                    "layout_buttons",
-                                    "layout_side_split_assymetrical"
-                                  );
-                                  addSquareButtonsToInsideToolsContainer(
-                                    "layout_buttons",
-                                    "layout_side_split_symetrical"
-                                  );
-                                  addSquareButtonsToInsideToolsContainer(
-                                    "layout_buttons",
-                                    "layout_3_row"
-                                  );
-                                  addSquareButtonsToInsideToolsContainer(
-                                    "layout_buttons",
-                                    "layout_3_col"
-                                  );
-                                  addSquareButtonsToInsideToolsContainer(
-                                    "layout_buttons",
-                                    "layout_2_row"
-                                  );
-                                  addSquareButtonsToInsideToolsContainer(
-                                    "layout_buttons",
-                                    "layout_2_col"
-                                  );
+          // Layout buttons
+          addLabelToInsideToolsContainer("Layout");
+          addSquareButtonsToInsideToolsContainer(
+            "layout_buttons",
+            "layout_4_split_assymetrical"
+          );
+          addSquareButtonsToInsideToolsContainer(
+            "layout_buttons",
+            "layout_4_split_symetrical"
+          );
+          addSquareButtonsToInsideToolsContainer(
+            "layout_buttons",
+            "layout_bottom_split_assymetrical"
+          );
+          addSquareButtonsToInsideToolsContainer(
+            "layout_buttons",
+            "layout_bottom_split_symetrical"
+          );
+          addSquareButtonsToInsideToolsContainer(
+            "layout_buttons",
+            "layout_side_split_assymetrical"
+          );
+          addSquareButtonsToInsideToolsContainer(
+            "layout_buttons",
+            "layout_side_split_symetrical"
+          );
+          addSquareButtonsToInsideToolsContainer(
+            "layout_buttons",
+            "layout_3_row"
+          );
+          addSquareButtonsToInsideToolsContainer(
+            "layout_buttons",
+            "layout_3_col"
+          );
+          addSquareButtonsToInsideToolsContainer(
+            "layout_buttons",
+            "layout_2_row"
+          );
+          addSquareButtonsToInsideToolsContainer(
+            "layout_buttons",
+            "layout_2_col"
+          );
 
-                                  */
+          */
 
           // Templates
           addLabelToInsideToolsContainer("Templates");
@@ -2178,7 +2191,7 @@
           }
 
           // Fit the text in the space
-          update_text_fit();
+          update_auto_text_resize();
 
           update_toolbox_panel("text_button");
           updateCanvas();
@@ -2917,6 +2930,7 @@
         let split_words = text.split(" ");
         const words = mergeSPGlobal(split_words); // Merges S&P Global into one word
         const avgCharsPerLine = text.length / numberOfLines;
+        console.log(`number of lines: ${numberOfLines}`);
 
         let lines = [];
         let currentLine = "";
@@ -2973,6 +2987,16 @@
         lines = lines.filter((line) => line.trim().length > 0);
         let joined_string = lines.join("\n");
         let add_spaces = joined_string.replace(/(\S)(\r?\n)/g, "$1 $2");
+
+        // Redo the text balance wrap if the number of requested lines was more than the final output
+        // It prevents weird text balances that get caused by overshooting
+        let final_line_count = add_spaces.split(/\r?\n/).length;
+        console.log(
+          `number of lines: ${numberOfLines} final line count ${final_line_count}`
+        );
+        if (numberOfLines > final_line_count) {
+          return balanceTextWrap(text, final_line_count);
+        }
 
         return add_spaces;
       }
