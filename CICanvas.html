@@ -995,7 +995,8 @@
 
       canvas_content.headline =
         random_headlines[Math.floor(Math.random() * random_headlines.length)];
-      //random_headlines[Math.floor(Math.random() * random_headlines.length)];
+      canvas_content.body = "";
+      canvas_content.cta = "";
 
       // Set default color scheme
       update_color_scheme("white");
@@ -1603,7 +1604,9 @@
         return textContainer;
       }
 
-      function update_auto_text_resize() {
+      // This looks for the longest line in the headline and tries to recognize that as the minimize size the container parent can be. The longest line can be multiple words in a line.
+      // If this is off, then it resizes based on the longest word. There can only be one longest word.
+      function calculate_headline_minimum_container_width() {
         let longestLine = findLongestLine(canvas_content.headline);
         // Resize to longest line -- Auto resize
         if (canvas_content.auto_font_resize) {
@@ -1623,7 +1626,17 @@
 
         if (button_label == "input_headline") {
           canvas_content.headline = string_value;
-          update_auto_text_resize();
+          calculate_headline_minimum_container_width();
+        }
+
+        if (button_label == "input_body") {
+          canvas_content.body = string_value;
+          //calculate_headline_minimum_container_width();
+        }
+
+        if (button_label == "input_cta") {
+          canvas_content.cta = string_value;
+          //calculate_headline_minimum_container_width();
         }
 
         updateCanvas();
@@ -1646,7 +1659,7 @@
             document.getElementsByName("input_headline")[0].value =
               canvas_content.headline;
             // Fit the text in the space
-            update_auto_text_resize();
+            calculate_headline_minimum_container_width();
             // Update the panel
             update_toolbox_panel("text_button");
           }
@@ -1659,7 +1672,7 @@
             document.getElementsByName("input_headline")[0].value =
               canvas_content.headline;
             // Fit the text in the space
-            update_auto_text_resize();
+            calculate_headline_minimum_container_width();
             // Update the panel
             update_toolbox_panel("text_button");
           }
@@ -1669,7 +1682,9 @@
               random_headlines[
                 Math.floor(Math.random() * random_headlines.length)
               ];
-            update_toolbox_panel("text_button");
+            // Update headline box
+            document.getElementsByName("input_headline")[0].value =
+              canvas_content.headline;
           }
         }
 
@@ -1767,7 +1782,7 @@
         if (current_panel_open == "Text") {
           if (button_label.includes("Auto-fit longest line")) {
             canvas_content.auto_font_resize = !canvas_content.auto_font_resize;
-            update_auto_text_resize();
+            calculate_headline_minimum_container_width();
           }
         }
 
@@ -1792,7 +1807,7 @@
             canvas_content.portal_color_overlay =
               !canvas_content.portal_color_overlay;
           }
-          if (button_label.includes("Portal visible margins")) {
+          if (button_label.includes("Show portal margins")) {
             canvas_content.portal_override_margins =
               !canvas_content.portal_override_margins;
           }
@@ -1906,10 +1921,6 @@
           );
 
           addLabelToInsideToolsContainer("Headline");
-          addButtonToInsideToolsContainer(
-            "Auto capitalize",
-            "brand-voice-headline"
-          );
           //addTextToInsideToolsContainer("Label here");
 
           let headline_button = addInputBoxToInsideToolsContainer(
@@ -1917,7 +1928,10 @@
             canvas_content.headline
           );
           headline_button.style.height = "100px";
-
+          addButtonToInsideToolsContainer(
+            "Auto capitalize",
+            "brand-voice-headline"
+          );
           addButtonToInsideToolsContainer("Remove all line breaks", "headline");
 
           // Show Grid
@@ -1930,12 +1944,14 @@
           addTextWrapButtonAndInput();
 
           addLabelToInsideToolsContainer("Body");
-          let description_button =
-            addInputBoxToInsideToolsContainer("Description");
+          let description_button = addInputBoxToInsideToolsContainer(
+            "body",
+            canvas_content.body
+          );
           description_button.style.height = "200px";
 
           addLabelToInsideToolsContainer("Call to action");
-          addInputBoxToInsideToolsContainer("cta");
+          addInputBoxToInsideToolsContainer("cta", canvas_content.cta);
         }
 
         if (buttonName === "layout_button") {
@@ -2004,50 +2020,50 @@
           }
 
           /*
-          // Layout buttons
-          addLabelToInsideToolsContainer("Layout");
-          addSquareButtonsToInsideToolsContainer(
-            "layout_buttons",
-            "layout_4_split_assymetrical"
-          );
-          addSquareButtonsToInsideToolsContainer(
-            "layout_buttons",
-            "layout_4_split_symetrical"
-          );
-          addSquareButtonsToInsideToolsContainer(
-            "layout_buttons",
-            "layout_bottom_split_assymetrical"
-          );
-          addSquareButtonsToInsideToolsContainer(
-            "layout_buttons",
-            "layout_bottom_split_symetrical"
-          );
-          addSquareButtonsToInsideToolsContainer(
-            "layout_buttons",
-            "layout_side_split_assymetrical"
-          );
-          addSquareButtonsToInsideToolsContainer(
-            "layout_buttons",
-            "layout_side_split_symetrical"
-          );
-          addSquareButtonsToInsideToolsContainer(
-            "layout_buttons",
-            "layout_3_row"
-          );
-          addSquareButtonsToInsideToolsContainer(
-            "layout_buttons",
-            "layout_3_col"
-          );
-          addSquareButtonsToInsideToolsContainer(
-            "layout_buttons",
-            "layout_2_row"
-          );
-          addSquareButtonsToInsideToolsContainer(
-            "layout_buttons",
-            "layout_2_col"
-          );
+            // Layout buttons
+            addLabelToInsideToolsContainer("Layout");
+            addSquareButtonsToInsideToolsContainer(
+              "layout_buttons",
+              "layout_4_split_assymetrical"
+            );
+            addSquareButtonsToInsideToolsContainer(
+              "layout_buttons",
+              "layout_4_split_symetrical"
+            );
+            addSquareButtonsToInsideToolsContainer(
+              "layout_buttons",
+              "layout_bottom_split_assymetrical"
+            );
+            addSquareButtonsToInsideToolsContainer(
+              "layout_buttons",
+              "layout_bottom_split_symetrical"
+            );
+            addSquareButtonsToInsideToolsContainer(
+              "layout_buttons",
+              "layout_side_split_assymetrical"
+            );
+            addSquareButtonsToInsideToolsContainer(
+              "layout_buttons",
+              "layout_side_split_symetrical"
+            );
+            addSquareButtonsToInsideToolsContainer(
+              "layout_buttons",
+              "layout_3_row"
+            );
+            addSquareButtonsToInsideToolsContainer(
+              "layout_buttons",
+              "layout_3_col"
+            );
+            addSquareButtonsToInsideToolsContainer(
+              "layout_buttons",
+              "layout_2_row"
+            );
+            addSquareButtonsToInsideToolsContainer(
+              "layout_buttons",
+              "layout_2_col"
+            );
 
-          */
+            */
 
           // Templates
           addLabelToInsideToolsContainer("Templates");
@@ -2176,7 +2192,7 @@
         textBalance.classList.add("text_balance");
 
         const label1 = document.createElement("label");
-        label1.textContent = "Convert to line count";
+        label1.textContent = "Auto-wordwrap line count";
 
         const inputBox = document.createElement("input");
         inputBox.type = "number";
@@ -2195,7 +2211,7 @@
 
           const text = canvas_content.headline;
           const numberOfLines = inputBox.value;
-          let removeBreakpoints = removeNewAndReturnLines(text, true);
+          let removeBreakpoints = removeNewLinesAndReturnLines(text, true);
 
           // Turn off fit by longest line
           canvas_content.fit_by_word.headline = false;
@@ -2212,7 +2228,7 @@
 
           // Fit the text in the space
           canvas_content.auto_font_resize = true;
-          update_auto_text_resize();
+          calculate_headline_minimum_container_width();
 
           update_toolbox_panel("text_button");
           updateCanvas();
@@ -2935,17 +2951,18 @@
               : font_size_max;
         }
 
+        // Initial guess at largest font size
         font_size = font_size_max;
 
-        console.log(`Initial font size ${font_size}px`);
+        // Remove line breaks if user has turned off formating
+        // Headline
+        let headline_unformatted = removeNewLinesAndReturnLines(
+          canvas_content.headline,
+          canvas_content.ignore_line_breaks.headline
+        );
 
-        // Largest font size (Manual override)
-        // Not coded yet
-        let headline = addTextToCanvas(
-          removeNewAndReturnLines(
-            canvas_content.headline,
-            canvas_content.ignore_line_breaks.headline
-          ),
+        let headline_properties = addTextToCanvas(
+          headline_unformatted,
           position.x,
           position.y,
           text_area.width,
@@ -2956,8 +2973,48 @@
           1.05,
           700
         );
+
+        // Draw guides around headline
+        ctx.strokeStyle = "#d6002a";
+        ctx.lineWidth = 1;
+        ctx.strokeRect(
+          headline_properties.x,
+          headline_properties.y,
+          headline_properties.width,
+          headline_properties.height
+        );
+
+        // Body
+        let text_margin_bottom = 32;
+        let text_area_body_available_height =
+          text_area.height - headline_properties.height + text_margin_bottom;
+        let body_font_size = font_size * 0.5;
+
+        let body_properties = addTextToCanvas(
+          canvas_content.body,
+          position.x,
+          position.y + headline_properties.height + text_margin_bottom,
+          text_area.width,
+          text_area_body_available_height,
+          body_font_size,
+          canvas_content.color_font,
+          0,
+          1.3, // Line height
+          400 // Regular
+        );
+
+        // Draw guides around body
+        ctx.strokeStyle = "blue";
+        ctx.lineWidth = 1;
+        ctx.strokeRect(
+          body_properties.x,
+          body_properties.y,
+          body_properties.width,
+          body_properties.height
+        );
       }
 
+      // Wraps an input text into a specified number of lines, balancing text content and ensuring certain phrases are not split across lines.
       function balanceTextWrap(text, numberOfLines) {
         let split_words = text.split(" ");
         const words = mergeSPGlobal(split_words); // Merges S&P Global into one word
@@ -3033,6 +3090,7 @@
         return add_spaces;
       }
 
+      // Find and return the longest line in a text, with a flag if the text is only one line.
       function findLongestLine(text) {
         const lines = text.split(/\r?\n/);
         const result = {
@@ -3048,13 +3106,6 @@
         // Additional space to protect against too small text
         result.longestLine += " ";
         return result;
-      }
-
-      function calculateBreakpoints(width, height) {
-        let width_breakpoint_name = findBreakpoint(width);
-        let height_breakpoint_name = findBreakpoint(height);
-        console.log(width_breakpoint_name);
-        console.log(height_breakpoint_name);
       }
 
       function get_portal_specs(portal_size, portal_side) {
@@ -3431,7 +3482,7 @@
       }
 
       // Remove line breaks
-      function removeNewAndReturnLines(str, remove = true) {
+      function removeNewLinesAndReturnLines(str, remove = true) {
         if (remove) {
           return str.replace(/[\n\r]/g, " ").replace(/\s+/g, " "); // Remove new lines && consecutive spaces
         }
@@ -3446,7 +3497,7 @@
           });
         }
 
-        str = removeNewAndReturnLines(str); // Remove new lines
+        str = removeNewLinesAndReturnLines(str); // Remove new lines
         str = str.replace(/\s+/g, " "); // Remove double spaces
         return capitalizeAfterPeriod(str);
       }
@@ -3522,10 +3573,8 @@
 
           // First word in current line
           let currentLine = words[0];
-
           for (let i = 1; i < words.length; i++) {
             const word = words[i];
-
             if (word === "\n" || word === "\r") {
               lines.push(currentLine);
               currentLine = "";
@@ -3533,7 +3582,6 @@
               currentLine += word;
             } else {
               const newLine = currentLine + word;
-
               if (getTextWidth(newLine, fontSize, letterSpacing) <= rectWidth) {
                 currentLine = newLine;
               } else {
@@ -3545,13 +3593,11 @@
 
           // Create an array where the lines are sorted by whether they fit horizontally in the available space. Text wrap.
           lines.push(currentLine);
-
           // Check if the resulting lines fit in the container vertically, if not make the font smaller and recursively start the process again.
           if (lines.length * fontSize * lineHeight > rectHeight) {
             fontSize -= 1;
             return fitText(customString);
           }
-
           return lines;
         }
 
@@ -3580,7 +3626,6 @@
         }
 
         // Text processing
-
         // Clean up input text -- Remove multiple new lines and replace return lines with new lines
         text = removeDuplicateNewLines(text);
 
@@ -3601,16 +3646,23 @@
 
         let textForRendering = cleanedUpLineBreaks;
 
-        // ----- CANVAS RENDERING
+        // CANVAS RENDERING
         // Get text size
-        const textWidth = getTextWidth(
-          textForRendering[0],
-          fontSize,
-          letterSpacing
-        );
+        var text_width_max = 1;
+        for (var i = 0; i < textForRendering.length; i++) {
+          var calculate_width = getTextWidth(
+            textForRendering[i],
+            fontSize,
+            letterSpacing
+          );
+          if (calculate_width > text_width_max) {
+            text_width_max = calculate_width;
+          }
+        }
+        const textWidth = text_width_max;
         const textHeight = textForRendering.length * fontSize * lineHeight;
 
-        // Snap to bottom
+        // Align text vertically to bottom -- If setting is on
         let snap_y = 0;
         if (canvas_content.text_bottom_aligned) {
           snap_y = rectHeight - textHeight;
@@ -3620,7 +3672,7 @@
         if (fontSize > 24) {
           fontSize = Math.floor(fontSize / 4) * 4;
         }
-        console.log(`Final font size ${fontSize}px.`);
+        //console.log(`Final font size ${fontSize}px.`);
 
         // Only render font sizes larger than 16
         if (fontSize < 14) {
@@ -3659,9 +3711,11 @@
 
         // Return results
         return {
-          fontSize,
-          textWidth,
-          textHeight,
+          font_size: fontSize,
+          x: position_x,
+          y: position_y,
+          width: textWidth,
+          height: textHeight,
         };
       }
 
@@ -3698,7 +3752,7 @@
           }
         }
 
-        return result; //result;
+        return result;
       }
 
       function addNewLinesAndRemoveDuplicates(inputString, inputArray) {
@@ -3923,7 +3977,7 @@
           sG = 0,
           sB = 0; // source's current point r,g,b
         /* untested !
-    var sA = 0;  //source alpha  */
+      var sA = 0;  //source alpha  */
 
         for (sy = 0; sy < sh; sy++) {
           ty = sy * scale; // y src position within target
@@ -3950,14 +4004,14 @@
             sB = sBuffer[sIndex + 2];
 
             /* !! untested : handling alpha !!
-               sA = sBuffer[sIndex + 3];
-               if (!sA) continue;
-               if (sA != 0xFF) {
-                   sR = (sR * sA) >> 8;  // or use /256 instead ??
-                   sG = (sG * sA) >> 8;
-                   sB = (sB * sA) >> 8;
-               }
-            */
+                 sA = sBuffer[sIndex + 3];
+                 if (!sA) continue;
+                 if (sA != 0xFF) {
+                     sR = (sR * sA) >> 8;  // or use /256 instead ??
+                     sG = (sG * sA) >> 8;
+                     sB = (sB * sA) >> 8;
+                 }
+              */
             if (!crossX && !crossY) {
               // pixel does not cross
               // just add components weighted by squared scale.

@@ -1,12 +1,27 @@
-Some built in Features
+Need to be able to set the minimum width to the minimum width of the word in the body, headline, and button (calculate_headline_minimum_container_width())
 
-PPT files fonts are inconsitent
-Adobe tools are too complicated
+//Input box modified
+function inputbox_modified(event) {
+let button_label = event.target.name;
+let string_value = event.target.value;
 
-Id like to make this an offical project
-Immediate goals -- functioning prototype and get our team and provide feedback
-Then roll out to company
+if (button_label == "input_headline") {
+    canvas_content.headline = string_value;
+    calculate_headline_minimum_container_width();
+}
 
+if (button_label == "input_body") {
+    canvas_content.body = string_value;
+    //calculate_headline_minimum_container_width();
+}
+
+if (button_label == "input_cta") {
+    canvas_content.cta = string_value;
+    //calculate_headline_minimum_container_width();
+}
+
+
+-------------------------------
 Automatic capitalization of divisions, products, countries
 Character limits
 Force best practices through the interface
@@ -16,13 +31,17 @@ Keep track of content created and how created it (Maybe in the future)
 --- Seek & Prosper text highlighting
 --- CI Events content with the Event Names
 --- Podcasts
---- Speakers
+--- Speaker
+
+
+
+
 
 
 Internal feed, 
 --------- 
 
-Need to improve the image downscaling
+Need to improve the image downscaling optimization
 Only downscale the image when the canvas changes.
 Save the portals to a canvas and reapply the image when the portal image, size, scale or focal point changes
 Only do slow downscaling when you download the image
@@ -30,6 +49,8 @@ Only do slow downscaling when you download the image
 https://stackoverflow.com/questions/18922880/html5-canvas-resize-downscale-image-high-quality#:~:text=To%20downsample%20an%20image%2C%20we,its%20value%20for%20the%20destination.
 
 
+
+-------------------------
 --------- Can fill the text boxes with crazy number of spaces
 --------- FIT BY LARGEST LINE OF TEXT IS NOT THAT OBVIOUS, maybe make it a toggle. --- Auto-Font Resize
 --------- AUTOMATED TEXT SIZE could be just fitting the text by one line
@@ -39,9 +60,6 @@ https://stackoverflow.com/questions/18922880/html5-canvas-resize-downscale-image
 ---- Need to create custom breakpoints for determining logo size like I did for the fonts
 
 -- Copy
----- If its one line, just based on one word
----- If the font size is over two lines ... auto-width based on longest line
-
 ---- HEADLINE Left DESCRIPTION Right (A design option that should exist)
 ---- Flag if the headline + copy is taking up almost no space. Aka the font is TINY for no reason.
 ---- Description + CTA + Button
