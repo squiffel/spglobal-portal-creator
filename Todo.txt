@@ -1,5 +1,30 @@
 Need to be able to set the minimum width to the minimum width of the word in the body, headline, and button (calculate_headline_minimum_container_width())
 
+This line height function needs to be updated to allow for a different default range of line heights
+
+function calculateLineHeight(fontSize) {
+          // set the minimum and maximum font sizes and line height values
+          const minFontSize = 16;
+          const maxFontSize = 48;
+          const minLineHeight = 1.05;
+          const maxLineHeight = 1.15;
+
+          // calculate the line height using linear interpolation
+          let lineHeight =
+            ((maxLineHeight - minLineHeight) * (maxFontSize - fontSize)) /
+              (maxFontSize - minFontSize) +
+            minLineHeight;
+
+          // enforce the minimum and maximum line height values
+          lineHeight = Math.max(minLineHeight, lineHeight);
+          lineHeight = Math.min(maxLineHeight, lineHeight);
+
+          // return the line height with two decimal places
+          return lineHeight; //.toFixed(2);
+        }
+
+
+
 //Input box modified
 function inputbox_modified(event) {
 let button_label = event.target.name;
@@ -34,8 +59,8 @@ Keep track of content created and how created it (Maybe in the future)
 --- Speaker
 
 
-
-
+-------------------------------
+Can prevent S&P Global being split with _ underscore S&P_Global then removing it in the final rendering of the text
 
 
 Internal feed, 
