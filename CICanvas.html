@@ -995,8 +995,9 @@
 
       canvas_content.headline =
         random_headlines[Math.floor(Math.random() * random_headlines.length)];
-      canvas_content.body = "";
-      canvas_content.cta = "";
+      canvas_content.body =
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation";
+      canvas_content.cta = "Learn more";
 
       // Set default color scheme
       update_color_scheme("white");
@@ -2974,21 +2975,11 @@
           700
         );
 
-        // Draw guides around headline
-        ctx.strokeStyle = "#d6002a";
-        ctx.lineWidth = 1;
-        ctx.strokeRect(
-          headline_properties.x,
-          headline_properties.y,
-          headline_properties.width,
-          headline_properties.height
-        );
-
         // Body
-        let text_margin_bottom = 32;
+        let text_margin_bottom = headline_properties.font_size * 0.5;
         let text_area_body_available_height =
-          text_area.height - headline_properties.height + text_margin_bottom;
-        let body_font_size = font_size * 0.5;
+          text_area.height - headline_properties.height - text_margin_bottom;
+        let body_font_size = headline_properties.font_size * 0.5;
 
         let body_properties = addTextToCanvas(
           canvas_content.body,
@@ -3003,15 +2994,41 @@
           400 // Regular
         );
 
-        // Draw guides around body
-        ctx.strokeStyle = "blue";
-        ctx.lineWidth = 1;
-        ctx.strokeRect(
-          body_properties.x,
-          body_properties.y,
-          body_properties.width,
-          body_properties.height
-        );
+        if (canvas_content.show_guides) {
+          // Draw guides around total available text area
+          ctx.strokeStyle = "red";
+          ctx.lineWidth = 1;
+          ctx.strokeRect(
+            position.x,
+            position.y,
+            text_area.width,
+            text_area.height
+          );
+
+          // Draw guides around headline
+          if (canvas_content.headline.length > 0) {
+            ctx.strokeStyle = "blue";
+            ctx.lineWidth = 1;
+            ctx.strokeRect(
+              headline_properties.x,
+              headline_properties.y,
+              headline_properties.width,
+              headline_properties.height
+            );
+          }
+
+          // Draw guides around body
+          if (canvas_content.body.length > 0) {
+            ctx.strokeStyle = "blue";
+            ctx.lineWidth = 1;
+            ctx.strokeRect(
+              body_properties.x,
+              body_properties.y,
+              body_properties.width,
+              text_area_body_available_height //body_properties.height
+            );
+          }
+        }
       }
 
       // Wraps an input text into a specified number of lines, balancing text content and ensuring certain phrases are not split across lines.
@@ -3560,9 +3577,10 @@
 
         function fitText(customString = "") {
           let lines = [];
+
           //let words = text.split(" ");
           let words = text.split(/( |\n|\r)/);
-          words = mergeSPGlobal(text.split(/( |\n|\r)/)); // Merges S&P Global into one word
+          words = mergeSPGlobal(text.split(/( |\n|\r)/)); // Merges "S&P Global" into one word when found in text
 
           lineHeight = calculateLineHeight(fontSize);
 
@@ -3570,6 +3588,10 @@
           while (isAnyWordWiderThanRect(words, customString)) {
             fontSize -= 1;
           }
+
+          // Set a universal minimum font size
+          let minimum_font_size = 14;
+          fontSize = Math.max(minimum_font_size, fontSize);
 
           // First word in current line
           let currentLine = words[0];
@@ -3594,7 +3616,11 @@
           // Create an array where the lines are sorted by whether they fit horizontally in the available space. Text wrap.
           lines.push(currentLine);
           // Check if the resulting lines fit in the container vertically, if not make the font smaller and recursively start the process again.
-          if (lines.length * fontSize * lineHeight > rectHeight) {
+          // Unless the font already is the minimum font size
+          if (
+            lines.length * fontSize * lineHeight > rectHeight &&
+            fontSize != minimum_font_size
+          ) {
             fontSize -= 1;
             return fitText(customString);
           }
@@ -3647,7 +3673,12 @@
         let textForRendering = cleanedUpLineBreaks;
 
         // CANVAS RENDERING
-        // Get text size
+        // Snap down fonts above 24px (24, 28, 32)
+        if (fontSize > 24) {
+          fontSize = Math.floor(fontSize / 4) * 4;
+        }
+
+        // Get text area size
         var text_width_max = 1;
         for (var i = 0; i < textForRendering.length; i++) {
           var calculate_width = getTextWidth(
@@ -3668,18 +3699,6 @@
           snap_y = rectHeight - textHeight;
         }
 
-        // Snap down fonts above 24px (24, 28, 32)
-        if (fontSize > 24) {
-          fontSize = Math.floor(fontSize / 4) * 4;
-        }
-        //console.log(`Final font size ${fontSize}px.`);
-
-        // Only render font sizes larger than 16
-        if (fontSize < 14) {
-          console.log(`Increased size to 14px`);
-        }
-        fontSize = Math.max(14, fontSize);
-
         // Render font
         ctx.fillStyle = fontColor;
         ctx.font = `${fontWeight} ${fontSize}px Akkurat LL`;
@@ -3695,19 +3714,6 @@
           // Add superscript, trademark and copywriting
           drawTextWithSuperscript(line, position_x, calculated_position_y);
         }
-
-        // Render guides
-        draw_guides(
-          canvas_content.show_guides,
-          "Text",
-          {
-            x: position_x,
-            y: position_y,
-            width: rectWidth,
-            height: rectHeight,
-          },
-          "#d6002a"
-        );
 
         // Return results
         return {
