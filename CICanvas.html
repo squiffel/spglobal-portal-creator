@@ -1048,6 +1048,27 @@
         return 20;
       }
 
+      // Calculate the canvas margin
+      function calculate_canvas_margin(width, height) {
+        let smallestDimension = Math.min(width, height);
+        let largestDimension = Math.max(width, height);
+        let area = width * height;
+
+        if (smallestDimension >= 1080) {
+          return 64;
+        } else if (smallestDimension >= 300) {
+          // If its smaller than 1080x300 then switch to 16px margins
+          if (area < 324000) {
+            return 16;
+          }
+          return 32;
+        } else if (smallestDimension > 160) {
+          return 16;
+        } else {
+          return 12;
+        }
+      }
+
       // Random initial headline
       let random_headlines = [
         "Powering the Markets of the Future.",
@@ -1066,11 +1087,43 @@
         "Creating benchmarks for progress",
       ];
 
-      canvas_content.headline =
-        random_headlines[Math.floor(Math.random() * random_headlines.length)];
-      canvas_content.body =
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation";
-      canvas_content.cta = "Learn more";
+      let random_description = [
+        "With S&P Global, navigate the intricate landscape of energy transitions and complex markets with ease, surpassing your expectations at every turn. As markets grow increasingly complex, our solutions offer a path towards understanding, enabling you to make an impact on tomorrow with confidence.",
+        "As energy transitions and markets become more complex, solutions from S&P Global push past your expectations to help you uncover new levels of understanding.",
+        "With increasing complexities in energy transitions and markets, solutions from S&P Global enhance your comprehension, empowering you to shape the future.",
+        "Push past your expectations and uncover new levels of understanding with solutions from S&P Global.",
+        "Uncover new levels of understanding with solutions from S&P Global.",
+        "Complex markets meet unexpected solutions from S&P Global.",
+        "So you can make an impact on tomorrow.",
+        "Make an impact on tomorrow.",
+        "Impact tomorrow.",
+      ];
+
+      let random_cta = [
+        "Learn More",
+        "Explore Our Dataset",
+        "Uncover Insights Now",
+        "Start Your Journey",
+        "Join Us Today",
+        "See the Difference",
+        "Get Started",
+        "Discover More",
+        "Try It Now",
+        "Dive Deeper",
+      ];
+
+      function generate_random_copy() {
+        canvas_content.headline =
+          random_headlines[Math.floor(Math.random() * random_headlines.length)];
+        canvas_content.body =
+          random_description[
+            Math.floor(Math.random() * random_description.length)
+          ];
+        canvas_content.cta =
+          random_cta[Math.floor(Math.random() * random_cta.length)];
+      }
+
+      generate_random_copy();
 
       // Set default color scheme
       update_color_scheme("white");
@@ -1735,13 +1788,16 @@
           }
           // Generate random headline
           if (event.target.name == "random_headline") {
-            canvas_content.headline =
-              random_headlines[
-                Math.floor(Math.random() * random_headlines.length)
-              ];
+            generate_random_copy();
             // Update headline box
             document.getElementsByName("input_headline")[0].value =
               canvas_content.headline;
+            // Update headline box
+            document.getElementsByName("input_body")[0].value =
+              canvas_content.body;
+            // Update headline box
+            document.getElementsByName("input_cta")[0].value =
+              canvas_content.cta;
           }
         }
 
@@ -1972,7 +2028,7 @@
           current_panel_open = "Text";
 
           addButtonToInsideToolsContainer(
-            "Generate random headline",
+            "Generate random copy",
             "random_headline"
           );
 
@@ -2082,50 +2138,50 @@
           }
 
           /*
-            // Layout buttons
-            addLabelToInsideToolsContainer("Layout");
-            addSquareButtonsToInsideToolsContainer(
-              "layout_buttons",
-              "layout_4_split_assymetrical"
-            );
-            addSquareButtonsToInsideToolsContainer(
-              "layout_buttons",
-              "layout_4_split_symetrical"
-            );
-            addSquareButtonsToInsideToolsContainer(
-              "layout_buttons",
-              "layout_bottom_split_assymetrical"
-            );
-            addSquareButtonsToInsideToolsContainer(
-              "layout_buttons",
-              "layout_bottom_split_symetrical"
-            );
-            addSquareButtonsToInsideToolsContainer(
-              "layout_buttons",
-              "layout_side_split_assymetrical"
-            );
-            addSquareButtonsToInsideToolsContainer(
-              "layout_buttons",
-              "layout_side_split_symetrical"
-            );
-            addSquareButtonsToInsideToolsContainer(
-              "layout_buttons",
-              "layout_3_row"
-            );
-            addSquareButtonsToInsideToolsContainer(
-              "layout_buttons",
-              "layout_3_col"
-            );
-            addSquareButtonsToInsideToolsContainer(
-              "layout_buttons",
-              "layout_2_row"
-            );
-            addSquareButtonsToInsideToolsContainer(
-              "layout_buttons",
-              "layout_2_col"
-            );
+                  // Layout buttons
+                  addLabelToInsideToolsContainer("Layout");
+                  addSquareButtonsToInsideToolsContainer(
+                    "layout_buttons",
+                    "layout_4_split_assymetrical"
+                  );
+                  addSquareButtonsToInsideToolsContainer(
+                    "layout_buttons",
+                    "layout_4_split_symetrical"
+                  );
+                  addSquareButtonsToInsideToolsContainer(
+                    "layout_buttons",
+                    "layout_bottom_split_assymetrical"
+                  );
+                  addSquareButtonsToInsideToolsContainer(
+                    "layout_buttons",
+                    "layout_bottom_split_symetrical"
+                  );
+                  addSquareButtonsToInsideToolsContainer(
+                    "layout_buttons",
+                    "layout_side_split_assymetrical"
+                  );
+                  addSquareButtonsToInsideToolsContainer(
+                    "layout_buttons",
+                    "layout_side_split_symetrical"
+                  );
+                  addSquareButtonsToInsideToolsContainer(
+                    "layout_buttons",
+                    "layout_3_row"
+                  );
+                  addSquareButtonsToInsideToolsContainer(
+                    "layout_buttons",
+                    "layout_3_col"
+                  );
+                  addSquareButtonsToInsideToolsContainer(
+                    "layout_buttons",
+                    "layout_2_row"
+                  );
+                  addSquareButtonsToInsideToolsContainer(
+                    "layout_buttons",
+                    "layout_2_col"
+                  );
 
-            */
+                  */
 
           // Templates
           addLabelToInsideToolsContainer("Templates");
@@ -2767,33 +2823,12 @@
           canvas_content.shortestSide = "width";
         }
 
-        // Calculate 8% of the shortest side
-        let side_percent = 0.08;
-        let side_percent_tighter = 0.07;
-        let factor = 8;
+        canvas_content.margin = calculate_canvas_margin(
+          canvas.width,
+          canvas.height
+        );
 
-        var margin =
-          Math.floor((shortestSide * side_percent) / factor) * factor; // Factors of 16
-
-        // Tighten up
-        if (margin >= 40) {
-          margin =
-            Math.floor((shortestSide * side_percent_tighter) / factor) * factor; // Factors of 16
-        }
-
-        margin = Math.max(margin, 16); // Minimum of 16px
-        margin = Math.min(margin, 64); // Maximum of 96px
-
-        // 12px on tiny graphics
-        let switch_to_min_margins_size = 256;
-        if (
-          canvas.width < switch_to_min_margins_size &&
-          canvas.height < switch_to_min_margins_size
-        ) {
-          margin = 12;
-        }
-
-        canvas_content.margin = margin;
+        console.log(canvas_content.margin);
 
         // Margins at 100% of the Canvas
         canvas_content.marginTop = canvas_content.margin;
@@ -3009,22 +3044,22 @@
           ); //reduce_font_size(estimate_headline_size);
         }
         /*
-        console.log(
-          "Canvas size: " +
-            canvas.width +
-            "x" +
-            canvas.height +
-            "\nArea: " +
-            canvas.width * canvas.height +
-            "\n" +
-            "ESTIMATED - Headline: " +
-            estimate_size +
-            " Body: " +
-            result_typescale.body +
-            " Cta: " +
-            result_typescale.cta
-        );
-        */
+              console.log(
+                "Canvas size: " +
+                  canvas.width +
+                  "x" +
+                  canvas.height +
+                  "\nArea: " +
+                  canvas.width * canvas.height +
+                  "\n" +
+                  "ESTIMATED - Headline: " +
+                  estimate_size +
+                  " Body: " +
+                  result_typescale.body +
+                  " Cta: " +
+                  result_typescale.cta
+              );
+              */
 
         // Initial guess at largest font size
         font_size = estimate_headline_size;
@@ -3452,7 +3487,9 @@
 
             // Red is a special exemption
             if (canvas_content.background_color == spglobal_colors.red) {
-              fontColor = spglobal_colors.red;
+              if (canvas_content.portal_size_percent < 100) {
+                fontColor = spglobal_colors.red;
+              }
             }
           }
 
@@ -4200,7 +4237,7 @@
           sG = 0,
           sB = 0; // source's current point r,g,b
         /* untested !
-      var sA = 0;  //source alpha  */
+            var sA = 0;  //source alpha  */
 
         for (sy = 0; sy < sh; sy++) {
           ty = sy * scale; // y src position within target
@@ -4227,14 +4264,14 @@
             sB = sBuffer[sIndex + 2];
 
             /* !! untested : handling alpha !!
-                 sA = sBuffer[sIndex + 3];
-                 if (!sA) continue;
-                 if (sA != 0xFF) {
-                     sR = (sR * sA) >> 8;  // or use /256 instead ??
-                     sG = (sG * sA) >> 8;
-                     sB = (sB * sA) >> 8;
-                 }
-              */
+                       sA = sBuffer[sIndex + 3];
+                       if (!sA) continue;
+                       if (sA != 0xFF) {
+                           sR = (sR * sA) >> 8;  // or use /256 instead ??
+                           sG = (sG * sA) >> 8;
+                           sB = (sB * sA) >> 8;
+                       }
+                    */
             if (!crossX && !crossY) {
               // pixel does not cross
               // just add components weighted by squared scale.

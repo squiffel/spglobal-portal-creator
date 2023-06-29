@@ -5,11 +5,13 @@ Button color set to red as an option?
 
 CTAs need character limits
 Need to calculate the max number of characters based on the available space
-Need to caculate when the text should be vertically centered
+Need to calculate when the text should be vertically centered
 Need to limit the number of image sizes you can set based on the size of the canvas
 Need to limit where the portal can be located based on the canvas size
+Toggle button visiibility
+Toggle description visibility
 CTAs could be dropdowns
-Need to calculate the available SPACE to the right of the LOGO where there CTA can go
+Need to calculate the available SPACE to the right of the LOGO — Check if its an option for the CTA
 
 Auto capitalize, font size, can all be smaller buttons
 
