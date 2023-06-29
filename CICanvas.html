@@ -937,6 +937,9 @@
         blue: "#C7DAE0",
       };
 
+      // Minimum font size
+      const minimum_font_size = 12;
+
       // User defined settings
       let canvas_content = {};
       let userDefinedAspectRatio;
@@ -973,6 +976,50 @@
           relative_x: 0.5,
           relative_y: 0.5,
         };
+      }
+
+      // Typography scale
+      const typescale = {
+        96: { body: 48, cta: 32 },
+        64: { body: 32, cta: 20 },
+        48: { body: 24, cta: 20 },
+        32: { body: 16, cta: 12 },
+        24: { body: 14, cta: 12 },
+        20: { body: 12, cta: 12 },
+        16: { body: 12, cta: 12 },
+        14: { body: 12, cta: 12 },
+        12: { body: 12, cta: 12 },
+      };
+
+      // Round down the correct scale
+      function round_to_nearest_typescale(value) {
+        let scale = [96, 64, 48, 32, 24, 20, 16, 14, 12];
+
+        for (let i = 0; i < scale.length; i++) {
+          if (value >= scale[i]) {
+            return scale[i];
+          }
+        }
+
+        return scale[scale.length - 1]; // return smallest scale if value is less than the smallest scale
+      }
+
+      // Gets the default largest scale
+      // If that doesn't fit it would still need to downscale
+      function estimate_typescale(width, height) {
+        let area = width * height;
+        if (area > 1600000) {
+          return 96;
+        } else if (area <= 1600000 && area > 600000) {
+          return 64;
+        } else if (area <= 600000 && area > 200000) {
+          return 48;
+        } else if (area <= 200000 && area > 60000) {
+          return 32;
+        } else if (area <= 60000 && area > 20000) {
+          return 24;
+        }
+        return 20;
       }
 
       // Random initial headline
@@ -1808,7 +1855,7 @@
             canvas_content.portal_color_overlay =
               !canvas_content.portal_color_overlay;
           }
-          if (button_label.includes("Show portal margins")) {
+          if (button_label.includes("Portal visible margins")) {
             canvas_content.portal_override_margins =
               !canvas_content.portal_override_margins;
           }
@@ -1998,7 +2045,7 @@
               addLabelToInsideToolsContainer("Portal Size");
 
               let select_size = createDropdownMenu(
-                ["100%", "150%", "66%", "50%", "33%", "0%"],
+                ["100%", "150%", "60%", "50%", "30%", "0%"],
                 "portal_size",
                 canvas_content.portal_size_percent + "%"
               );
@@ -2013,9 +2060,9 @@
                 "100%",
                 "100% Portal 100% Text"
               );
-              changeDropdownMenuText(select_size, "66%", "66% Portal 33% Text");
+              changeDropdownMenuText(select_size, "60%", "60% Portal 30% Text");
               changeDropdownMenuText(select_size, "50%", "50% Portal 50% Text");
-              changeDropdownMenuText(select_size, "33%", "33% Portal 66% Text");
+              changeDropdownMenuText(select_size, "30%", "30% Portal 60% Text");
               changeDropdownMenuText(select_size, "0%", "No Portal 100% Text");
             }
           }
@@ -2975,17 +3022,18 @@
           700
         );
 
+        let minimum_margin = 8;
         // Calculate the margins between text
         let headline_margin_bottom = Math.max(
           headline_properties.font_size * 0.5,
-          16
+          minimum_margin
         );
 
         // Precalculate button size so that it can removed from the available space
         let button_padding = 12;
         let button_font_size = Math.max(
           headline_properties.font_size * 0.4,
-          14
+          minimum_font_size
         );
         let button_area_size = 0;
         if (canvas_content.cta.length > 0) {
@@ -3042,6 +3090,16 @@
             button_position_y
           );
         }
+
+        console.log(
+          "headline: " +
+            headline_properties.font_size +
+            "px body: " +
+            body_properties.font_size +
+            "px button: " +
+            button_font_size +
+            "px"
+        );
 
         // Draw text guides
         if (canvas_content.show_guides) {
@@ -3693,7 +3751,7 @@
           const minFontSize = 16;
           const maxFontSize = 48;
           const minLineHeight = defaultLineHeight;
-          const maxLineHeight = defaultLineHeight * 1.09523809524;
+          const maxLineHeight = defaultLineHeight * 1.095;
 
           // calculate the line height using linear interpolation
           let lineHeight =
@@ -3724,7 +3782,6 @@
           }
 
           // Set a universal minimum font size
-          let minimum_font_size = 14;
           fontSize = Math.max(minimum_font_size, fontSize);
 
           // First word in current line
