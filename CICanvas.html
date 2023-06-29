@@ -953,8 +953,7 @@
       canvas_content.ignore_line_breaks = { headline: false };
 
       canvas_content.text_container_minimum_character_width = "";
-      canvas_content.fit_by_word = { headline: false };
-      canvas_content.auto_font_resize = false;
+      canvas_content.font_size_small = false;
 
       canvas_content.portal_color_overlay = false;
 
@@ -991,32 +990,58 @@
         12: { body: 12, cta: 12 },
       };
 
-      // Round down the correct scale
-      function round_to_nearest_typescale(value) {
-        let scale = [96, 64, 48, 32, 24, 20, 16, 14, 12];
+      // Button height
+      function calculate_button_padding(height) {
+        if (height > 600) {
+          return 16;
+        } else if (height > 100) {
+          return 8;
+        }
+        return 4;
+      }
 
-        for (let i = 0; i < scale.length; i++) {
-          if (value >= scale[i]) {
-            return scale[i];
-          }
+      const typescale_map = [96, 64, 48, 32, 24, 20, 16, 14, 12];
+
+      // Downscale the font size
+      function reduce_font_size(inputValue) {
+        const sortedMap = typescale_map.sort((a, b) => a - b);
+        const index = sortedMap.indexOf(inputValue);
+
+        if (index === -1 || index === 0) {
+          // Input value not found or already the lowest value
+          return null;
         }
 
-        return scale[scale.length - 1]; // return smallest scale if value is less than the smallest scale
+        return sortedMap[index - 1];
+      }
+
+      // Round down the correct scale
+      function round_to_nearest_typescale(value) {
+        // Downscale
+        for (let i = 0; i < typescale_map.length; i++) {
+          if (value >= typescale_map[i]) {
+            return typescale_map[i];
+          }
+        }
+        // return smallest scale if value is less than the smallest scale
+        return typescale_map[typescale_map.length - 1];
       }
 
       // Gets the default largest scale
       // If that doesn't fit it would still need to downscale
+      // This bases the scale on total canvas width not the potential for images, maybe that is okay?
+      // The available space inside the canvas might further downscale the text but how?
       function estimate_typescale(width, height) {
         let area = width * height;
-        if (area > 1600000) {
+        if (area > 1000000) {
           return 96;
-        } else if (area <= 1600000 && area > 600000) {
+        } else if (area <= 1000000 && area > 600000) {
           return 64;
-        } else if (area <= 600000 && area > 200000) {
+        } else if (area <= 600000 && area > 250000) {
           return 48;
-        } else if (area <= 200000 && area > 60000) {
+        } else if (area <= 250000 && area > 120000) {
           return 32;
-        } else if (area <= 60000 && area > 20000) {
+        } else if (area <= 120000 && area > 74000) {
           return 24;
         }
         return 20;
@@ -1656,15 +1681,9 @@
       // If this is off, then it resizes based on the longest word. There can only be one longest word.
       function calculate_headline_minimum_container_width() {
         let longestLine = findLongestLine(canvas_content.headline);
-        // Resize to longest line -- Auto resize
-        if (canvas_content.auto_font_resize) {
-          canvas_content.text_container_minimum_character_width =
-            longestLine.longestLine;
-        } else {
-          // Resize to longest word -- Default
-          canvas_content.text_container_minimum_character_width =
-            findLongestWordsByWidth(canvas_content.headline, 1);
-        }
+        // Ensure the longest line fits
+        canvas_content.text_container_minimum_character_width =
+          findLongestWordsByWidth(canvas_content.headline, 1);
       }
 
       //Input box modified
@@ -1828,9 +1847,8 @@
         let button_label = element.innerText;
 
         if (current_panel_open == "Text") {
-          if (button_label.includes("Auto-fit longest line")) {
-            canvas_content.auto_font_resize = !canvas_content.auto_font_resize;
-            calculate_headline_minimum_container_width();
+          if (button_label.includes("Set font size: Small")) {
+            canvas_content.font_size_small = !canvas_content.font_size_small;
           }
         }
 
@@ -1982,12 +2000,11 @@
           );
           addButtonToInsideToolsContainer("Remove all line breaks", "headline");
 
-          // Show Grid
-          let toggle_auto_font_switch = addToggleSwitchWithLabel(
-            "Auto-fit longest line",
-            canvas_content.auto_font_resize
+          // Set font size
+          let toggle_font_size = addToggleSwitchWithLabel(
+            "Set font size: Small",
+            canvas_content.font_size_small
           );
-          toggle_auto_font_switch.id = "fit-text-auto";
 
           addTextWrapButtonAndInput();
 
@@ -2261,9 +2278,6 @@
           const numberOfLines = inputBox.value;
           let removeBreakpoints = removeNewLinesAndReturnLines(text, true);
 
-          // Turn off fit by longest line
-          canvas_content.fit_by_word.headline = false;
-
           // Remove all break points and find the longest word
           canvas_content.headline = removeBreakpoints;
 
@@ -2274,8 +2288,7 @@
             canvas_content.headline = textWrap;
           }
 
-          // Fit the text in the space
-          canvas_content.auto_font_resize = true;
+          // Make sure the longest word fits in the canvas
           calculate_headline_minimum_container_width();
 
           update_toolbox_panel("text_button");
@@ -2979,28 +2992,38 @@
         }
 
         // Dynamic font size
-        let font_size_max =
-          text_area.width > 700 && text_area.height > 700 ? 96 : 72;
+        // Estimate font size
+        let estimate_headline_size = estimate_typescale(
+          canvas.width,
+          canvas.height
+        );
 
-        font_size_max =
-          text_area.width < 600 && text_area.height < 600 ? 64 : font_size_max;
-
-        font_size_max =
-          text_area.width < 500 && text_area.height < 500 ? 48 : font_size_max;
-
-        // Super wide canvas with image and long text
-        if (canvas_content.headline.length > 32) {
-          font_size_max =
-            text_area.width > 500 &&
-            text_area.height > 180 &&
-            text_area.height < 300 &&
-            text_area.width < 1200
-              ? 56
-              : font_size_max;
+        if (canvas_content.font_size_small) {
+          console.log("Downscale font");
+          estimate_headline_size = round_to_nearest_typescale(
+            estimate_headline_size - 1
+          ); //reduce_font_size(estimate_headline_size);
         }
+        /*
+        console.log(
+          "Canvas size: " +
+            canvas.width +
+            "x" +
+            canvas.height +
+            "\nArea: " +
+            canvas.width * canvas.height +
+            "\n" +
+            "ESTIMATED - Headline: " +
+            estimate_size +
+            " Body: " +
+            result_typescale.body +
+            " Cta: " +
+            result_typescale.cta
+        );
+        */
 
         // Initial guess at largest font size
-        font_size = font_size_max;
+        font_size = estimate_headline_size;
 
         // Remove line breaks if user has turned off formating
         // Headline
@@ -3022,19 +3045,21 @@
           700
         );
 
+        // Constrain headline font size to specific sizes
+        let headline_fixed_font_size = round_to_nearest_typescale(
+          headline_properties.font_size
+        );
+
         let minimum_margin = 8;
         // Calculate the margins between text
         let headline_margin_bottom = Math.max(
-          headline_properties.font_size * 0.5,
+          headline_fixed_font_size * 0.5,
           minimum_margin
         );
 
         // Precalculate button size so that it can removed from the available space
-        let button_padding = 12;
-        let button_font_size = Math.max(
-          headline_properties.font_size * 0.4,
-          minimum_font_size
-        );
+        let button_padding = calculate_button_padding(canvas.height);
+        let button_font_size = typescale[headline_fixed_font_size].cta;
         let button_area_size = 0;
         if (canvas_content.cta.length > 0) {
           button_area_size =
@@ -3049,7 +3074,7 @@
           headline_margin_bottom -
           button_area_size;
 
-        let body_font_size = headline_properties.font_size * 0.5;
+        let body_font_size = typescale[headline_fixed_font_size].body;
         let body_position_y =
           position.y + headline_properties.height + headline_margin_bottom;
 
@@ -3094,6 +3119,8 @@
         console.log(
           "headline: " +
             headline_properties.font_size +
+            " fixed headline: " +
+            headline_fixed_font_size +
             "px body: " +
             body_properties.font_size +
             "px button: " +

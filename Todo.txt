@@ -1,14 +1,12 @@
 Need to be able to set the minimum width to the minimum width of the word in the body, headline, and button (calculate_headline_minimum_container_width())
 
 
-I want to stop at 1280x1280 for simplicity but ...
-typescale[value]
-round_to_nearest_typescale(value)
-estimate_typescale(width, height)
-
 CTAs need character limits
+Need to calculate the max number of characters based on the available space
+Need to caculate when the text should be vertically centered
+Need to limit the number of image sizes you can set based on the size of the canvas
 CTAs could be dropdowns
-When font sizes downscale they should trigger fixed downscaling of the body / cta
+Need to calculate the available SPACE to the right of the LOGO where there CTA can go.
 
 ------
 
