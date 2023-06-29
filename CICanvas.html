@@ -953,8 +953,14 @@
       canvas_content.ignore_line_breaks = { headline: false };
 
       canvas_content.text_container_minimum_character_width = "";
-      canvas_content.font_size_small = false;
       canvas_content.button_style = "solid";
+
+      canvas_content.font_size = {
+        headline: 96,
+        body: 48,
+        cta: 32,
+        small: false,
+      };
 
       canvas_content.portal_color_overlay = false;
 
@@ -1056,6 +1062,8 @@
 
         if (smallestDimension >= 1080) {
           return 64;
+        } else if (smallestDimension > 600) {
+          return 40;
         } else if (smallestDimension >= 300) {
           // If its smaller than 1080x300 then switch to 16px margins
           if (area < 324000) {
@@ -1064,9 +1072,25 @@
           return 32;
         } else if (smallestDimension > 160) {
           return 16;
-        } else {
-          return 12;
+        } else if (smallestDimension > 120) {
+          return 14;
         }
+        return 12;
+      }
+
+      // Font size labelling in tool panel
+      function update_font_size_label() {
+        let headline_label = document.getElementById("headline_label");
+        if (!headline_label) {
+          return;
+        }
+        let body_label = document.getElementById("body_label");
+        let cta_label = document.getElementById("cta_label");
+        headline_label.innerText =
+          "Headline: " + canvas_content.font_size.headline + "px";
+        body_label.innerText = "Body: " + canvas_content.font_size.body + "px";
+        cta_label.innerText =
+          "Call To Action: " + canvas_content.font_size.cta + "px";
       }
 
       // Random initial headline
@@ -1077,14 +1101,14 @@
         "Life behind the data.",
         "Powerful impact.",
         "Placing risk and performance in a greater context is Essential Intelligence.",
-        "Embracing resilience and growth",
-        "Navigating energy in transition",
-        "Innovating energy for growth",
-        "Transforming energy for tomorrow",
-        "Creating clarity amid complexity",
-        "Clarifying uncertainty with insight",
-        "Empowering markets for growth",
-        "Creating benchmarks for progress",
+        "Embracing resilience and growth.",
+        "Navigating energy in transition.",
+        "Innovating energy for growth.",
+        "Transforming energy for tomorrow.",
+        "Creating clarity amid complexity.",
+        "Clarifying uncertainty with insight.",
+        "Empowering markets for growth.",
+        "Creating benchmarks for progress.",
       ];
 
       let random_description = [
@@ -1100,16 +1124,16 @@
       ];
 
       let random_cta = [
-        "Learn More",
-        "Explore Our Dataset",
-        "Uncover Insights Now",
-        "Start Your Journey",
-        "Join Us Today",
-        "See the Difference",
-        "Get Started",
-        "Discover More",
-        "Try It Now",
-        "Dive Deeper",
+        "Learn more",
+        "Explore our dataset",
+        "Uncover insights now",
+        "Start your journey",
+        "Join us today",
+        "See the difference",
+        "Get started",
+        "Discover more",
+        "Try it now",
+        "Dive deeper",
       ];
 
       function generate_random_copy() {
@@ -1124,6 +1148,10 @@
       }
 
       generate_random_copy();
+
+      function zoom_label_generate(value) {
+        return "Zoom " + (1 + parseInt(value) * 0.2) + "x";
+      }
 
       // Set default color scheme
       update_color_scheme("white");
@@ -1218,15 +1246,7 @@
           canvas_content.portal_side = "top";
         }
 
-        // Replace random headline if it is one
-        let random_headline_generator = getRandomValueFromArray(
-          random_headlines,
-          canvas_content.headline
-        );
-        if (random_headline_generator != "") {
-          canvas_content.headline = random_headline_generator;
-        }
-
+        // Fit copy
         canvas_content.text_container_minimum_character_width =
           findLongestWordsByWidth(canvas_content.headline, 1);
 
@@ -1894,7 +1914,7 @@
 
         if (current_panel_open == "Text") {
           if (button_label.includes("Set font size: Small")) {
-            canvas_content.font_size_small = !canvas_content.font_size_small;
+            canvas_content.font_size.small = !canvas_content.font_size.small;
           }
         }
 
@@ -2035,10 +2055,11 @@
           // Set font size
           let toggle_font_size = addToggleSwitchWithLabel(
             "Set font size: Small",
-            canvas_content.font_size_small
+            canvas_content.font_size.small
           );
 
-          addLabelToInsideToolsContainer("Headline");
+          let headline_label = addLabelToInsideToolsContainer("Headline");
+          headline_label.id = "headline_label";
           //addTextToInsideToolsContainer("Label here");
 
           let headline_button = addInputBoxToInsideToolsContainer(
@@ -2054,14 +2075,18 @@
           // Auto-wordwrap
           addTextWrapButtonAndInput();
 
-          addLabelToInsideToolsContainer("Body");
+          let body_label = addLabelToInsideToolsContainer("Body");
+          body_label.id = "body_label";
+
           let description_button = addInputBoxToInsideToolsContainer(
             "body",
             canvas_content.body
           );
           description_button.style.height = "200px";
 
-          addLabelToInsideToolsContainer("Call to action");
+          let cta_label = addLabelToInsideToolsContainer("Call to action");
+          cta_label.id = "cta_label";
+
           addInputBoxToInsideToolsContainer("cta", canvas_content.cta);
 
           addLabelToInsideToolsContainer("Button Style");
@@ -2070,6 +2095,9 @@
             "button_style",
             canvas_content.button_style
           );
+
+          // Update labels
+          update_font_size_label();
         }
 
         if (buttonName === "layout_button") {
@@ -2222,6 +2250,16 @@
           btn.value = canvas.height;
           btn.id = "heightInput";
           btn.classList.add("input_fixed_height");
+
+          let margin_label = addTextToInsideToolsContainer(
+            "Margins: " +
+              calculate_canvas_margin(canvas.width, canvas.height) +
+              "px"
+          );
+          margin_label.id = "margin_label";
+          margin_label.style.marginBottom = "4px";
+          margin_label.style.marginBottom = "8px";
+
           let submit_button = addButtonToInsideToolsContainer("Submit");
           submit_button.id = "submit_canvas_size_button";
           submit_button.style.marginTop = "4px";
@@ -2278,7 +2316,11 @@
                     addButtonToInsideToolsContainer("Convert to primary");
                 }
                 // Show scale
-                addLabelToInsideToolsContainer("Scale", 0);
+                let zoom_label = zoom_label_generate(
+                  canvas_content.portal_image_scale[i]
+                );
+                let zoom_scale = addLabelToInsideToolsContainer(zoom_label, 0);
+                zoom_scale.id = "zoom-scale-label";
                 createRangeSlider(
                   4,
                   canvas_content.portal_image_scale[i],
@@ -2828,8 +2870,6 @@
           canvas.height
         );
 
-        console.log(canvas_content.margin);
-
         // Margins at 100% of the Canvas
         canvas_content.marginTop = canvas_content.margin;
         canvas_content.marginLeft = canvas_content.margin;
@@ -3031,17 +3071,17 @@
         }
 
         // Dynamic font size
-        // Estimate font size
         let estimate_headline_size = estimate_typescale(
           canvas.width,
           canvas.height
         );
 
-        if (canvas_content.font_size_small) {
+        // Downscale the font if the user picks a smaller font
+        if (canvas_content.font_size.small) {
           console.log("Downscale font");
           estimate_headline_size = round_to_nearest_typescale(
             estimate_headline_size - 1
-          ); //reduce_font_size(estimate_headline_size);
+          );
         }
         /*
               console.log(
@@ -3095,6 +3135,7 @@
           headline_fixed_font_size * 0.5,
           minimum_margin
         );
+        console.log("Margin between text: " + headline_margin_bottom + "px");
 
         // Precalculate button size so that it can removed from the available space
         let button_padding = calculate_button_padding(canvas.height);
@@ -3150,6 +3191,7 @@
           );
         }
 
+        /*
         console.log(
           "headline: " +
             headline_properties.font_size +
@@ -3161,6 +3203,13 @@
             button_font_size +
             "px"
         );
+        */
+
+        // Store font sizes
+        canvas_content.font_size.headline = headline_properties.font_size;
+        canvas_content.font_size.body = body_properties.font_size;
+        canvas_content.font_size.cta = button_font_size;
+        update_font_size_label();
 
         // Draw text guides
         if (canvas_content.show_guides) {
@@ -4184,6 +4233,8 @@
         if (slider.name.includes("image_scale")) {
           let i = parseInt(slider.name.replace("image_scale_", ""));
           canvas_content.portal_image_scale[i] = incrementPosition;
+          document.getElementById("zoom-scale-label").innerText =
+            zoom_label_generate(incrementPosition);
         }
 
         // Update canvas

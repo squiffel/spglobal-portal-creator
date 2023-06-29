@@ -3,6 +3,14 @@ Need to be able to set the minimum width to the minimum width of the word in the
 When canvas_content.button_style == "none" — There should be a icon you can set to make it look clickable
 Button color set to red as an option?
 
+Dynamic character count should
+--- For the headline calculate how many characters can fit as the headline with no other copy
+--- For description calculate how many characters can fit based on the description size
+--- For CTA calculate based on remaining available space (either below the text or in the bottom right corner)
+
+70% Size should be — Canvas is square or landscape. Width is greater than 1080
+Do not think we should always downgrade the size of the button copy when the headline is shrunk
+
 CTAs need character limits
 Need to calculate the max number of characters based on the available space
 Need to calculate when the text should be vertically centered
@@ -12,23 +20,21 @@ Toggle button visiibility
 Toggle description visibility
 CTAs could be dropdowns
 Need to calculate the available SPACE to the right of the LOGO — Check if its an option for the CTA
+Fix issue with top aligned logo causing description text to start above the headline.
+Add an additional MARGIN to the right of the text box when there is an image on the right and space allows for it, so that the description or headline don't get uncomfortablity closePath
+Add auto-balance text to the body copy?
 
 Auto capitalize, font size, can all be smaller buttons
 
 ------
 
-Not sure how to handle the sizing and positioning of buttons and headlines etc.
-- Button size should be dependent on total asset size, not the headline.
 - Need option for vertical or horizontal text alignment.
 - Need to be able to set character limits and show how much you have left in the editor panels
 - Button or text should never exceed available visual space -- HIDE IT and WARN if it does
 - Consider hiding buttons when they go off screen; perform collision checks.
 = Identify appropriate layouts for specific content cases; hide text boxes when they are not suitable.
-- Fix issue with top aligned logo causing description text to start above the headline.
 - Improve AI recognition of the logo's size and location, and understand its impact on the text.
-- Slider for the text size to let users grow and shrink it
 
-- If identified ideal font sizes for specific layouts then it might be easier to set character limits but maybe I dont want that at all
 
 //Input box modified
 function inputbox_modified(event) {
