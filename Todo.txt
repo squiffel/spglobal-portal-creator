@@ -2,7 +2,13 @@ Need to be able to set the minimum width to the minimum width of the word in the
 
 
 I want to stop at 1280x1280 for simplicity but ...
+typescale[value]
+round_to_nearest_typescale(value)
+estimate_typescale(width, height)
 
+CTAs need character limits
+CTAs could be dropdowns
+When font sizes downscale they should trigger fixed downscaling of the body / cta
 
 ------
 
