@@ -1,12 +1,17 @@
 Need to be able to set the minimum width to the minimum width of the word in the body, headline, and button (calculate_headline_minimum_container_width())
 
+When canvas_content.button_style == "none" — There should be a icon you can set to make it look clickable
+Button color set to red as an option?
 
 CTAs need character limits
 Need to calculate the max number of characters based on the available space
 Need to caculate when the text should be vertically centered
 Need to limit the number of image sizes you can set based on the size of the canvas
+Need to limit where the portal can be located based on the canvas size
 CTAs could be dropdowns
-Need to calculate the available SPACE to the right of the LOGO where there CTA can go.
+Need to calculate the available SPACE to the right of the LOGO where there CTA can go
+
+Auto capitalize, font size, can all be smaller buttons
 
 ------
 

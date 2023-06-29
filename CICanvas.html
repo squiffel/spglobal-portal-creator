@@ -954,6 +954,7 @@
 
       canvas_content.text_container_minimum_character_width = "";
       canvas_content.font_size_small = false;
+      canvas_content.button_style = "solid";
 
       canvas_content.portal_color_overlay = false;
 
@@ -1720,17 +1721,6 @@
         }
 
         if (current_panel_open == "Text") {
-          // Convert to Sentence case protecting a list of brand words & countries
-          if (event.target.name == "headline") {
-            canvas_content.headline = clearFormatting(canvas_content.headline);
-            document.getElementsByName("input_headline")[0].value =
-              canvas_content.headline;
-            // Fit the text in the space
-            calculate_headline_minimum_container_width();
-            // Update the panel
-            update_toolbox_panel("text_button");
-          }
-
           // Auto format
           if (event.target.name == "brand-voice-headline") {
             canvas_content.headline = convertToBrandVoice(
@@ -1986,6 +1976,12 @@
             "random_headline"
           );
 
+          // Set font size
+          let toggle_font_size = addToggleSwitchWithLabel(
+            "Set font size: Small",
+            canvas_content.font_size_small
+          );
+
           addLabelToInsideToolsContainer("Headline");
           //addTextToInsideToolsContainer("Label here");
 
@@ -1998,14 +1994,8 @@
             "Auto capitalize",
             "brand-voice-headline"
           );
-          addButtonToInsideToolsContainer("Remove all line breaks", "headline");
 
-          // Set font size
-          let toggle_font_size = addToggleSwitchWithLabel(
-            "Set font size: Small",
-            canvas_content.font_size_small
-          );
-
+          // Auto-wordwrap
           addTextWrapButtonAndInput();
 
           addLabelToInsideToolsContainer("Body");
@@ -2017,6 +2007,13 @@
 
           addLabelToInsideToolsContainer("Call to action");
           addInputBoxToInsideToolsContainer("cta", canvas_content.cta);
+
+          addLabelToInsideToolsContainer("Button Style");
+          let select_position = createDropdownMenu(
+            ["solid", "outline", "none"],
+            "button_style",
+            canvas_content.button_style
+          );
         }
 
         if (buttonName === "layout_button") {
@@ -2135,19 +2132,20 @@
           let select_template = createDropdownMenu(
             [
               "Select...",
-              "1920x1080",
+              "1920x1080 [Desktop] Landscape",
+              "1080x1920 [Desktop] Portrait",
+              "1200x1200 [Social] Square",
+              "1200x628 [Social] Landscape",
+              "628x1200 [Social] Portrait",
               "1920x420",
               "1800x300",
               "1500x300",
-              "Social Media 1200x628",
-              "Social Media 628x1200",
-              "Social Media 1200x1200",
               "1220x180",
-              "728x90",
               "990x120",
-              "Email 600x150",
-              "Email 400x100",
+              "728x90",
               "616x205",
+              "600x150 [Email]",
+              "400x100 [Email]",
               "300x600",
               "300x250",
               "160x600",
@@ -2257,7 +2255,7 @@
         textBalance.classList.add("text_balance");
 
         const label1 = document.createElement("label");
-        label1.textContent = "Auto-wordwrap line count";
+        label1.textContent = "Auto-wordwrap";
 
         const inputBox = document.createElement("input");
         inputBox.type = "number";
@@ -2307,6 +2305,12 @@
       function userModifiedSelectionDropdown(event) {
         let selected_value = event.target.value;
         let button_label = event.target.name;
+
+        if (current_panel_open == "Text") {
+          if (button_label == "button_style") {
+            canvas_content.button_style = selected_value;
+          }
+        }
 
         if (current_panel_open == "Layout") {
           if (button_label == "logo_position") {
@@ -3097,11 +3101,6 @@
           button_position_y =
             body_position_y + body_properties.height + headline_margin_bottom;
         }
-        let button_style_generator = ["", "outline", "none"];
-        let button_style =
-          button_style_generator[
-            Math.floor(Math.random() * button_style_generator.length)
-          ];
 
         let button;
         if (canvas_content.cta.length > 0) {
@@ -3109,7 +3108,7 @@
             canvas_content.cta,
             button_font_size,
             "bold",
-            button_style,
+            canvas_content.button_style,
             button_padding,
             position.x,
             button_position_y
