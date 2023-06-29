@@ -6,7 +6,11 @@ Button color set to red as an option?
 Dynamic character count should
 --- For the headline calculate how many characters can fit as the headline with no other copy
 --- For description calculate how many characters can fit based on the description size
---- For CTA calculate based on remaining available space (either below the text or in the bottom right corner)
+--- Consider how much space the text is taking up. Does it look absurd?
+--- For CTA calculate based on remaining available spaces
+------ Can if fit in the width of the text box
+------ Can it fit below the text without exceeding the height of the textbox safe space
+------ Can it fit in the bottom right hand corner
 
 70% Size should be — Canvas is square or landscape. Width is greater than 1080
 Do not think we should always downgrade the size of the button copy when the headline is shrunk

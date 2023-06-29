@@ -3129,12 +3129,15 @@
           headline_properties.font_size
         );
 
-        let minimum_margin = 8;
         // Calculate the margins between text
+        let minimum_margin = 8;
         let headline_margin_bottom = Math.max(
           headline_fixed_font_size * 0.5,
           minimum_margin
         );
+        if (headline_properties.font_size == 16) {
+          headline_margin_bottom = 4;
+        }
         console.log("Margin between text: " + headline_margin_bottom + "px");
 
         // Precalculate button size so that it can removed from the available space
