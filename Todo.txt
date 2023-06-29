@@ -1,7 +1,23 @@
 Need to be able to set the minimum width to the minimum width of the word in the body, headline, and button (calculate_headline_minimum_container_width())
 
-This line height function needs to be updated to allow for a different default range of line heights
 
+I want to stop at 1280x1280 for simplicity but ...
+
+
+------
+
+Not sure how to handle the sizing and positioning of buttons and headlines etc.
+- Button size should be dependent on total asset size, not the headline.
+- Need option for vertical or horizontal text alignment.
+- Need to be able to set character limits and show how much you have left in the editor panels
+- Button or text should never exceed available visual space -- HIDE IT and WARN if it does
+- Consider hiding buttons when they go off screen; perform collision checks.
+= Identify appropriate layouts for specific content cases; hide text boxes when they are not suitable.
+- Fix issue with top aligned logo causing description text to start above the headline.
+- Improve AI recognition of the logo's size and location, and understand its impact on the text.
+- Slider for the text size to let users grow and shrink it
+
+- If identified ideal font sizes for specific layouts then it might be easier to set character limits but maybe I dont want that at all
 
 //Input box modified
 function inputbox_modified(event) {
@@ -44,7 +60,7 @@ Can prevent S&P Global being split with _ underscore S&P_Global then removing it
 Internal feed, 
 --------- 
 
-Need to improve the image downscaling optimization
+Need to improve the image downscaling optimization !!!!!!!! This is important
 Only downscale the image when the canvas changes.
 Save the portals to a canvas and reapply the image when the portal image, size, scale or focal point changes
 Only do slow downscaling when you download the image
