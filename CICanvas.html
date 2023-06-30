@@ -2665,7 +2665,7 @@
                 canvas_content.color_font != spglobal_colors.black
                   ? "#000000"
                   : "#ffffff";
-              drawBackground(color, 0.3);
+              renderBackground(color, 0.3);
             }
             // Render text overlay
             renderText();
@@ -2699,7 +2699,7 @@
         );
       }
 
-      function drawLogo() {
+      function renderLogo() {
         // Make logos visible
         let logo_container = document.getElementById("svg-container");
         logo_container.style.display = "inline";
@@ -2959,7 +2959,7 @@
         text_has_been_rendered = false;
 
         // Update color scheme
-        drawBackground(canvas_content.background_color);
+        renderBackground(canvas_content.background_color);
 
         // Add image
         let userImageContainer = document.getElementById(
@@ -3033,7 +3033,7 @@
         calculateGrid(canvas_content.show_guides);
 
         // Add logo
-        drawLogo();
+        renderLogo();
 
         // Render Text
         renderText();
@@ -3584,7 +3584,7 @@
       }
 
       // Set the background color
-      function drawBackground(color = "#ffffff", opacity = 1) {
+      function renderBackground(color = "#ffffff", opacity = 1) {
         // Opacity ranges from 0.0 — 1.0
         const width = canvas.width;
         const height = canvas.height;
