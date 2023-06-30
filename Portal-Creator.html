@@ -606,7 +606,7 @@
         <input type="number" id="widthInput" value="1200" />
         <label class="toolbox_expanded_label" for="heightInput">Height:</label>
         <input type="number" id="heightInput" value="628" />
-        <button onclick="createCanvas()">Create</button>
+        <button onclick="create_canvas()">Create</button>
       </div>
     </div>
 
@@ -614,7 +614,7 @@
     <script>
       var canvas, ctx;
 
-      createFooterText();
+      create_footer_text();
 
       // Brand words for Title Case
       const capitalizationArray = [
@@ -1159,7 +1159,7 @@
       // UI States
       let current_panel_open = "None";
 
-      function getRandomValueFromArray(array, currentString) {
+      function get_random_value_excluding_current(array, currentString) {
         // check if the current string exists in the array
         const index = array.indexOf(currentString);
         if (index === -1) {
@@ -1175,7 +1175,7 @@
       }
 
       // Functions
-      function createCanvas() {
+      function create_canvas() {
         let width = parseInt(document.getElementById("widthInput").value);
         let height = parseInt(document.getElementById("heightInput").value);
 
@@ -1248,7 +1248,7 @@
 
         // Fit copy
         canvas_content.text_container_minimum_character_width =
-          findLongestWordsByWidth(canvas_content.headline, 1);
+          find_longest_words_by_width(canvas_content.headline, 1);
 
         // Update panel
         if (current_panel_open == "Layout") {
@@ -1256,10 +1256,10 @@
         }
 
         // Update the grid
-        calculateGrid(canvas_content.show_guides);
+        calculate_grid(canvas_content.show_guides);
 
         // Update the canvas with the custom attributes
-        updateCanvas();
+        update_canvas();
 
         let dimensions = document.createElement("div");
         dimensions.id = "canvas_dimensions";
@@ -1284,7 +1284,7 @@
         dimensions.style.margin = "0 96px 88px 96px"; // Set the margin of the dimensions div
       }
 
-      function handleWindowResize() {
+      function handle_window_resize() {
         if (!canvas) return;
 
         const panelWidth = document.querySelector(".left-panel").offsetWidth;
@@ -1311,10 +1311,10 @@
         canvas.style.height = `${newHeight}px`;
       }
 
-      window.addEventListener("resize", handleWindowResize);
+      window.addEventListener("resize", handle_window_resize);
 
       // Download Canvas
-      function downloadCanvasAsPng() {
+      function download_canvas_as_png() {
         if (!canvas) {
           alert("Please create the canvas before downloading.");
           return;
@@ -1331,7 +1331,7 @@
       }
 
       // Expand the left side toolbox
-      function clearInsideToolsContainer() {
+      function clear_inside_tools_container() {
         const insideToolsContainer = document.querySelector(
           ".inside_tools_container"
         );
@@ -1344,17 +1344,17 @@
       }
 
       // Expanding the left panel
-      function toggleLeftPanel() {
+      function toggle_left_panel() {
         const leftPanel = document.querySelector(".left-panel");
         const rightPanel = document.querySelector(".right-panel");
         const isExpanded = leftPanel.classList.contains("expanded");
 
         leftPanel.classList.toggle("expanded");
         rightPanel.classList.toggle("left-expanded");
-        handleWindowResize();
+        handle_window_resize();
 
         if (isExpanded) {
-          clearInsideToolsContainer();
+          clear_inside_tools_container();
         }
       }
 
@@ -1371,7 +1371,7 @@
       }
 
       // Return has no spaces
-      function addLineBreakBeforeNoSpace(str) {
+      function add_line_break_before_no_space(str) {
         // Use a regular expression to find all occurrences of a line break or carriage return
         // between two words that have no spaces before or after the line break
         const pattern = /(\w)(\n|\r)(\w)/g;
@@ -1379,22 +1379,22 @@
       }
 
       // Expanding the left panel
-      function collapseLeftPanel() {
+      function collapse_left_panel() {
         const leftPanel = document.querySelector(".left-panel");
         const rightPanel = document.querySelector(".right-panel");
         leftPanel.classList.remove("expanded");
         rightPanel.classList.remove("left-expanded");
-        handleWindowResize();
-        clearInsideToolsContainer();
+        handle_window_resize();
+        clear_inside_tools_container();
         show_hide_panel();
       }
 
-      function expandLeftPanel() {
+      function expand_left_panel() {
         const leftPanel = document.querySelector(".left-panel");
         const rightPanel = document.querySelector(".right-panel");
         leftPanel.classList.add("expanded");
         rightPanel.classList.add("left-expanded");
-        handleWindowResize();
+        handle_window_resize();
         show_hide_panel();
       }
 
@@ -1412,7 +1412,7 @@
       }
 
       // Color indicator
-      function addColorIndicator(button, rgb) {
+      function add_color_indicator(button, rgb) {
         const colorIndicator = document.createElement("div");
         colorIndicator.classList.add("color-indicator");
         colorIndicator.style.backgroundColor = rgb;
@@ -1460,7 +1460,7 @@
 
           // Update canvas once image has loaded
 
-          updateCanvas();
+          update_canvas();
           // Upload panel
           if (current_panel_open == "Image") {
             // Update panel
@@ -1470,14 +1470,14 @@
         reader.readAsDataURL(file);
       }
 
-      function addFileUploadArea() {
+      function add_file_upload_area() {
         const container = document.querySelector(".inside_tools_container");
 
         if (canvas_content.portal_count == 2) {
           return;
         }
 
-        addLabelToInsideToolsContainer("Add Portal");
+        add_label_to_inside_tools_container("Add Portal");
 
         const dragDropArea = document.createElement("div");
         dragDropArea.classList.add("drag-drop-area");
@@ -1527,7 +1527,7 @@
       }
 
       // Delete photo
-      function removeImageButton(image_id) {
+      function remove_image_button(image_id) {
         const container = document.querySelector(".inside_tools_container");
 
         let buttonText = ["primary image", "secondary image"];
@@ -1604,7 +1604,7 @@
           }
 
           // Update Canvas
-          updateCanvas();
+          update_canvas();
 
           // Update panel
           update_toolbox_panel("image_button");
@@ -1612,7 +1612,7 @@
         return deleteButton;
       }
 
-      function findLongestWordsByWidth(inputString, consecutiveWords = 1) {
+      function find_longest_words_by_width(inputString, consecutiveWords = 1) {
         // Split the input string into words
         const words = inputString.split(/\s+/);
 
@@ -1648,7 +1648,7 @@
         return longestSubstring;
       }
 
-      function createFooterText() {
+      function create_footer_text() {
         // create a new element for the footer text
         const footerText = document.createElement("div");
 
@@ -1666,11 +1666,11 @@
         document.body.appendChild(footerText);
 
         // handle window resize events to keep the footer text at the bottom right corner
-        function handleResize() {
+        function handle_resize() {
           footerText.style.bottom = "16px";
           footerText.style.right = "16px";
         }
-        window.addEventListener("resize", handleResize);
+        window.addEventListener("resize", handle_resize);
       }
 
       function update_toolbox_panel(button_label) {
@@ -1679,7 +1679,7 @@
       }
 
       // Add icon buttons
-      function addSquareButtonsToInsideToolsContainer(
+      function add_square_buttons_to_inside_tools_container(
         button_container_id,
         svg_id
       ) {
@@ -1710,7 +1710,7 @@
       }
 
       // Add buttons
-      function addButtonToInsideToolsContainer(label_string, name = "") {
+      function add_button_to_inside_tools_container(label_string, name = "") {
         const insideToolsContainer = document.querySelector(
           ".inside_tools_container"
         );
@@ -1718,13 +1718,13 @@
         button.className = "toolbox_expanded_button";
         button.textContent = label_string;
         button.name = name;
-        button.addEventListener("click", panelButtonClicked);
+        button.addEventListener("click", panel_button_clicked);
         insideToolsContainer.appendChild(button);
         return button;
       }
 
       // Add labels
-      function addLabelToInsideToolsContainer(
+      function add_label_to_inside_tools_container(
         label_string,
         padding_bottom = 11
       ) {
@@ -1740,7 +1740,7 @@
       }
 
       // Text label
-      function addTextToInsideToolsContainer(text) {
+      function add_text_to_inside_tools_container(text) {
         const insideToolsContainer = document.querySelector(
           ".inside_tools_container"
         );
@@ -1754,14 +1754,14 @@
       // This looks for the longest line in the headline and tries to recognize that as the minimize size the container parent can be. The longest line can be multiple words in a line.
       // If this is off, then it resizes based on the longest word. There can only be one longest word.
       function calculate_headline_minimum_container_width() {
-        let longestLine = findLongestLine(canvas_content.headline);
+        let longestLine = find_longest_line(canvas_content.headline);
         // Ensure the longest line fits
         canvas_content.text_container_minimum_character_width =
-          findLongestWordsByWidth(canvas_content.headline, 1);
+          find_longest_words_by_width(canvas_content.headline, 1);
       }
 
       //Input box modified
-      function inputbox_modified(event) {
+      function inputbox_event_listener(event) {
         let button_label = event.target.name;
         let string_value = event.target.value;
 
@@ -1780,11 +1780,11 @@
           //calculate_headline_minimum_container_width();
         }
 
-        updateCanvas();
+        update_canvas();
       }
 
       // Button clicked
-      function panelButtonClicked(event) {
+      function panel_button_clicked(event) {
         // Which button was pressed
         var button_label = event.target.textContent;
 
@@ -1796,7 +1796,7 @@
         if (current_panel_open == "Text") {
           // Auto format
           if (event.target.name == "brand-voice-headline") {
-            canvas_content.headline = convertToBrandVoice(
+            canvas_content.headline = format_string_to_brand_style(
               canvas_content.headline
             );
             document.getElementsByName("input_headline")[0].value =
@@ -1831,7 +1831,7 @@
         if (current_panel_open == "Layout") {
           // Resize Canvas
           if (button_label.includes("Submit")) {
-            createCanvas();
+            create_canvas();
           }
         }
 
@@ -1868,11 +1868,11 @@
           }
         }
         // Update
-        updateCanvas();
+        update_canvas();
       }
 
       // Toggle switch
-      function addToggleSwitchWithLabel(labelText, state) {
+      function add_toggle_switch_with_label(labelText, state) {
         const insideToolsContainer = document.querySelector(
           ".inside_tools_container"
         );
@@ -1899,7 +1899,7 @@
 
         toggleSwitchContainer.addEventListener("click", () => {
           toggleSwitch.classList.toggle("on");
-          toggleSwitchValueChanged(
+          toggle_switch_value_changed(
             toggleSwitchContainer,
             toggleSwitch.classList.contains("on")
           );
@@ -1909,7 +1909,7 @@
         return toggleSwitchContainer;
       }
 
-      function toggleSwitchValueChanged(element, toggleValue) {
+      function toggle_switch_value_changed(element, toggleValue) {
         let button_label = element.innerText;
 
         if (current_panel_open == "Text") {
@@ -1950,10 +1950,10 @@
         }
 
         // Update canvas
-        updateCanvas();
+        update_canvas();
       }
 
-      function addInputBoxToInsideToolsContainer(
+      function add_input_box_to_inside_tools_container(
         input_box_name,
         default_string = ""
       ) {
@@ -1965,7 +1965,7 @@
         inputBox.placeholder = "Type...";
         inputBox.value = default_string;
         inputBox.name = "input_" + input_box_name;
-        inputBox.addEventListener("input", inputbox_modified);
+        inputBox.addEventListener("input", inputbox_event_listener);
         insideToolsContainer.appendChild(inputBox);
         return inputBox;
       }
@@ -1979,7 +1979,7 @@
         }
 
         current_panel_open = "None";
-        clearInsideToolsContainer();
+        clear_inside_tools_container();
 
         // Remove the 'active' class from all buttons
         const buttons = document.querySelectorAll(".toolbox_button");
@@ -1992,105 +1992,105 @@
         button.classList.add("active");
 
         if (buttonName === "download_button") {
-          collapseLeftPanel();
+          collapse_left_panel();
           // Turn off guides
           canvas_content.show_guides = false;
-          updateCanvas();
+          update_canvas();
           // Download canvas
           setTimeout(function () {
-            downloadCanvasAsPng();
+            download_canvas_as_png();
           }, 250); // Slight delay to ensure that the canvas is updated
-          //downloadCanvasAsPng();
+          //download_canvas_as_png();
         }
 
         if (buttonName === "color_button") {
-          expandLeftPanel();
+          expand_left_panel();
           current_panel_open = "Color";
-          addLabelToInsideToolsContainer("Background color");
-          addColorIndicator(
-            addButtonToInsideToolsContainer("White"),
+          add_label_to_inside_tools_container("Background color");
+          add_color_indicator(
+            add_button_to_inside_tools_container("White"),
             spglobal_colors.white
           );
-          addColorIndicator(
-            addButtonToInsideToolsContainer("Black"),
+          add_color_indicator(
+            add_button_to_inside_tools_container("Black"),
             spglobal_colors.black
           );
-          addColorIndicator(
-            addButtonToInsideToolsContainer("Red"),
+          add_color_indicator(
+            add_button_to_inside_tools_container("Red"),
             spglobal_colors.red
           );
-          addColorIndicator(
-            addButtonToInsideToolsContainer("Yellow"),
+          add_color_indicator(
+            add_button_to_inside_tools_container("Yellow"),
             spglobal_colors.yellow
           );
-          addColorIndicator(
-            addButtonToInsideToolsContainer("Blue"),
+          add_color_indicator(
+            add_button_to_inside_tools_container("Blue"),
             spglobal_colors.blue
           );
         }
 
         if (buttonName === "logo_button") {
-          expandLeftPanel();
+          expand_left_panel();
           current_panel_open = "Logo";
 
           // Select logo
-          addLabelToInsideToolsContainer("Logo");
-          addButtonToInsideToolsContainer("Corporate");
-          addButtonToInsideToolsContainer("Ratings");
-          addButtonToInsideToolsContainer("Dow Jones Indices");
-          addButtonToInsideToolsContainer("Commodity Insights");
-          addButtonToInsideToolsContainer("Market Intelligence");
-          addButtonToInsideToolsContainer("Mobility");
+          add_label_to_inside_tools_container("Logo");
+          add_button_to_inside_tools_container("Corporate");
+          add_button_to_inside_tools_container("Ratings");
+          add_button_to_inside_tools_container("Dow Jones Indices");
+          add_button_to_inside_tools_container("Commodity Insights");
+          add_button_to_inside_tools_container("Market Intelligence");
+          add_button_to_inside_tools_container("Mobility");
         }
 
         if (buttonName === "text_button") {
-          expandLeftPanel();
+          expand_left_panel();
           current_panel_open = "Text";
 
-          addButtonToInsideToolsContainer(
+          add_button_to_inside_tools_container(
             "Generate random copy",
             "random_headline"
           );
 
           // Set font size
-          let toggle_font_size = addToggleSwitchWithLabel(
+          let toggle_font_size = add_toggle_switch_with_label(
             "Set font size: Small",
             canvas_content.font_size.small
           );
 
-          let headline_label = addLabelToInsideToolsContainer("Headline");
+          let headline_label = add_label_to_inside_tools_container("Headline");
           headline_label.id = "headline_label";
-          //addTextToInsideToolsContainer("Label here");
+          //add_text_to_inside_tools_container("Label here");
 
-          let headline_button = addInputBoxToInsideToolsContainer(
+          let headline_button = add_input_box_to_inside_tools_container(
             "headline",
             canvas_content.headline
           );
           headline_button.style.height = "100px";
-          addButtonToInsideToolsContainer(
+          add_button_to_inside_tools_container(
             "Auto capitalize",
             "brand-voice-headline"
           );
 
           // Auto-wordwrap
-          addTextWrapButtonAndInput();
+          add_text_wrap_button_and_input();
 
-          let body_label = addLabelToInsideToolsContainer("Body");
+          let body_label = add_label_to_inside_tools_container("Body");
           body_label.id = "body_label";
 
-          let description_button = addInputBoxToInsideToolsContainer(
+          let description_button = add_input_box_to_inside_tools_container(
             "body",
             canvas_content.body
           );
           description_button.style.height = "200px";
 
-          let cta_label = addLabelToInsideToolsContainer("Call to action");
+          let cta_label = add_label_to_inside_tools_container("Call to action");
           cta_label.id = "cta_label";
 
-          addInputBoxToInsideToolsContainer("cta", canvas_content.cta);
+          add_input_box_to_inside_tools_container("cta", canvas_content.cta);
 
-          addLabelToInsideToolsContainer("Button Style");
-          let select_position = createDropdownMenu(
+          add_label_to_inside_tools_container("Button Style");
+          let select_position = create_dropdown_menu(
             ["solid", "outline", "none"],
             "button_style",
             canvas_content.button_style
@@ -2101,15 +2101,15 @@
         }
 
         if (buttonName === "layout_button") {
-          expandLeftPanel();
+          expand_left_panel();
           current_panel_open = "Layout";
 
           // Show Grid
-          addToggleSwitchWithLabel("Show Grid", canvas_content.show_guides);
+          add_toggle_switch_with_label("Show Grid", canvas_content.show_guides);
 
           // Update logo position
-          addLabelToInsideToolsContainer("Logo Position");
-          createDropdownMenu(
+          add_label_to_inside_tools_container("Logo Position");
+          create_dropdown_menu(
             ["top left", "bottom left"], // "top right", "bottom right"
             "logo_position",
             canvas_content.logo.corner.toLowerCase().replace(/_/g, " ")
@@ -2117,7 +2117,7 @@
 
           // Text bottom aligned
           if (canvas_content.logo.corner.includes("top")) {
-            addToggleSwitchWithLabel(
+            add_toggle_switch_with_label(
               "Text bottom aligned",
               canvas_content.text_bottom_aligned
             );
@@ -2131,80 +2131,96 @@
           if (userImageContainer) {
             if (userImageContainer.children.length > 0) {
               // Position
-              addLabelToInsideToolsContainer("Portal Position");
+              add_label_to_inside_tools_container("Portal Position");
 
-              let select_position = createDropdownMenu(
+              let select_position = create_dropdown_menu(
                 ["top", "right", "bottom", "left"],
                 "portal_side",
                 canvas_content.portal_side
               );
 
               // Size
-              addLabelToInsideToolsContainer("Portal Size");
+              add_label_to_inside_tools_container("Portal Size");
 
-              let select_size = createDropdownMenu(
+              let select_size = create_dropdown_menu(
                 ["100%", "150%", "60%", "50%", "30%", "0%"],
                 "portal_size",
                 canvas_content.portal_size_percent + "%"
               );
 
-              changeDropdownMenuText(
+              change_dropdown_menu_text(
                 select_size,
                 "150%",
                 "100% Portal 50% Text"
               );
-              changeDropdownMenuText(
+              change_dropdown_menu_text(
                 select_size,
                 "100%",
                 "100% Portal 100% Text"
               );
-              changeDropdownMenuText(select_size, "60%", "60% Portal 30% Text");
-              changeDropdownMenuText(select_size, "50%", "50% Portal 50% Text");
-              changeDropdownMenuText(select_size, "30%", "30% Portal 60% Text");
-              changeDropdownMenuText(select_size, "0%", "No Portal 100% Text");
+              change_dropdown_menu_text(
+                select_size,
+                "60%",
+                "60% Portal 30% Text"
+              );
+              change_dropdown_menu_text(
+                select_size,
+                "50%",
+                "50% Portal 50% Text"
+              );
+              change_dropdown_menu_text(
+                select_size,
+                "30%",
+                "30% Portal 60% Text"
+              );
+              change_dropdown_menu_text(
+                select_size,
+                "0%",
+                "No Portal 100% Text"
+              );
             }
           }
 
           /*
                   // Layout buttons
-                  addLabelToInsideToolsContainer("Layout");
-                  addSquareButtonsToInsideToolsContainer(
+                  add_label_to_inside_tools_container("Layout");
+                  add_square_buttons_to_inside_tools_container(
                     "layout_buttons",
                     "layout_4_split_assymetrical"
                   );
-                  addSquareButtonsToInsideToolsContainer(
+                  add_square_buttons_to_inside_tools_container(
                     "layout_buttons",
                     "layout_4_split_symetrical"
                   );
-                  addSquareButtonsToInsideToolsContainer(
+                  add_square_buttons_to_inside_tools_container(
                     "layout_buttons",
                     "layout_bottom_split_assymetrical"
                   );
-                  addSquareButtonsToInsideToolsContainer(
+                  add_square_buttons_to_inside_tools_container(
                     "layout_buttons",
                     "layout_bottom_split_symetrical"
                   );
-                  addSquareButtonsToInsideToolsContainer(
+                  add_square_buttons_to_inside_tools_container(
                     "layout_buttons",
                     "layout_side_split_assymetrical"
                   );
-                  addSquareButtonsToInsideToolsContainer(
+                  add_square_buttons_to_inside_tools_container(
                     "layout_buttons",
                     "layout_side_split_symetrical"
                   );
-                  addSquareButtonsToInsideToolsContainer(
+                  add_square_buttons_to_inside_tools_container(
                     "layout_buttons",
                     "layout_3_row"
                   );
-                  addSquareButtonsToInsideToolsContainer(
+                  add_square_buttons_to_inside_tools_container(
                     "layout_buttons",
                     "layout_3_col"
                   );
-                  addSquareButtonsToInsideToolsContainer(
+                  add_square_buttons_to_inside_tools_container(
                     "layout_buttons",
                     "layout_2_row"
                   );
-                  addSquareButtonsToInsideToolsContainer(
+                  add_square_buttons_to_inside_tools_container(
                     "layout_buttons",
                     "layout_2_col"
                   );
@@ -2212,8 +2228,8 @@
                   */
 
           // Templates
-          addLabelToInsideToolsContainer("Templates");
-          let select_template = createDropdownMenu(
+          add_label_to_inside_tools_container("Templates");
+          let select_template = create_dropdown_menu(
             [
               "Select...",
               "1920x1080 [Desktop] Landscape",
@@ -2239,19 +2255,19 @@
           );
 
           // Update layout size
-          addLabelToInsideToolsContainer("Custom Size");
-          addTextToInsideToolsContainer("Width (min 144, max 1920)");
-          let btn = addInputBoxToInsideToolsContainer("width");
+          add_label_to_inside_tools_container("Custom Size");
+          add_text_to_inside_tools_container("Width (min 144, max 1920)");
+          let btn = add_input_box_to_inside_tools_container("width");
           btn.value = canvas.width;
           btn.id = "widthInput";
           btn.classList.add("input_fixed_height");
-          addTextToInsideToolsContainer("Height (min 88, max 1920)");
-          btn = addInputBoxToInsideToolsContainer("height");
+          add_text_to_inside_tools_container("Height (min 88, max 1920)");
+          btn = add_input_box_to_inside_tools_container("height");
           btn.value = canvas.height;
           btn.id = "heightInput";
           btn.classList.add("input_fixed_height");
 
-          let margin_label = addTextToInsideToolsContainer(
+          let margin_label = add_text_to_inside_tools_container(
             "Margins: " +
               calculate_canvas_margin(canvas.width, canvas.height) +
               "px"
@@ -2260,7 +2276,7 @@
           margin_label.style.marginBottom = "4px";
           margin_label.style.marginBottom = "8px";
 
-          let submit_button = addButtonToInsideToolsContainer("Submit");
+          let submit_button = add_button_to_inside_tools_container("Submit");
           submit_button.id = "submit_canvas_size_button";
           submit_button.style.marginTop = "4px";
           convert_to_blue_button_style(submit_button);
@@ -2268,29 +2284,29 @@
 
         // IMAGES
         if (buttonName === "image_button") {
-          expandLeftPanel();
+          expand_left_panel();
           current_panel_open = "Image";
 
           // Portal upload
-          addFileUploadArea();
+          add_file_upload_area();
 
           // Show margins
           if (canvas_content.portal_count == 1) {
             // Margins
-            addToggleSwitchWithLabel(
+            add_toggle_switch_with_label(
               "Portal visible margins",
               canvas_content.portal_override_margins
             );
             // Overlay
             if (is_fullscreen_image()) {
-              addToggleSwitchWithLabel(
+              add_toggle_switch_with_label(
                 "Full image color overlay",
                 canvas_content.portal_color_overlay
               );
             }
           }
           if (canvas_content.portal_count == 2) {
-            addToggleSwitchWithLabel(
+            add_toggle_switch_with_label(
               "Primary image side",
               canvas_content.portal_primary_image_side
             );
@@ -2306,34 +2322,37 @@
               if (img) {
                 let portal_label =
                   i == 0 ? "Portal [PRIMARY]" : "Portal [Secondary]";
-                let label = addLabelToInsideToolsContainer(portal_label);
+                let label = add_label_to_inside_tools_container(portal_label);
                 label.classList.add("portal_label");
                 // Focal point setter
-                createImagePreviewWithFocalPoint(img, i);
+                create_image_preview_with_focal_point(img, i);
                 // Add make primary button
                 if (i == 1) {
                   let makePrimaryButton =
-                    addButtonToInsideToolsContainer("Convert to primary");
+                    add_button_to_inside_tools_container("Convert to primary");
                 }
                 // Show scale
                 let zoom_label = zoom_label_generate(
                   canvas_content.portal_image_scale[i]
                 );
-                let zoom_scale = addLabelToInsideToolsContainer(zoom_label, 0);
+                let zoom_scale = add_label_to_inside_tools_container(
+                  zoom_label,
+                  0
+                );
                 zoom_scale.id = "zoom-scale-label";
-                createRangeSlider(
+                create_range_slider(
                   4,
                   canvas_content.portal_image_scale[i],
                   "image_scale_" + i
                 );
                 // Show Grid
-                let toggle_switch = addToggleSwitchWithLabel(
+                let toggle_switch = add_toggle_switch_with_label(
                   "Mirror horizontally",
                   canvas_content.portal_image_flip[i]
                 );
                 toggle_switch.name = i;
                 // Create the delete button
-                let removeButton = removeImageButton(i);
+                let removeButton = remove_image_button(i);
                 if (i == 1) {
                   removeButton.style.marginBottom = "16px";
                 }
@@ -2344,7 +2363,7 @@
       }
 
       // Text wrap
-      function addTextWrapButtonAndInput() {
+      function add_text_wrap_button_and_input() {
         const insideToolsContainer = document.querySelector(
           ".inside_tools_container"
         );
@@ -2372,14 +2391,14 @@
 
           const text = canvas_content.headline;
           const numberOfLines = inputBox.value;
-          let removeBreakpoints = removeNewLinesAndReturnLines(text, true);
+          let removeBreakpoints = remove_new_lines_and_return_lines(text, true);
 
           // Remove all break points and find the longest word
           canvas_content.headline = removeBreakpoints;
 
           // If the copy has more than one line use the longest word
-          let textWrap = balanceTextWrap(removeBreakpoints, numberOfLines);
-          let longestLine = findLongestLine(textWrap);
+          let textWrap = balance_text_wrap(removeBreakpoints, numberOfLines);
+          let longestLine = find_longest_line(textWrap);
           if (longestLine.oneLine == false) {
             canvas_content.headline = textWrap;
           }
@@ -2388,7 +2407,7 @@
           calculate_headline_minimum_container_width();
 
           update_toolbox_panel("text_button");
-          updateCanvas();
+          update_canvas();
         });
 
         textBalance.appendChild(label1);
@@ -2400,7 +2419,7 @@
       }
 
       // Dropdown menus
-      function userModifiedSelectionDropdown(event) {
+      function user_modified_selection_dropdown(event) {
         let selected_value = event.target.value;
         let button_label = event.target.name;
 
@@ -2468,7 +2487,7 @@
         }
 
         // Update canvas
-        updateCanvas();
+        update_canvas();
       }
 
       function convert_to_blue_button_style(button) {
@@ -2476,7 +2495,7 @@
       }
 
       // Dropdown menu
-      function createDropdownMenu(options, name, selected_string) {
+      function create_dropdown_menu(options, name, selected_string) {
         const insideToolsContainer = document.querySelector(
           ".inside_tools_container"
         );
@@ -2484,7 +2503,7 @@
         const select = document.createElement("select");
         select.name = name;
         select.classList.add("toolbox_dropdown");
-        select.addEventListener("change", userModifiedSelectionDropdown);
+        select.addEventListener("change", user_modified_selection_dropdown);
 
         options.forEach((option) => {
           const opt = document.createElement("option");
@@ -2500,7 +2519,7 @@
         return select;
       }
 
-      function changeDropdownMenuText(element, current, replacement) {
+      function change_dropdown_menu_text(element, current, replacement) {
         for (let i = 0; i < element.children.length; i++) {
           let child = element.children[i];
           if (child.textContent == current) {
@@ -2559,7 +2578,7 @@
       }
 
       // Add image to the canvas
-      function addImageToCanvas(
+      function add_image_to_canvas(
         img,
         pos_x,
         pos_y,
@@ -2624,7 +2643,7 @@
           ctx.clip();
 
           // Flip the image horizontally
-          let transformed_image = flipImageHorizontally(image, image_flip);
+          let transformed_image = flip_image_horizontally(image, image_flip);
 
           // Downscale image
           let downscale_ratio = 1 / scaleFactor;
@@ -2632,7 +2651,7 @@
           // Only downscale if the image is larger than the canvas
           if (downscale_ratio < 1) {
             // High resolution downscale
-            downscaled_image = downScaleImage(
+            downscaled_image = down_scale_image(
               transformed_image,
               1 / scaleFactor
             );
@@ -2650,7 +2669,7 @@
 
           // Draw portal divider line
           if (canvas_content.portal_count > 1) {
-            drawDivider(
+            draw_divider(
               canvas_content.portal_divider_x,
               canvas_content.portal_divider_y,
               canvas_content.portal_divider_height
@@ -2665,15 +2684,15 @@
                 canvas_content.color_font != spglobal_colors.black
                   ? "#000000"
                   : "#ffffff";
-              renderBackground(color, 0.3);
+              render_background(color, 0.3);
             }
             // Render text overlay
-            renderText();
+            render_text();
           }
         };
       }
 
-      function flipImageHorizontally(img, flip) {
+      function flip_image_horizontally(img, flip) {
         // Create an offscreen canvas
         const offscreenCanvas = document.createElement("canvas");
         offscreenCanvas.width = img.width;
@@ -2699,7 +2718,7 @@
         );
       }
 
-      function renderLogo() {
+      function render_logo() {
         // Make logos visible
         let logo_container = document.getElementById("svg-container");
         logo_container.style.display = "inline";
@@ -2853,7 +2872,7 @@
       }
 
       // Margins
-      function calculateGrid(show_guides) {
+      function calculate_grid(show_guides) {
         const width = canvas.width;
         const height = canvas.height;
 
@@ -2952,14 +2971,14 @@
         }
       }
 
-      function updateCanvas() {
-        clearCanvas();
+      function update_canvas() {
+        clear_canvas();
 
         // Text
         text_has_been_rendered = false;
 
         // Update color scheme
-        renderBackground(canvas_content.background_color);
+        render_background(canvas_content.background_color);
 
         // Add image
         let userImageContainer = document.getElementById(
@@ -2978,7 +2997,7 @@
         ) {
           var portal_full = get_portal_specs(0);
           let img = get_image(0);
-          addImageToCanvas(
+          add_image_to_canvas(
             img,
             portal_full.x,
             portal_full.y,
@@ -3007,7 +3026,7 @@
           }
 
           let img_a = get_image(0);
-          addImageToCanvas(
+          add_image_to_canvas(
             img_a,
             portal_large.x,
             portal_large.y,
@@ -3018,7 +3037,7 @@
           );
 
           let img_b = get_image(1);
-          addImageToCanvas(
+          add_image_to_canvas(
             img_b,
             portal_small.x,
             portal_small.y,
@@ -3030,16 +3049,16 @@
         }
 
         // Grid system
-        calculateGrid(canvas_content.show_guides);
+        calculate_grid(canvas_content.show_guides);
 
         // Add logo
-        renderLogo();
+        render_logo();
 
         // Render Text
-        renderText();
+        render_text();
       }
 
-      function renderText() {
+      function render_text() {
         // Text available space and position
         let position = {
           x: canvas_content.marginLeft,
@@ -3106,12 +3125,12 @@
 
         // Remove line breaks if user has turned off formating
         // Headline
-        let headline_unformatted = removeNewLinesAndReturnLines(
+        let headline_unformatted = remove_new_lines_and_return_lines(
           canvas_content.headline,
           canvas_content.ignore_line_breaks.headline
         );
 
-        let headline_properties = addTextToCanvas(
+        let headline_properties = add_text_to_canvas(
           headline_unformatted,
           position.x,
           position.y,
@@ -3161,7 +3180,7 @@
         let body_position_y =
           position.y + headline_properties.height + headline_margin_bottom;
 
-        let body_properties = addTextToCanvas(
+        let body_properties = add_text_to_canvas(
           canvas_content.body,
           position.x,
           body_position_y,
@@ -3253,9 +3272,9 @@
       }
 
       // Wraps an input text into a specified number of lines, balancing text content and ensuring certain phrases are not split across lines.
-      function balanceTextWrap(text, numberOfLines) {
+      function balance_text_wrap(text, numberOfLines) {
         let split_words = text.split(" ");
-        const words = mergeSPGlobal(split_words); // Merges S&P Global into one word
+        const words = merge_spglobal_and_dow_strings(split_words); // Merges S&P Global into one word
         const avgCharsPerLine = text.length / numberOfLines;
         console.log(`number of lines: ${numberOfLines}`);
 
@@ -3297,7 +3316,7 @@
             0
           );
           let longestLineWords = lines[longestLineIndex].split(" ");
-          longestLineWords = mergeSPGlobal(longestLineWords);
+          longestLineWords = merge_spglobal_and_dow_strings(longestLineWords);
 
           let wordToMove = longestLineWords.pop();
           lines[longestLineIndex] = longestLineWords.join(" ");
@@ -3322,14 +3341,14 @@
           `number of lines: ${numberOfLines} final line count ${final_line_count}`
         );
         if (numberOfLines > final_line_count) {
-          return balanceTextWrap(text, final_line_count);
+          return balance_text_wrap(text, final_line_count);
         }
 
         return add_spaces;
       }
 
       // Find and return the longest line in a text, with a flag if the text is only one line.
-      function findLongestLine(text) {
+      function find_longest_line(text) {
         const lines = text.split(/\r?\n/);
         const result = {
           oneLine: lines.length <= 1,
@@ -3458,7 +3477,7 @@
       }
 
       // Merge S&P Global and S&P Dow
-      function mergeSPGlobal(words) {
+      function merge_spglobal_and_dow_strings(words) {
         const mergedWords = [];
         let i = 0;
 
@@ -3579,12 +3598,12 @@
       }
 
       // Clear canvas
-      function clearCanvas() {
+      function clear_canvas() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
       }
 
       // Set the background color
-      function renderBackground(color = "#ffffff", opacity = 1) {
+      function render_background(color = "#ffffff", opacity = 1) {
         // Opacity ranges from 0.0 — 1.0
         const width = canvas.width;
         const height = canvas.height;
@@ -3596,7 +3615,7 @@
       }
 
       // Draw portal line
-      function drawDivider(pos_x, pos_y, height) {
+      function draw_divider(pos_x, pos_y, height) {
         let width = Math.max(4, canvas.width * 0.004);
         // Default is bwhite
         let fill_color = "#ffffff";
@@ -3609,7 +3628,7 @@
 
       // ------------
       // Portal Image Focal Point Setter
-      function createImagePreviewWithFocalPoint(image, img_number) {
+      function create_image_preview_with_focal_point(image, img_number) {
         const insideToolsContainer = document.querySelector(
           ".inside_tools_container"
         );
@@ -3633,7 +3652,7 @@
         // Update portal canvas
         let portal_ctx = portal_canvas.getContext("2d");
 
-        function drawFocalPoint() {
+        function draw_focal_point() {
           portal_ctx.beginPath();
           // Draw circle
           portal_ctx.arc(
@@ -3659,7 +3678,7 @@
           portal_ctx.fill();
         }
 
-        function drawImageAndFocalPoint() {
+        function draw_image_and_focal_point() {
           portal_ctx.fillStyle = "#E7F0F5"; // Canvas color
           portal_ctx.fillRect(0, 0, portal_canvas.width, portal_canvas.height);
 
@@ -3677,7 +3696,7 @@
             width,
             height
           );
-          drawFocalPoint();
+          draw_focal_point();
         }
 
         const img = new Image();
@@ -3712,10 +3731,10 @@
           portal_ctx.clearRect(0, 0, portal_canvas.width, portal_canvas.height);
 
           // Draw image & focal point
-          drawImageAndFocalPoint();
+          draw_image_and_focal_point();
 
           // Update canvas
-          updateCanvas();
+          update_canvas();
         };
 
         // Focal point position
@@ -3754,7 +3773,7 @@
             Math.min(y, imgY + height)
           );
 
-          drawImageAndFocalPoint();
+          draw_image_and_focal_point();
           canvas_content.portal_focal_point[n].dragging = true;
         }
 
@@ -3771,7 +3790,7 @@
         function caclulate_relative_focal_point() {
           if (canvas_content.portal_focal_point[n].dragging) {
             canvas_content.portal_focal_point[n].dragging = false;
-            drawImageAndFocalPoint();
+            draw_image_and_focal_point();
 
             // Calculate the relative position of the focal point within the image
             const scaleFactor = Math.min(
@@ -3795,7 +3814,7 @@
             canvas_content.portal_focal_point[n].relative_y = relativeY;
 
             // Update canvas
-            updateCanvas();
+            update_canvas();
           }
         }
 
@@ -3806,7 +3825,7 @@
       }
 
       // Remove line breaks
-      function removeNewLinesAndReturnLines(str, remove = true) {
+      function remove_new_lines_and_return_lines(str, remove = true) {
         if (remove) {
           return str.replace(/[\n\r]/g, " ").replace(/\s+/g, " "); // Remove new lines && consecutive spaces
         }
@@ -3814,20 +3833,20 @@
       }
 
       // Remove line breaks
-      function clearFormatting(str) {
-        function capitalizeAfterPeriod(str) {
+      function clear_formatting(str) {
+        function capitalize_after_period(str) {
           return str.replace(/\.(\s+)?(\w)/g, (match, space, letter) => {
             return `.${space || ""}${letter.toUpperCase()}`;
           });
         }
 
-        str = removeNewLinesAndReturnLines(str); // Remove new lines
+        str = remove_new_lines_and_return_lines(str); // Remove new lines
         str = str.replace(/\s+/g, " "); // Remove double spaces
-        return capitalizeAfterPeriod(str);
+        return capitalize_after_period(str);
       }
 
       // Add text to canvas
-      function addTextToCanvas(
+      function add_text_to_canvas(
         text,
         position_x,
         position_y,
@@ -3841,7 +3860,7 @@
         textWrap
       ) {
         // Get the width of the text
-        function getTextWidth(text, fontSize, letterSpacing) {
+        function get_text_width(text, fontSize, letterSpacing) {
           // Start the width as 0
           let width = 0;
           ctx.font = `${fontWeight} ${fontSize}px Akkurat LL`;
@@ -3853,15 +3872,17 @@
         }
 
         // Check if ONE word is wider than the container, and if custom string is wider than the container
-        function isAnyWordWiderThanRect(words, customString) {
+        function check_if_any_word_exceeds_rect_width(words, customString) {
           return (
             words.some(
-              (word) => getTextWidth(word, fontSize, letterSpacing) > rectWidth
-            ) || getTextWidth(customString, fontSize, letterSpacing) > rectWidth
+              (word) =>
+                get_text_width(word, fontSize, letterSpacing) > rectWidth
+            ) ||
+            get_text_width(customString, fontSize, letterSpacing) > rectWidth
           );
         }
 
-        function calculateLineHeight(fontSize) {
+        function calculate_line_height(fontSize) {
           // set the minimum and maximum font sizes and line height values
           const minFontSize = 16;
           const maxFontSize = 48;
@@ -3882,17 +3903,17 @@
           return lineHeight; //.toFixed(2);
         }
 
-        function fitText(customString = "") {
+        function fit_text(customString = "") {
           let lines = [];
 
           //let words = text.split(" ");
           let words = text.split(/( |\n|\r)/);
-          words = mergeSPGlobal(text.split(/( |\n|\r)/)); // Merges "S&P Global" into one word when found in text
+          words = merge_spglobal_and_dow_strings(text.split(/( |\n|\r)/)); // Merges "S&P Global" into one word when found in text
 
-          lineHeight = calculateLineHeight(fontSize);
+          lineHeight = calculate_line_height(fontSize);
 
           // If ONE word is wider than the container (with custom string) shrink the font size until it fits
-          while (isAnyWordWiderThanRect(words, customString)) {
+          while (check_if_any_word_exceeds_rect_width(words, customString)) {
             fontSize -= 1;
           }
 
@@ -3910,7 +3931,9 @@
               currentLine += word;
             } else {
               const newLine = currentLine + word;
-              if (getTextWidth(newLine, fontSize, letterSpacing) <= rectWidth) {
+              if (
+                get_text_width(newLine, fontSize, letterSpacing) <= rectWidth
+              ) {
                 currentLine = newLine;
               } else {
                 lines.push(currentLine);
@@ -3928,12 +3951,12 @@
             fontSize != minimum_font_size
           ) {
             fontSize -= 1;
-            return fitText(customString);
+            return fit_text(customString);
           }
           return lines;
         }
 
-        function drawTextWithSuperscript(text, x, y) {
+        function draw_text_with_superscript(text, x, y) {
           const specialChars = ["™", "®", "©"];
           const originalFontSize = parseInt(ctx.font.match(/\d+/)[0]);
           const superscriptFontSize = Math.floor(originalFontSize * 0.6);
@@ -3959,19 +3982,19 @@
 
         // Text processing
         // Clean up input text -- Remove multiple new lines and replace return lines with new lines
-        text = removeDuplicateNewLines(text);
+        text = remove_duplicate_new_lines(text);
 
         // Fit text in the available text space
-        let fitTextInArea = fitText(
+        let fit_textInArea = fit_text(
           canvas_content.text_container_minimum_character_width
         );
 
         // Remove unwanted text new lines -- Sometimes the text breaks onto a new line then it registers the new line
-        let removeEmptyTextLines = removeUnwantedEmptyLines(
+        let removeEmptyTextLines = remove_added_empty_lines(
           text,
-          fitTextInArea
+          fit_textInArea
         );
-        let cleanedUpLineBreaks = addNewLinesAndRemoveDuplicates(
+        let cleanedUpLineBreaks = add_new_lines_and_remove_duplicates(
           text,
           removeEmptyTextLines
         );
@@ -3987,7 +4010,7 @@
         // Get text area size
         var text_width_max = 1;
         for (var i = 0; i < textForRendering.length; i++) {
-          var calculate_width = getTextWidth(
+          var calculate_width = get_text_width(
             textForRendering[i],
             fontSize,
             letterSpacing
@@ -4018,7 +4041,7 @@
             i * fontSize * lineHeight +
             fontSize * offset_y;
           // Add superscript, trademark and copywriting
-          drawTextWithSuperscript(line, position_x, calculated_position_y);
+          draw_text_with_superscript(line, position_x, calculated_position_y);
         }
 
         // Return results
@@ -4032,7 +4055,7 @@
       }
 
       // Remove empty strings
-      function removeUnwantedEmptyLines(originalString, modifiedArray) {
+      function remove_added_empty_lines(originalString, modifiedArray) {
         const result = [];
         const originalLines = originalString.split(/\r?\n/);
 
@@ -4067,7 +4090,7 @@
         return result;
       }
 
-      function addNewLinesAndRemoveDuplicates(inputString, inputArray) {
+      function add_new_lines_and_remove_duplicates(inputString, inputArray) {
         let outputArray = [];
         let stringIndex = 0;
 
@@ -4110,7 +4133,7 @@
         return mergedOutputArray;
       }
 
-      function removeDuplicateNewLines(inputString) {
+      function remove_duplicate_new_lines(inputString) {
         // Replace all \r with \n
         let stringWithReplacedLines = inputString.replace(/\r/g, "\n");
 
@@ -4120,22 +4143,22 @@
         return outputString;
       }
 
-      function escapeRegExp(string) {
+      function escape_reg_exp(string) {
         return string.replace(/[.*+\-?^${}()|[\]\\]/g, "\\$&");
       }
 
-      function capitalizeFirstLetterOfSentence(match) {
+      function capitalize_first_letter_of_sentence(match) {
         return match.charAt(0).toUpperCase() + match.slice(1);
       }
 
-      function replaceWithCapitalized(string, capitalizationArray) {
+      function replace_with_capitalized(string, capitalizationArray) {
         // Add an additional space before string to prevent a bug where the first word is not capitalized
         const lowercaseString = " " + string.toLowerCase();
 
         // Capitalize the first letter of the first word in every sentence
         let modifiedString = lowercaseString.replace(
           /(^\w)|(\.\s*\w)/g,
-          capitalizeFirstLetterOfSentence
+          capitalize_first_letter_of_sentence
         );
 
         // Sort capitalizationArray in descending order of length
@@ -4145,7 +4168,7 @@
 
         sortedCapitalizationArray.forEach((element) => {
           const lowercaseElement = element.toLowerCase();
-          const escapedLowercaseElement = escapeRegExp(lowercaseElement);
+          const escapedLowercaseElement = escape_reg_exp(lowercaseElement);
           const regex = new RegExp(
             "(?<=^|\\s|[^\\w])" +
               escapedLowercaseElement.split(" ").join("\\s+") +
@@ -4158,7 +4181,7 @@
         return modifiedString.slice(1);
       }
 
-      function capitalizeAfterPeriod(text) {
+      function capitalize_after_period(text) {
         // Step 2: Split the input string into sentences using the period as the delimiter
         const sentences = text.split(". ");
 
@@ -4174,27 +4197,28 @@
       }
 
       // Brand voice
-      function convertToBrandVoice(string) {
+      function format_string_to_brand_style(string) {
         // Remove formating
-        let cleared_formating = clearFormatting(string);
+        let cleared_formating = clear_formatting(string);
 
-        let capitalize_brand_words = replaceWithCapitalized(
+        let capitalize_brand_words = replace_with_capitalized(
           cleared_formating,
           capitalizationArray
         );
 
         console.log(capitalize_brand_words);
 
-        let capitalize_countries = convertCountriesToSentenceCase(
+        let capitalize_countries = convert_countries_to_sentence_case(
           capitalize_brand_words
         );
 
-        let capitalize_first_word = capitalizeAfterPeriod(capitalize_countries);
+        let capitalize_first_word =
+          capitalize_after_period(capitalize_countries);
 
         return capitalize_first_word;
       }
 
-      function convertCountriesToSentenceCase(inputStr) {
+      function convert_countries_to_sentence_case(inputStr) {
         const regex = new RegExp("\\b(" + countryList.join("|") + ")\\b", "gi");
         const result = inputStr.replace(regex, (matchedCountry) => {
           // Find the correct format of the matched country from the list
@@ -4208,7 +4232,7 @@
       }
 
       // SLider
-      function createRangeSlider(incrementCount, initial_value = 0, name) {
+      function create_range_slider(incrementCount, initial_value = 0, name) {
         const container = document.querySelector(".inside_tools_container");
         const sliderWrapper = document.createElement("div");
         const slider = document.createElement("input");
@@ -4225,14 +4249,14 @@
         slider.addEventListener("mouseup", (event) => {
           const value = parseFloat(event.target.value);
           const incrementPosition = Math.round(value / stepSize);
-          reportSliderValue(event.target, incrementPosition);
+          report_slider_value(event.target, incrementPosition);
         });
 
         sliderWrapper.appendChild(slider);
         container.appendChild(sliderWrapper);
       }
 
-      function reportSliderValue(slider, incrementPosition) {
+      function report_slider_value(slider, incrementPosition) {
         if (slider.name.includes("image_scale")) {
           let i = parseInt(slider.name.replace("image_scale_", ""));
           canvas_content.portal_image_scale[i] = incrementPosition;
@@ -4241,24 +4265,24 @@
         }
 
         // Update canvas
-        updateCanvas();
+        update_canvas();
       }
 
       //---------------- IMAGE DOWNSCALING -----------------//
       // scales the image by (float) scale < 1
       // returns a canvas containing the scaled image.
-      function downScaleImage(img, scale) {
+      function down_scale_image(img, scale) {
         var imgCV = document.createElement("canvas");
         imgCV.width = img.width;
         imgCV.height = img.height;
         var imgCtx = imgCV.getContext("2d");
         imgCtx.drawImage(img, 0, 0);
-        return downScaleCanvas(imgCV, scale);
+        return reduce_canvas_size(imgCV, scale);
       }
 
       // scales the canvas by (float) scale < 1
       // returns a new canvas containing the scaled image.
-      function downScaleCanvas(cv, scale) {
+      function reduce_canvas_size(cv, scale) {
         if (!(scale < 1) || !(scale > 0))
           throw "scale must be a positive number <1 ";
         var sqScale = scale * scale; // square scale = area of source pixel within target
