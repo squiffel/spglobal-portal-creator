@@ -971,6 +971,9 @@
       canvas_content.portal_primary_image_side = true;
       canvas_content.portal_image_scale = [0, 0];
 
+      // Downscaled image is null
+      canvas_content.portal_downscaled_image = [null, null];
+
       // Default focal point
       canvas_content.portal_focal_point = [];
       for (var i = 0; i < 2; i++) {
@@ -1227,6 +1230,9 @@
         // Add canvas to document
         document.querySelector(".right-panel").appendChild(canvas);
 
+        // Clear downscaled images
+        canvas_content.portal_downscaled_image = [null, null];
+
         // Update the input boxes
         let inputbox_width = document.getElementById("widthInput");
         let inputbox_height = document.getElementById("wheightInput");
@@ -1437,6 +1443,9 @@
           img.style.display = "none";
 
           let n = canvas_content.portal_upload_image_number;
+          // Clear the downscaled image data
+          canvas_content.portal_downscaled_image[n] = null;
+
           // If there are no images add one
           if (userImagesDiv.children.length == 0) {
             userImagesDiv.appendChild(img);
@@ -2470,11 +2479,15 @@
 
           if (button_label == "portal_side") {
             canvas_content.portal_side = selected_value;
+            // Clear portal downscaled image
+            canvas_content.portal_downscaled_image = [null, null];
           }
 
           if (button_label == "portal_size") {
             let value = parseInt(selected_value);
             canvas_content.portal_size_percent = value;
+            // Clear portal downscaled image
+            canvas_content.portal_downscaled_image = [null, null];
           }
         }
 
@@ -2650,11 +2663,21 @@
           let downscaled_image = transformed_image;
           // Only downscale if the image is larger than the canvas
           if (downscale_ratio < 1) {
-            // High resolution downscale
-            downscaled_image = down_scale_image(
-              transformed_image,
-              1 / scaleFactor
-            );
+            // Render using the pre-downscaled image
+            if (canvas_content.portal_downscaled_image[image_number]) {
+              //Use pre-downscaled image
+              downscaled_image =
+                canvas_content.portal_downscaled_image[image_number];
+              console.log("Reuse downscaled image");
+            } else {
+              console.log("Expensive downscale of the high res image");
+              // Expensive high resolution downscale
+              downscaled_image = down_scale_image(
+                transformed_image,
+                1 / scaleFactor,
+                image_number
+              );
+            }
           }
 
           // Draw the image in the center of the mask (Constrained by the edges of the image)
@@ -4264,6 +4287,9 @@
             zoom_label_generate(incrementPosition);
         }
 
+        // Clear portal downscaled image
+        canvas_content.portal_downscaled_image[i] = null;
+
         // Update canvas
         update_canvas();
       }
@@ -4271,13 +4297,18 @@
       //---------------- IMAGE DOWNSCALING -----------------//
       // scales the image by (float) scale < 1
       // returns a canvas containing the scaled image.
-      function down_scale_image(img, scale) {
+      function down_scale_image(img, scale, img_number) {
         var imgCV = document.createElement("canvas");
         imgCV.width = img.width;
         imgCV.height = img.height;
         var imgCtx = imgCV.getContext("2d");
         imgCtx.drawImage(img, 0, 0);
-        return reduce_canvas_size(imgCV, scale);
+        // Store downscaled image
+        canvas_content.portal_downscaled_image[img_number] = reduce_canvas_size(
+          imgCV,
+          scale
+        );
+        return canvas_content.portal_downscaled_image[img_number];
       }
 
       // scales the canvas by (float) scale < 1
