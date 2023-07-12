@@ -1,6 +1,11 @@
 Need to be able to set the minimum width to the minimum width of the word in the body, headline, and button (calculate_headline_minimum_container_width())
 
-When canvas_content.button_style == "none" — There should be a icon you can set to make it look clickable
+
+--- Add saving and use it to optimize
+
+
+
+When canvas_content.button_style == "none" — There should be a icon you can set to make it look clickable. Ie like caret CTA > or a plus CTA +
 Button color set to red as an option?
 
 Downscale the LOGO with the same high res method used for the images
@@ -95,11 +100,7 @@ Can prevent S&P Global being split with _ underscore S&P_Global then removing it
 Internal feed, 
 --------- 
 
-Need to improve the image downscaling optimization !!!!!!!! This is important
-Only downscale the image when the canvas changes.
-Save the portals to a canvas and reapply the image when the portal image, size, scale or focal point changes
-Only do slow downscaling when you download the image
-
+Downscaling image code
 https://stackoverflow.com/questions/18922880/html5-canvas-resize-downscale-image-high-quality#:~:text=To%20downsample%20an%20image%2C%20we,its%20value%20for%20the%20destination.
 
 
