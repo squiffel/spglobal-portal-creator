@@ -447,7 +447,7 @@
         margin-top: -8px;
         margin-left: -8px;
         border-radius: 50%;
-        background-color: #00f;
+        background-color: #4390df;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
         cursor: pointer;
       }
@@ -936,6 +936,9 @@
         yellow: "#EDF86F",
         blue: "#C7DAE0",
       };
+
+      // Image loading animation
+      let image_stop_loading_animation;
 
       // Minimum font size
       const minimum_font_size = 12;
@@ -1435,9 +1438,17 @@
           document.body.appendChild(userImagesDiv);
         }
 
+        // Show loading bar
+        const { loadingBar, progressBar } = showLoadingBar();
+
         // Upload image
         const reader = new FileReader();
         reader.onload = function (event) {
+          // Hide loading bar
+          loadingBar.remove();
+          // Stop loading animation
+          image_stop_loading_animation();
+
           const img = new Image();
           img.src = event.target.result;
           img.style.display = "none";
@@ -2603,6 +2614,7 @@
         if (!img) {
           return;
         }
+
         // Load image and draw it on the canvas
         const image = new Image();
         image.src = img.src;
@@ -4459,6 +4471,54 @@
         // writing result to canvas.
         resCtx.putImageData(imgRes, 0, 0);
         return resCV;
+      }
+
+      function showLoadingBar() {
+        // Create loading bar element
+        const loadingBar = document.createElement("div");
+        loadingBar.style.position = "fixed";
+        loadingBar.style.top = "0";
+        loadingBar.style.left = "0";
+        loadingBar.style.height = "8px";
+        loadingBar.style.width = "100%";
+        loadingBar.style.background = "#ccc";
+
+        // Create progress bar element
+        const progressBar = document.createElement("div");
+        progressBar.style.height = "100%";
+        progressBar.style.width = "0%";
+        progressBar.style.background = "#4390df";
+
+        // Add progress bar to loading bar
+        loadingBar.appendChild(progressBar);
+
+        // Add loading bar to body
+        document.body.appendChild(loadingBar);
+
+        // Loading bar animation
+        let loadProgress = 0;
+        let loadingInterval;
+
+        function updateProgress() {
+          loadProgress += 10;
+          progressBar.style.width = `${loadProgress}%`;
+          if (loadProgress >= 100) {
+            loadProgress = 0;
+            //clearInterval(loadingInterval);
+          }
+        }
+
+        loadingInterval = setInterval(updateProgress, 200);
+
+        // Assign stop function to global variable
+        image_stop_loading_animation = () => {
+          clearInterval(loadingInterval);
+        };
+
+        return {
+          loadingBar,
+          progressBar,
+        };
       }
     </script>
 
