@@ -610,6 +610,27 @@
           />
         </svg>
       </button>
+      <!-- Upload -->
+      <button
+        class="toolbox_button"
+        name="upload_button"
+        onclick="pressed_toolbox_button(this.name)"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="20"
+          height="19.766"
+          viewBox="0 0 20 19.766"
+        >
+          <path
+            id="Path_11092"
+            data-name="Path 11092"
+            d="M10.938-3.437V-2.5H9.063V-13.676L5.352-9.965,4.688-9.3,3.363-10.625l.664-.664L9.336-16.6,10-17.266l.664.664,5.313,5.313.664.664L15.313-9.3l-.664-.664-3.711-3.711Zm1.25-.312V-5.625H20V2.5H0V-5.625H7.812V-3.75H1.875V.625h16.25V-3.75ZM15-1.562a.938.938,0,0,1,.938-.937.938.938,0,0,1,.938.938.938.938,0,0,1-.937.938A.938.938,0,0,1,15-1.562Z"
+            transform="translate(0 17.266)"
+            fill="#666"
+          />
+        </svg>
+      </button>
 
       <!-- END BUTTON PANEL -->
 
@@ -969,6 +990,10 @@
       let userDefinedHeight;
       let resetFocalPoint = [false, false];
 
+      // Canvas size
+      canvas_content.canvas_width = 1200;
+      canvas_content.canvas_height = 628;
+
       // Set to default
       canvas_content.logo = { name: "spg_corporate", corner: "bottom_left" };
       // Text
@@ -987,6 +1012,7 @@
 
       // Downscaled images
       temp_portal_downscaled_image = [null, null];
+      temp_portal_image = [];
 
       // Portal content
       canvas_content.portal_color_overlay = false;
@@ -996,8 +1022,7 @@
       canvas_content.portal_override_margins = false;
       canvas_content.portal_primary_image_side = true;
       canvas_content.portal_image_scale = [0, 0];
-      canvas_content.portal_image_data = [];
-      canvas_content.portal_image_src_data = [];
+      canvas_content.portal_image_src = [];
       canvas_content.portal_focal_point = [];
       // Set focal point defaults
       for (var i = 0; i < 2; i++) {
@@ -1203,8 +1228,19 @@
 
       // Functions
       function create_canvas() {
-        let width = parseInt(document.getElementById("widthInput").value);
-        let height = parseInt(document.getElementById("heightInput").value);
+        var user_set_canvas_size = document.getElementById("widthInput");
+        let width, height;
+        let uploaded_data = false;
+
+        if (user_set_canvas_size) {
+          width = parseInt(document.getElementById("widthInput").value);
+          height = parseInt(document.getElementById("heightInput").value);
+        } else {
+          // If there is no width available go to the saved data
+          width = canvas_content.canvas_width;
+          height = canvas_content.canvas_height;
+          uploaded_data = true;
+        }
 
         // Add constraints
         var min_width_resolution = 144;
@@ -1247,8 +1283,13 @@
 
         // Create a new canvas
         canvas = document.createElement("canvas");
+        // Set size
         canvas.width = width;
         canvas.height = height;
+        // Store data
+        canvas_content.canvas_width = canvas.width;
+        canvas_content.canvas_height = canvas.height;
+        // Update
         canvas.id = "canvas";
         ctx = canvas.getContext("2d");
         // Add canvas to document
@@ -1268,12 +1309,15 @@
         // Get canvas type (Vertical, Horizontal, Square)
         get_canvas_type();
 
-        // Set default to right
-        canvas_content.portal_side = "right";
+        // Goes to defaults if the user isn't loading a save file
+        if (uploaded_data == false) {
+          // Set default to right
+          canvas_content.portal_side = "right";
 
-        // Set if vertical set to top
-        if (canvas_content.orientation == "vertical") {
-          canvas_content.portal_side = "top";
+          // Set if vertical set to top
+          if (canvas_content.orientation == "vertical") {
+            canvas_content.portal_side = "top";
+          }
         }
 
         // Fit copy
@@ -1472,21 +1516,21 @@
           temp_portal_downscaled_image[n] = null;
 
           // If there are no images add one
-          if (canvas_content.portal_image_data.length == 0) {
-            canvas_content.portal_image_data.push(img);
+          if (temp_portal_image.length == 0) {
+            temp_portal_image.push(img);
           }
           // If there is one child
-          if (canvas_content.portal_image_data.length == 1) {
+          if (temp_portal_image.length == 1) {
             // Update the primary image or add an image
             if (n == 0) {
-              canvas_content.portal_image_data[0] = img;
+              temp_portal_image[0] = img;
             } else {
-              canvas_content.portal_image_data[1] = img;
+              temp_portal_image[1] = img;
             }
           }
           // If there are 2 children, replace with the user selected image src
-          if (canvas_content.portal_image_data.length == 2) {
-            canvas_content.portal_image_data[1] = img;
+          if (temp_portal_image.length == 2) {
+            temp_portal_image[1] = img;
           }
 
           // New image has been uploaded
@@ -1608,9 +1652,9 @@
           let button_label = event.target.name;
 
           // Delete the uploaded image
-          if (canvas_content.portal_image_data.length > 0) {
+          if (temp_portal_image.length > 0) {
             let n = parseInt(button_label);
-            let img = canvas_content.portal_image_data[n];
+            let img = temp_portal_image[n];
             // If you delete the primary image, move the secondary focal point to the primary
             if (n == 0) {
               // Transfer focal point information over
@@ -1633,11 +1677,10 @@
               canvas_content.portal_image_scale[0] =
                 canvas_content.portal_image_scale[1];
               // Transfer secondary image to primary
-              canvas_content.portal_image_data[0] =
-                canvas_content.portal_image_data[1];
+              temp_portal_image[0] = temp_portal_image[1];
             }
             // Remove the image
-            canvas_content.portal_image_data.splice(n, 1);
+            temp_portal_image.splice(n, 1);
             // Clear portal downscaled images
             temp_portal_downscaled_image = [null, null];
           }
@@ -1877,13 +1920,13 @@
         // Image
         if (current_panel_open == "Image") {
           if (button_label.includes("Convert to primary")) {
-            if (canvas_content.portal_image_data.length == 2) {
+            if (temp_portal_image.length == 2) {
               // Move primary image below secondary
-              let primary_image = canvas_content.portal_image_data[0]; // Current position
-              let secondary_image = canvas_content.portal_image_data[1];
+              let primary_image = temp_portal_image[0]; // Current position
+              let secondary_image = temp_portal_image[1];
               // Flip order
-              canvas_content.portal_image_data[0] = secondary_image; // New position
-              canvas_content.portal_image_data[1] = primary_image;
+              temp_portal_image[0] = secondary_image; // New position
+              temp_portal_image[1] = primary_image;
 
               // Transfer attributes
               let primary_focal_point = canvas_content.portal_focal_point[0];
@@ -2005,12 +2048,35 @@
         return inputBox;
       }
 
+      // Upload files
+      function handleFileSelect(event) {
+        var file = event.target.files[0];
+        var reader = new FileReader();
+
+        reader.onload = function (e) {
+          var contents = e.target.result;
+          var parsedData = JSON.parse(contents);
+          // Store the parsed data in canvas_content
+          canvas_content = parsedData;
+          console.log(canvas_content);
+          // Load images
+          for (var i = 0; i < canvas_content.portal_image_src.length; i++) {
+            const image = new Image();
+            image.src = canvas_content.portal_image_src;
+            temp_portal_image[i] = image;
+          }
+          // Update canvas
+          create_canvas();
+        };
+
+        reader.readAsText(file);
+      }
+
       // Save file
       function downloadAsJson(filename) {
         // Store the image data
-        for (var i = 0; i < canvas_content.portal_image_data.length; i++) {
-          canvas_content.portal_image_src_data[i] =
-            canvas_content.portal_image_data[i].src;
+        for (var i = 0; i < temp_portal_image.length; i++) {
+          canvas_content.portal_image_src[i] = temp_portal_image[i].src;
         }
         // Convert to JSON
         var dataStr =
@@ -2065,6 +2131,19 @@
           if (filename) {
             downloadAsJson(filename);
           }
+        }
+
+        if (buttonName === "upload_button") {
+          collapse_left_panel();
+          // Create an input element of type "file"
+          var input = document.createElement("input");
+          input.type = "file";
+          // Add a change event listener to the input element
+          input.addEventListener("change", handleFileSelect);
+          // Trigger the file input dialog
+          input.click();
+          // Remove the input element after the file selection
+          input.remove();
         }
 
         if (buttonName === "color_button") {
@@ -2188,7 +2267,7 @@
           }
 
           // Size and position
-          if (canvas_content.portal_image_data.length > 0) {
+          if (temp_portal_image.length > 0) {
             // Position
             add_label_to_inside_tools_container("Portal Position");
 
@@ -2616,7 +2695,7 @@
           image_number = 0;
         }
 
-        if (canvas_content.portal_image_data.length == 0) {
+        if (temp_portal_image.length == 0) {
           return null;
         }
 
@@ -2624,7 +2703,7 @@
         let img = null;
 
         // Looks for the image ID
-        img = canvas_content.portal_image_data[image_number];
+        img = temp_portal_image[image_number];
 
         return img;
       }
@@ -3045,7 +3124,7 @@
 
         // Portals
         canvas_content.portal_margins = false;
-        canvas_content.portal_count = canvas_content.portal_image_data.length;
+        canvas_content.portal_count = temp_portal_image.length;
 
         // Create ONE Portal image on the canvas
         if (
