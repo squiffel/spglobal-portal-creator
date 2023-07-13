@@ -1,7 +1,7 @@
 Need to be able to set the minimum width to the minimum width of the word in the body, headline, and button (calculate_headline_minimum_container_width())
 
 
---- Add saving and use it to optimize
+--- Add saving
 
 When canvas_content.button_style == "none" — There should be a icon you can set to make it look clickable. Ie like caret CTA > or a plus CTA +
 Button color set to red as an option?

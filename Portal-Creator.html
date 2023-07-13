@@ -589,6 +589,29 @@
           />
         </svg>
       </button>
+      <!-- Save -->
+      <button
+        class="toolbox_button"
+        name="save_button"
+        onclick="pressed_toolbox_button(this.name)"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="20.125"
+          height="20.125"
+          viewBox="0 0 20.125 20.125"
+        >
+          <path
+            id="Path_11090"
+            data-name="Path 11090"
+            d="M2.156,1.438H0V-18.687H15.094l5.031,5.031V1.438H2.156ZM17.969-.719V-12.762l-3.594-3.594v5.575H3.594v-5.75H2.156V-.719ZM5.75-16.531v3.594h6.469v-3.594ZM7.188-5.75A2.875,2.875,0,0,1,8.625-8.24a2.875,2.875,0,0,1,2.875,0,2.875,2.875,0,0,1,1.438,2.49A2.875,2.875,0,0,1,11.5-3.26a2.875,2.875,0,0,1-2.875,0A2.875,2.875,0,0,1,7.188-5.75Z"
+            transform="translate(0 18.688)"
+            fill="#666"
+          />
+        </svg>
+      </button>
+
+      <!-- END BUTTON PANEL -->
 
       <div class="tools">
         <div class="inside_tools_container">
@@ -948,12 +971,10 @@
 
       // Set to default
       canvas_content.logo = { name: "spg_corporate", corner: "bottom_left" };
+      // Text
       canvas_content.text_bottom_aligned = false;
       canvas_content.ignore_line_breaks = { headline: false };
-
       canvas_content.text_container_minimum_character_width = "";
-      canvas_content.button_style = "solid";
-
       canvas_content.font_size = {
         headline: 96,
         body: 48,
@@ -961,22 +982,24 @@
         small: false,
       };
 
-      canvas_content.portal_color_overlay = false;
+      // Buton
+      canvas_content.button_style = "solid";
 
+      // Downscaled images
+      temp_portal_downscaled_image = [null, null];
+
+      // Portal content
+      canvas_content.portal_color_overlay = false;
       canvas_content.portal_image_flip = [false, false];
       canvas_content.portal_size_percent = 50;
       canvas_content.portal_upload_image_number = 0;
       canvas_content.portal_override_margins = false;
       canvas_content.portal_primary_image_side = true;
       canvas_content.portal_image_scale = [0, 0];
-
-      canvas_content.user_image_data = [];
-
-      // Downscaled image is null
-      canvas_content.portal_downscaled_image = [null, null];
-
-      // Default focal point
+      canvas_content.portal_image_data = [];
+      canvas_content.portal_image_src_data = [];
       canvas_content.portal_focal_point = [];
+      // Set focal point defaults
       for (var i = 0; i < 2; i++) {
         canvas_content.portal_focal_point[i] = {
           x: 0,
@@ -1232,7 +1255,7 @@
         document.querySelector(".right-panel").appendChild(canvas);
 
         // Clear downscaled images
-        canvas_content.portal_downscaled_image = [null, null];
+        temp_portal_downscaled_image = [null, null];
 
         // Update the input boxes
         let inputbox_width = document.getElementById("widthInput");
@@ -1446,24 +1469,24 @@
 
           let n = canvas_content.portal_upload_image_number;
           // Clear the downscaled image data
-          canvas_content.portal_downscaled_image[n] = null;
+          temp_portal_downscaled_image[n] = null;
 
           // If there are no images add one
-          if (canvas_content.user_image_data.length == 0) {
-            canvas_content.user_image_data.push(img);
+          if (canvas_content.portal_image_data.length == 0) {
+            canvas_content.portal_image_data.push(img);
           }
           // If there is one child
-          if (canvas_content.user_image_data.length == 1) {
+          if (canvas_content.portal_image_data.length == 1) {
             // Update the primary image or add an image
             if (n == 0) {
-              canvas_content.user_image_data[0] = img;
+              canvas_content.portal_image_data[0] = img;
             } else {
-              canvas_content.user_image_data[1] = img;
+              canvas_content.portal_image_data[1] = img;
             }
           }
           // If there are 2 children, replace with the user selected image src
-          if (canvas_content.user_image_data.length == 2) {
-            canvas_content.user_image_data[1] = img;
+          if (canvas_content.portal_image_data.length == 2) {
+            canvas_content.portal_image_data[1] = img;
           }
 
           // New image has been uploaded
@@ -1585,9 +1608,9 @@
           let button_label = event.target.name;
 
           // Delete the uploaded image
-          if (canvas_content.user_image_data.length > 0) {
+          if (canvas_content.portal_image_data.length > 0) {
             let n = parseInt(button_label);
-            let img = canvas_content.user_image_data[n];
+            let img = canvas_content.portal_image_data[n];
             // If you delete the primary image, move the secondary focal point to the primary
             if (n == 0) {
               // Transfer focal point information over
@@ -1610,13 +1633,13 @@
               canvas_content.portal_image_scale[0] =
                 canvas_content.portal_image_scale[1];
               // Transfer secondary image to primary
-              canvas_content.user_image_data[0] =
-                canvas_content.user_image_data[1];
+              canvas_content.portal_image_data[0] =
+                canvas_content.portal_image_data[1];
             }
             // Remove the image
-            canvas_content.user_image_data.splice(n, 1);
+            canvas_content.portal_image_data.splice(n, 1);
             // Clear portal downscaled images
-            canvas_content.portal_downscaled_image = [null, null];
+            temp_portal_downscaled_image = [null, null];
           }
 
           // Update Canvas
@@ -1854,13 +1877,13 @@
         // Image
         if (current_panel_open == "Image") {
           if (button_label.includes("Convert to primary")) {
-            if (canvas_content.user_image_data.length == 2) {
+            if (canvas_content.portal_image_data.length == 2) {
               // Move primary image below secondary
-              let primary_image = canvas_content.user_image_data[0]; // Current position
-              let secondary_image = canvas_content.user_image_data[1];
+              let primary_image = canvas_content.portal_image_data[0]; // Current position
+              let secondary_image = canvas_content.portal_image_data[1];
               // Flip order
-              canvas_content.user_image_data[0] = secondary_image; // New position
-              canvas_content.user_image_data[1] = primary_image;
+              canvas_content.portal_image_data[0] = secondary_image; // New position
+              canvas_content.portal_image_data[1] = primary_image;
 
               // Transfer attributes
               let primary_focal_point = canvas_content.portal_focal_point[0];
@@ -1982,6 +2005,26 @@
         return inputBox;
       }
 
+      // Save file
+      function downloadAsJson(filename) {
+        // Store the image data
+        for (var i = 0; i < canvas_content.portal_image_data.length; i++) {
+          canvas_content.portal_image_src_data[i] =
+            canvas_content.portal_image_data[i].src;
+        }
+        // Convert to JSON
+        var dataStr =
+          "data:text/json;charset=utf-8," +
+          encodeURIComponent(JSON.stringify(canvas_content));
+        // Download the file
+        var downloadAnchor = document.createElement("a");
+        downloadAnchor.setAttribute("href", dataStr);
+        downloadAnchor.setAttribute("download", filename + ".json");
+        document.body.appendChild(downloadAnchor);
+        downloadAnchor.click();
+        document.body.removeChild(downloadAnchor);
+      }
+
       // Side panel buttons default click behavior
       function pressed_toolbox_button(buttonName) {
         // Buttons do not work if there is no canvas
@@ -2013,6 +2056,15 @@
             download_canvas_as_png();
           }, 250); // Slight delay to ensure that the canvas is updated
           //download_canvas_as_png();
+        }
+
+        if (buttonName === "save_button") {
+          collapse_left_panel();
+          // Download JSON file
+          var filename = prompt("Enter the filename");
+          if (filename) {
+            downloadAsJson(filename);
+          }
         }
 
         if (buttonName === "color_button") {
@@ -2136,7 +2188,7 @@
           }
 
           // Size and position
-          if (canvas_content.user_image_data.length > 0) {
+          if (canvas_content.portal_image_data.length > 0) {
             // Position
             add_label_to_inside_tools_container("Portal Position");
 
@@ -2470,14 +2522,14 @@
           if (button_label == "portal_side") {
             canvas_content.portal_side = selected_value;
             // Clear portal downscaled image
-            canvas_content.portal_downscaled_image = [null, null];
+            temp_portal_downscaled_image = [null, null];
           }
 
           if (button_label == "portal_size") {
             let value = parseInt(selected_value);
             canvas_content.portal_size_percent = value;
             // Clear portal downscaled image
-            canvas_content.portal_downscaled_image = [null, null];
+            temp_portal_downscaled_image = [null, null];
           }
         }
 
@@ -2564,7 +2616,7 @@
           image_number = 0;
         }
 
-        if (canvas_content.user_image_data.length == 0) {
+        if (canvas_content.portal_image_data.length == 0) {
           return null;
         }
 
@@ -2572,7 +2624,7 @@
         let img = null;
 
         // Looks for the image ID
-        img = canvas_content.user_image_data[image_number];
+        img = canvas_content.portal_image_data[image_number];
 
         return img;
       }
@@ -2652,10 +2704,9 @@
           // Only downscale if the image is larger than the canvas
           if (downscale_ratio < 1) {
             // Render using the pre-downscaled image
-            if (canvas_content.portal_downscaled_image[image_number]) {
+            if (temp_portal_downscaled_image[image_number]) {
               //Use pre-downscaled image
-              downscaled_image =
-                canvas_content.portal_downscaled_image[image_number];
+              downscaled_image = temp_portal_downscaled_image[image_number];
               console.log("Reuse downscaled image");
             } else {
               console.log("Expensive downscale of the high res image");
@@ -2994,7 +3045,7 @@
 
         // Portals
         canvas_content.portal_margins = false;
-        canvas_content.portal_count = canvas_content.user_image_data.length;
+        canvas_content.portal_count = canvas_content.portal_image_data.length;
 
         // Create ONE Portal image on the canvas
         if (
@@ -4271,7 +4322,7 @@
         }
 
         // Clear portal downscaled image
-        canvas_content.portal_downscaled_image[i] = null;
+        temp_portal_downscaled_image[i] = null;
 
         // Update canvas
         update_canvas();
@@ -4298,11 +4349,11 @@
 
         image_canvas_context.drawImage(img, 0, 0);
         // Store downscaled image
-        canvas_content.portal_downscaled_image[img_number] = reduce_canvas_size(
+        temp_portal_downscaled_image[img_number] = reduce_canvas_size(
           image_canvas,
           scale
         );
-        return canvas_content.portal_downscaled_image[img_number];
+        return temp_portal_downscaled_image[img_number];
       }
 
       // scales the canvas by (float) scale < 1
