@@ -346,10 +346,6 @@
         background-color: #e8f0f5;
       }
 
-      .user-image-container {
-        display: none;
-      }
-
       .color-indicator {
         width: 12px;
         height: 12px;
@@ -974,6 +970,8 @@
       canvas_content.portal_primary_image_side = true;
       canvas_content.portal_image_scale = [0, 0];
 
+      canvas_content.user_image_data = [];
+
       // Downscaled image is null
       canvas_content.portal_downscaled_image = [null, null];
 
@@ -1431,13 +1429,6 @@
 
       // File upload
       function add_user_image(file) {
-        let userImagesDiv = document.getElementById("user-image-container");
-        if (userImagesDiv == null) {
-          userImagesDiv = document.createElement("div");
-          userImagesDiv.id = "user-image-container";
-          document.body.appendChild(userImagesDiv);
-        }
-
         // Show loading bar
         const { loadingBar, progressBar } = showLoadingBar();
 
@@ -1458,21 +1449,21 @@
           canvas_content.portal_downscaled_image[n] = null;
 
           // If there are no images add one
-          if (userImagesDiv.children.length == 0) {
-            userImagesDiv.appendChild(img);
+          if (canvas_content.user_image_data.length == 0) {
+            canvas_content.user_image_data.push(img);
           }
           // If there is one child
-          if (userImagesDiv.children.length == 1) {
+          if (canvas_content.user_image_data.length == 1) {
             // Update the primary image or add an image
             if (n == 0) {
-              userImagesDiv.children[0].src = img.src;
+              canvas_content.user_image_data[0] = img;
             } else {
-              userImagesDiv.appendChild(img);
+              canvas_content.user_image_data[1] = img;
             }
           }
           // If there are 2 children, replace with the user selected image src
-          if (userImagesDiv.children.length == 2) {
-            userImagesDiv.children[n].src = img.src;
+          if (canvas_content.user_image_data.length == 2) {
+            canvas_content.user_image_data[1] = img;
           }
 
           // New image has been uploaded
@@ -1594,10 +1585,9 @@
           let button_label = event.target.name;
 
           // Delete the uploaded image
-          let image_container = document.getElementById("user-image-container");
-          if (image_container) {
+          if (canvas_content.user_image_data.length > 0) {
             let n = parseInt(button_label);
-            let img = image_container.children[n];
+            let img = canvas_content.user_image_data[n];
             // If you delete the primary image, move the secondary focal point to the primary
             if (n == 0) {
               // Transfer focal point information over
@@ -1619,8 +1609,14 @@
               // Transfer scale over
               canvas_content.portal_image_scale[0] =
                 canvas_content.portal_image_scale[1];
+              // Transfer secondary image to primary
+              canvas_content.user_image_data[0] =
+                canvas_content.user_image_data[1];
             }
-            image_container.removeChild(img);
+            // Remove the image
+            canvas_content.user_image_data.splice(n, 1);
+            // Clear portal downscaled images
+            canvas_content.portal_downscaled_image = [null, null];
           }
 
           // Update Canvas
@@ -1858,32 +1854,28 @@
         // Image
         if (current_panel_open == "Image") {
           if (button_label.includes("Convert to primary")) {
-            let userImageContainer = document.getElementById(
-              "user-image-container"
-            );
-            if (userImageContainer) {
-              if (userImageContainer.children.length > 1) {
-                // Move primary image below secondary
-                let primary_image = userImageContainer.children[0];
-                userImageContainer.removeChild(primary_image);
-                userImageContainer.appendChild(primary_image);
+            if (canvas_content.user_image_data.length == 2) {
+              // Move primary image below secondary
+              let primary_image = canvas_content.user_image_data[0]; // Current position
+              let secondary_image = canvas_content.user_image_data[1];
+              // Flip order
+              canvas_content.user_image_data[0] = secondary_image; // New position
+              canvas_content.user_image_data[1] = primary_image;
 
-                // Transfer attributes
-                let primary_focal_point = canvas_content.portal_focal_point[0];
-                let secondary_focal_point =
-                  canvas_content.portal_focal_point[1];
+              // Transfer attributes
+              let primary_focal_point = canvas_content.portal_focal_point[0];
+              let secondary_focal_point = canvas_content.portal_focal_point[1];
 
-                let primary_mirror = canvas_content.portal_image_flip[0];
-                let secondary_mirror = canvas_content.portal_image_flip[1];
+              let primary_mirror = canvas_content.portal_image_flip[0];
+              let secondary_mirror = canvas_content.portal_image_flip[1];
 
-                canvas_content.portal_focal_point[0] = secondary_focal_point;
-                canvas_content.portal_focal_point[1] = primary_focal_point;
-                canvas_content.portal_image_flip[0] = secondary_mirror;
-                canvas_content.portal_image_flip[1] = primary_mirror;
+              canvas_content.portal_focal_point[0] = secondary_focal_point;
+              canvas_content.portal_focal_point[1] = primary_focal_point;
+              canvas_content.portal_image_flip[0] = secondary_mirror;
+              canvas_content.portal_image_flip[1] = primary_mirror;
 
-                // Update panel
-                update_toolbox_panel("image_button");
-              }
+              // Update panel
+              update_toolbox_panel("image_button");
             }
           }
         }
@@ -2144,61 +2136,51 @@
           }
 
           // Size and position
-          let userImageContainer = document.getElementById(
-            "user-image-container"
-          );
+          if (canvas_content.user_image_data.length > 0) {
+            // Position
+            add_label_to_inside_tools_container("Portal Position");
 
-          if (userImageContainer) {
-            if (userImageContainer.children.length > 0) {
-              // Position
-              add_label_to_inside_tools_container("Portal Position");
+            let select_position = create_dropdown_menu(
+              ["top", "right", "bottom", "left"],
+              "portal_side",
+              canvas_content.portal_side
+            );
 
-              let select_position = create_dropdown_menu(
-                ["top", "right", "bottom", "left"],
-                "portal_side",
-                canvas_content.portal_side
-              );
+            // Size
+            add_label_to_inside_tools_container("Portal Size");
 
-              // Size
-              add_label_to_inside_tools_container("Portal Size");
+            let select_size = create_dropdown_menu(
+              ["100%", "150%", "60%", "50%", "30%", "0%"],
+              "portal_size",
+              canvas_content.portal_size_percent + "%"
+            );
 
-              let select_size = create_dropdown_menu(
-                ["100%", "150%", "60%", "50%", "30%", "0%"],
-                "portal_size",
-                canvas_content.portal_size_percent + "%"
-              );
-
-              change_dropdown_menu_text(
-                select_size,
-                "150%",
-                "100% Portal 50% Text"
-              );
-              change_dropdown_menu_text(
-                select_size,
-                "100%",
-                "100% Portal 100% Text"
-              );
-              change_dropdown_menu_text(
-                select_size,
-                "60%",
-                "60% Portal 30% Text"
-              );
-              change_dropdown_menu_text(
-                select_size,
-                "50%",
-                "50% Portal 50% Text"
-              );
-              change_dropdown_menu_text(
-                select_size,
-                "30%",
-                "30% Portal 60% Text"
-              );
-              change_dropdown_menu_text(
-                select_size,
-                "0%",
-                "No Portal 100% Text"
-              );
-            }
+            change_dropdown_menu_text(
+              select_size,
+              "150%",
+              "100% Portal 50% Text"
+            );
+            change_dropdown_menu_text(
+              select_size,
+              "100%",
+              "100% Portal 100% Text"
+            );
+            change_dropdown_menu_text(
+              select_size,
+              "60%",
+              "60% Portal 30% Text"
+            );
+            change_dropdown_menu_text(
+              select_size,
+              "50%",
+              "50% Portal 50% Text"
+            );
+            change_dropdown_menu_text(
+              select_size,
+              "30%",
+              "30% Portal 60% Text"
+            );
+            change_dropdown_menu_text(select_size, "0%", "No Portal 100% Text");
           }
 
           /*
@@ -2333,9 +2315,6 @@
           }
 
           // Add Focal Point controls
-          let user_image_container = document.getElementById(
-            "user-image-container"
-          );
           if (canvas_content.portal_count > 0) {
             for (var i = 0; i < canvas_content.portal_count; i++) {
               let img = get_image(i);
@@ -2585,10 +2564,7 @@
           image_number = 0;
         }
 
-        const userImageContainer = document.getElementById(
-          "user-image-container"
-        );
-        if (!userImageContainer) {
+        if (canvas_content.user_image_data.length == 0) {
           return null;
         }
 
@@ -2596,7 +2572,7 @@
         let img = null;
 
         // Looks for the image ID
-        img = userImageContainer.children[image_number];
+        img = canvas_content.user_image_data[image_number];
 
         return img;
       }
@@ -2684,7 +2660,7 @@
             } else {
               console.log("Expensive downscale of the high res image");
               // Expensive high resolution downscale
-              downscaled_image = down_scale_image(
+              downscaled_image = high_resolution_image_downscale(
                 transformed_image,
                 1 / scaleFactor,
                 image_number
@@ -2901,6 +2877,7 @@
         // Load as an image
         let image = new Image();
         image.onload = () => {
+          // Draw logo
           ctx.drawImage(image, position.x, position.y, logo_width, logo_height);
         };
         image.src = blobURL;
@@ -3015,15 +2992,9 @@
         // Update color scheme
         render_background(canvas_content.background_color);
 
-        // Add image
-        let userImageContainer = document.getElementById(
-          "user-image-container"
-        );
-
+        // Portals
         canvas_content.portal_margins = false;
-        canvas_content.portal_count = userImageContainer
-          ? userImageContainer.children.length
-          : 0;
+        canvas_content.portal_count = canvas_content.user_image_data.length;
 
         // Create ONE Portal image on the canvas
         if (
@@ -4309,15 +4280,26 @@
       //---------------- IMAGE DOWNSCALING -----------------//
       // scales the image by (float) scale < 1
       // returns a canvas containing the scaled image.
-      function down_scale_image(img, scale, img_number) {
-        var imgCV = document.createElement("canvas");
-        imgCV.width = img.width;
-        imgCV.height = img.height;
-        var imgCtx = imgCV.getContext("2d");
-        imgCtx.drawImage(img, 0, 0);
+      function high_resolution_image_downscale(img, scale, img_number) {
+        var image_canvas = document.createElement("canvas");
+        // Offsets added to prevent images from having pixels cut off
+        image_canvas.width = img.width;
+        image_canvas.height = img.height;
+
+        // Set background color
+        var image_canvas_context = image_canvas.getContext("2d");
+        image_canvas_context.fillStyle = canvas_content.background_color;
+        image_canvas_context.fillRect(
+          0,
+          0,
+          image_canvas.width,
+          image_canvas.height
+        );
+
+        image_canvas_context.drawImage(img, 0, 0);
         // Store downscaled image
         canvas_content.portal_downscaled_image[img_number] = reduce_canvas_size(
-          imgCV,
+          image_canvas,
           scale
         );
         return canvas_content.portal_downscaled_image[img_number];
@@ -4384,6 +4366,16 @@
             sG = sBuffer[sIndex + 1];
             sB = sBuffer[sIndex + 2];
 
+            // Handling alpha
+
+            sA = sBuffer[sIndex + 3];
+            if (!sA) continue;
+            if (sA != 0xff) {
+              sR = (sR * sA) >> 8; // or use /256 instead ??
+              sG = (sG * sA) >> 8;
+              sB = (sB * sA) >> 8;
+            }
+
             /* !! untested : handling alpha !!
                        sA = sBuffer[sIndex + 3];
                        if (!sA) continue;
@@ -4393,6 +4385,7 @@
                            sB = (sB * sA) >> 8;
                        }
                     */
+
             if (!crossX && !crossY) {
               // pixel does not cross
               // just add components weighted by squared scale.

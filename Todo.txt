@@ -3,24 +3,8 @@ Need to be able to set the minimum width to the minimum width of the word in the
 
 --- Add saving and use it to optimize
 
-
-
 When canvas_content.button_style == "none" — There should be a icon you can set to make it look clickable. Ie like caret CTA > or a plus CTA +
 Button color set to red as an option?
-
-Downscale the LOGO with the same high res method used for the images
-  // Downscale image
-  let downscale_ratio = 1 / scaleFactor;
-  let downscaled_image = transformed_image;
-  // Only downscale if the image is larger than the canvas
-  if (downscale_ratio < 1) {
-    // High resolution downscale
-    downscaled_image = downScaleImage(
-      transformed_image,
-      1 / scaleFactor
-    );
-  }
-
 
 Dynamic character count should
 --- For the headline calculate how many characters can fit as the headline with no other copy
