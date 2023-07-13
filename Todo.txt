@@ -1,5 +1,6 @@
 Need to be able to set the minimum width to the minimum width of the word in the body, headline, and button (calculate_headline_minimum_container_width())
 
+
 When canvas_content.button_style == "none" — There should be a icon you can set to make it look clickable. Ie like caret CTA > or a plus CTA +
 Button color set to red as an option?
 
@@ -39,90 +40,37 @@ Auto capitalize, font size, can all be smaller buttons
 = Identify appropriate layouts for specific content cases; hide text boxes when they are not suitable.
 - Improve AI recognition of the logo's size and location, and understand its impact on the text.
 
+-------------------------------------- NOTES --------------------------------------
 
-//Input box modified
-function inputbox_modified(event) {
-let button_label = event.target.name;
-let string_value = event.target.value;
-
-if (button_label == "input_headline") {
-    canvas_content.headline = string_value;
-    calculate_headline_minimum_container_width();
-}
-
-if (button_label == "input_body") {
-    canvas_content.body = string_value;
-    //calculate_headline_minimum_container_width();
-}
-
-if (button_label == "input_cta") {
-    canvas_content.cta = string_value;
-    //calculate_headline_minimum_container_width();
-}
+Minor fixes
+-- Prevent S&P Global being split with _ underscore, then merge back to S&P Global after
 
 
--------------------------------
-Automatic capitalization of divisions, products, countries
-Character limits
-Force best practices through the interface
-Image library integration through he media portal
-Keep track of content created and how created it (Maybe in the future)
-
---- Seek & Prosper text highlighting
---- CI Events content with the Event Names
---- Podcasts
---- Speaker
-
-
--------------------------------
-Can prevent S&P Global being split with _ underscore S&P_Global then removing it in the final rendering of the text
-
-
-Internal feed, 
---------- 
-
-Downscaling image code
-https://stackoverflow.com/questions/18922880/html5-canvas-resize-downscale-image-high-quality#:~:text=To%20downsample%20an%20image%2C%20we,its%20value%20for%20the%20destination.
-
-
-
--------------------------
---------- Can fill the text boxes with crazy number of spaces
---------- FIT BY LARGEST LINE OF TEXT IS NOT THAT OBVIOUS, maybe make it a toggle. --- Auto-Font Resize
---------- AUTOMATED TEXT SIZE could be just fitting the text by one line
---------- CUSTOM TEXT SIZE COULD MAKE THE TEXT BALANCE VISIBLE AND FIT TO LONGEST LINE
-
+Objectives
 -- Logo
 ---- Need to create custom breakpoints for determining logo size like I did for the fonts
 
 -- Copy
 ---- HEADLINE Left DESCRIPTION Right (A design option that should exist)
----- Flag if the headline + copy is taking up almost no space. Aka the font is TINY for no reason.
----- Description + CTA + Button
----- Character count limits — Red warnings when over and cut off points super over.
----- Don't allow rescaling if it will make the text tiny in proportion to the available space
----------- HEADLINES should be 60-80 characters. Cap at 120?
----- Bottom aligned text, if the last line has no descenders then it is offset.
----- Font size on giant sizes like 1800x300 are still weird
+---- Character count limits — Red warnings when text overlaps / collides with logo
 
 -- Layouts
----- When the canvas is super wide, move the text to the right of the logo
----- If there is enough room like 1800x300 then the font size will need some work
+---- Text & Logo & Button placement
 
-
--- Saving
-----
----- 
+Scope creep
+-- Automatic capitalization of divisions, products, countries
+-- Force best practices through the interface
+-- Image library integration through he media portal
+-- Keep track of content created and how created it (Maybe in the future)
 
 -- Styles
 ---- Seek & Prosper
+-------- Seek & Prosper text highlighting
 ---- CI Event -- ADD EVENT NAME
 ---- Podcast
-
 -- Speakers*
-
-
-Scope creep
 -- Hide portal should be a separate toggle switch?
--- Make canvas size setting ONE line with two Input Boxes
--- I need to able to hide settings WHILE explaining why they are hidden
+--- CI Events content with the Event Names
+
+Downscaling image code
+https://stackoverflow.com/questions/18922880/html5-canvas-resize-downscale-image-high-quality#:~:text=To%20downsample%20an%20image%2C%20we,its%20value%20for%20the%20destination.
