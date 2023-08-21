@@ -1009,6 +1009,7 @@
 
       // Buton
       canvas_content.button_style = "solid";
+      canvas_content.button_bottom_right = false;
 
       // Downscaled images
       temp_portal_downscaled_image = [null, null];
@@ -2032,6 +2033,10 @@
           if (button_label.includes("Set font size: Small")) {
             canvas_content.font_size.small = !canvas_content.font_size.small;
           }
+          if (button_label.includes("Button bottom right")) {
+            canvas_content.button_bottom_right =
+              !canvas_content.button_bottom_right;
+          }
         }
 
         if (current_panel_open == "Layout") {
@@ -2258,6 +2263,12 @@
             ["solid", "outline", "none"],
             "button_style",
             canvas_content.button_style
+          );
+
+          // Set font size
+          let toggle_button_location = add_toggle_switch_with_label(
+            "Button bottom right",
+            canvas_content.button_bottom_right
           );
 
           // Update labels
@@ -3320,9 +3331,17 @@
         let button_padding = calculate_button_padding(canvas.height);
         let button_font_size = typescale[headline_fixed_font_size].cta;
         let button_area_size = 0;
+        let button_height = button_padding * 2 + button_font_size;
+
+        fontFamily = "Akkurat LL";
+
+        // Measure text width
+        ctx.font = "bold " + button_font_size + "px Akkurat LL";
+        let button_width =
+          button_padding * 2 + ctx.measureText(canvas_content.cta).width;
+
         if (canvas_content.cta.length > 0) {
-          button_area_size =
-            button_padding * 2 + button_font_size + headline_margin_bottom;
+          button_area_size = button_height + headline_margin_bottom;
         }
 
         // Body
@@ -3352,9 +3371,14 @@
 
         // Button
         let button_position_y = body_position_y; // Default to below the headline
+        let button_position_x = position.x;
         if (canvas_content.body.length > 0) {
           button_position_y =
             body_position_y + body_properties.height + headline_margin_bottom;
+        }
+        if (canvas_content.button_bottom_right) {
+          button_position_y = canvas_content.marginBottom - button_height;
+          button_position_x = canvas_content.marginRight - button_width;
         }
 
         let button;
@@ -3365,7 +3389,7 @@
             "bold",
             canvas_content.button_style,
             button_padding,
-            position.x,
+            button_position_x,
             button_position_y
           );
         }
@@ -3652,6 +3676,15 @@
         }
 
         return mergedWords;
+      }
+
+      // Replace footnotes and quotations
+      function replace_footnotes_and_quotations(string) {
+        // Replace single quotes with single quotation marks
+        var modifiedString = string.replace(/'/g, "\u2019");
+        // Replace double footnotes with left and right quotations
+        modifiedString = modifiedString.replace(/"([^"]+)"/g, "“$1”");
+        return modifiedString;
       }
 
       // Draw CTA Button
@@ -4140,6 +4173,7 @@
         // Text processing
         // Clean up input text -- Remove multiple new lines and replace return lines with new lines
         text = remove_duplicate_new_lines(text);
+        text = replace_footnotes_and_quotations(text); // Fix footnotes and quotations
 
         // Fit text in the available text space
         let fit_textInArea = fit_text(
