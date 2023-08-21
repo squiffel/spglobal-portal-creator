@@ -1,5 +1,17 @@
 Need to be able to set the minimum width to the minimum width of the word in the body, headline, and button (calculate_headline_minimum_container_width())
 
+WORKING on
+Button bottom right
+render_text
+// Button
+        let button_position_y = body_position_y; // Default to below the headline
+        if (canvas_content.body.length > 0) {
+          button_position_y =
+            body_position_y + body_properties.height + headline_margin_bottom;
+        }
+canvas_content.button_bottom_right;
+
+
 
 When canvas_content.button_style == "none" — There should be a icon you can set to make it look clickable. Ie like caret CTA > or a plus CTA +
 Button color set to red as an option?
@@ -13,7 +25,7 @@ Dynamic character count should
 ------ Can it fit below the text without exceeding the height of the textbox safe space
 ------ Can it fit in the bottom right hand corner
 
-70% Size should be — Canvas is square or landscape. Width is greater than 1080
+70% text container width -- should be — Canvas is square or landscape. Width is greater than 1080
 Do not think we should always downgrade the size of the button copy when the headline is shrunk
 
 CTAs need character limits
