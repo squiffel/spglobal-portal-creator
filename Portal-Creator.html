@@ -2570,6 +2570,14 @@
         insideToolsContainer.appendChild(textBalance);
       }
 
+      // Update button position
+      function update_text_and_button_position() {
+        if (canvas_content.logo.corner.includes("top")) {
+          canvas_content.text_bottom_aligned = true;
+          canvas_content.button_bottom_right = false;
+        }
+      }
+
       // Dropdown menus
       function user_modified_selection_dropdown(event) {
         let selected_value = event.target.value;
@@ -2587,10 +2595,7 @@
             canvas_content.logo.corner = position_name;
             canvas_content.text_bottom_aligned = false;
             // Default is to snap the text to the bottom of the canvas
-            if (position_name.includes("top")) {
-              canvas_content.text_bottom_aligned = true;
-              canvas_content.button_bottom_right = false;
-            }
+            update_text_and_button_position();
             update_toolbox_panel("layout_button");
           }
 
@@ -3218,6 +3223,9 @@
       }
 
       function render_text() {
+        // Update button position
+        update_text_and_button_position();
+
         // Text available space and position
         let position = {
           x: canvas_content.marginLeft,
