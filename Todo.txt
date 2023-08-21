@@ -1,6 +1,21 @@
 Need to be able to set the minimum width to the minimum width of the word in the body, headline, and button (calculate_headline_minimum_container_width())
 
 TO DO NEXT
+Text to the RIGHT of the logo for ultra wide formats
+-- Text is vertically centered
+-- Button is bottom right side
+
+canvas_content.logo_offset_text = false;
+
+how
+Add toggle button for centered text.  --- LATER Only on horizontal canvases
+Calculate the size of the logo
+Calculate the size of the button -- THIS IS A CHALLENGE. I have to calculate the button size after calculating the headline size
+
+
+Calculate the height of the canvas minus the margins
+
+Calculate the vertical center of the headline + description or just headline
 
 
 ------------------------------------------
@@ -54,19 +69,22 @@ Objectives
 ---- Need to create custom breakpoints for determining logo size like I did for the fonts
 
 -- Copy
----- HEADLINE Left DESCRIPTION Right (A design option that should exist)
 ---- Character count limits — Red warnings when text overlaps / collides with logo
 
 -- Layouts
 ---- Text & Logo & Button placement
 
-Scope creep
--- Automatic capitalization of divisions, products, countries
--- Force best practices through the interface
--- Image library integration through he media portal
--- Keep track of content created and who created it (Maybe in the future)
 
--- Styles
+
+
+Downscaling image code
+https://stackoverflow.com/questions/18922880/html5-canvas-resize-downscale-image-high-quality#:~:text=To%20downsample%20an%20image%2C%20we,its%20value%20for%20the%20destination.
+
+STRETCH GOALS
+
+-- Prevent S&P Global being split with _ underscore, then merge back to S&P Global after
+-- HEADLINE Left DESCRIPTION Right (A design option that should exist) -- Super rare occurence so can be ignored for now
+Styles
 ---- Seek & Prosper
 -------- Seek & Prosper text highlighting
 ---- CI Event -- ADD EVENT NAME
@@ -75,9 +93,8 @@ Scope creep
 -- Hide portal should be a separate toggle switch?
 --- CI Events content with the Event Names
 
-Downscaling image code
-https://stackoverflow.com/questions/18922880/html5-canvas-resize-downscale-image-high-quality#:~:text=To%20downsample%20an%20image%2C%20we,its%20value%20for%20the%20destination.
-
-STRETCH GOALS
-Minor fixes
--- Prevent S&P Global being split with _ underscore, then merge back to S&P Global after
+Scope creep
+-- Automatic capitalization of divisions, products, countries
+-- Force best practices through the interface
+-- Image library integration through he media portal
+-- Keep track of content created and who created it (Maybe in the future)
