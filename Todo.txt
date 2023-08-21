@@ -1,9 +1,17 @@
 Need to be able to set the minimum width to the minimum width of the word in the body, headline, and button (calculate_headline_minimum_container_width())
 
-GLITCH
-Fix issue with top aligned logo causing description text to start above the headline.
+TO DO NEXT
+When LOGO POSITION is TOP LEFT
+Text should always be bottom aligned
+canvas_content.text_bottom_aligned = true
+
+When text is bottom aligned
+buttons should be left aligned
+canvas_content.button_bottom_right = false
 
 
+
+------------------------------------------
 
 
 When canvas_content.button_style == "none" — There should be a icon you can set to make it look clickable. Ie like caret CTA > or a plus CTA +
