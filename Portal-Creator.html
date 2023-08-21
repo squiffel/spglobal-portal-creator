@@ -1011,6 +1011,9 @@
       canvas_content.button_style = "solid";
       canvas_content.button_bottom_right = false;
 
+      // Text
+      canvas_content.logo_offset_text = false;
+
       // Downscaled images
       temp_portal_downscaled_image = [null, null];
       temp_portal_image = [];
@@ -2033,6 +2036,11 @@
           if (button_label.includes("Set font size: Small")) {
             canvas_content.font_size.small = !canvas_content.font_size.small;
           }
+
+          if (button_label.includes("Set text centered")) {
+            canvas_content.logo_offset_text = !canvas_content.logo_offset_text;
+          }
+
           if (button_label.includes("Button bottom right")) {
             canvas_content.button_bottom_right =
               !canvas_content.button_bottom_right;
@@ -2221,6 +2229,12 @@
           let toggle_font_size = add_toggle_switch_with_label(
             "Set font size: Small",
             canvas_content.font_size.small
+          );
+
+          // Set centered text
+          let toggle_text_offset = add_toggle_switch_with_label(
+            "Set text centered",
+            canvas_content.logo_offset_text
           );
 
           let headline_label = add_label_to_inside_tools_container("Headline");
@@ -2571,7 +2585,7 @@
       }
 
       // Update button position
-      function update_text_and_button_position() {
+      function if_logo_is_top_left_update_text_and_button_position() {
         if (canvas_content.logo.corner.includes("top")) {
           canvas_content.text_bottom_aligned = true;
           canvas_content.button_bottom_right = false;
@@ -2595,7 +2609,7 @@
             canvas_content.logo.corner = position_name;
             canvas_content.text_bottom_aligned = false;
             // Default is to snap the text to the bottom of the canvas
-            update_text_and_button_position();
+            if_logo_is_top_left_update_text_and_button_position();
             update_toolbox_panel("layout_button");
           }
 
@@ -3223,8 +3237,13 @@
       }
 
       function render_text() {
-        // Update button position
-        update_text_and_button_position();
+        // Text and button alignment have to follow strict rules
+        if_logo_is_top_left_update_text_and_button_position();
+
+        function estimate_button_text_size(button_font_size) {
+          ctx.font = "bold " + button_font_size + "px Akkurat LL"; // Measure button inner text width
+          return ctx.measureText(canvas_content.cta).width;
+        }
 
         // Text available space and position
         let position = {
@@ -3244,16 +3263,6 @@
             canvas_content.logo.height -
             logo_padding,
         };
-
-        // Limit portal size
-        if (canvas_content.portal_size_percent == 150) {
-          if (canvas_content.shortestSide == "height") {
-            text_area.width = text_area.width * 0.5;
-          }
-          if (canvas_content.shortestSide == "width") {
-            text_area.height = text_area.height * 0.5;
-          }
-        }
 
         // Dynamic font size
         let estimate_headline_size = estimate_typescale(
@@ -3278,6 +3287,51 @@
           canvas_content.headline,
           canvas_content.ignore_line_breaks.headline
         );
+
+        // Content showing
+        let show_body = canvas_content.body.length > 0;
+        let show_button = canvas_content.cta.length > 0;
+
+        // Move text if its offset
+        if (canvas_content.logo_offset_text) {
+          // Logo + Padding
+          let logo_and_margin = canvas_content.logo.width + logo_padding;
+
+          // Shift text over
+          position.x = canvas_content.marginLeft + logo_and_margin;
+
+          // If button is bottom right
+          let estimate_button_width = 0;
+          if (canvas_content.button_bottom_right) {
+            let estimate_button_padding = calculate_button_padding(
+              canvas.height
+            );
+            let estimate_button_font_size =
+              typescale[round_to_nearest_typescale(estimate_headline_size)].cta;
+            // Calculated guess
+            estimate_button_width = show_button
+              ? estimate_button_padding * 2 +
+                estimate_button_text_size(estimate_button_font_size) +
+                logo_padding
+              : 0;
+          }
+
+          // Remove text space
+          text_area.width =
+            canvas_content.marginWidth -
+            logo_and_margin -
+            estimate_button_width;
+        }
+
+        // Limit portal size
+        if (canvas_content.portal_size_percent == 150) {
+          if (canvas_content.shortestSide == "height") {
+            text_area.width = text_area.width * 0.5;
+          }
+          if (canvas_content.shortestSide == "width") {
+            text_area.height = text_area.height * 0.5;
+          }
+        }
 
         let headline_properties = add_text_to_canvas(
           headline_unformatted,
@@ -3317,7 +3371,7 @@
         let button_height = button_padding * 2 + button_font_size;
         ctx.font = "bold " + button_font_size + "px Akkurat LL"; // Measure button inner text width
         let button_width =
-          button_padding * 2 + ctx.measureText(canvas_content.cta).width;
+          button_padding * 2 + estimate_button_text_size(button_font_size);
 
         if (canvas_content.cta.length > 0) {
           button_area_size = button_height + headline_margin_bottom;
@@ -3348,10 +3402,6 @@
           400, // Regular
           logo_is_top_left
         );
-
-        // Content showing
-        let show_body = canvas_content.body.length > 0;
-        let show_button = canvas_content.cta.length > 0;
 
         // Button -- Default calculations for position
         let button_position_y = body_position_y; // Default to below the headline
