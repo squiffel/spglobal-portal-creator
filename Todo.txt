@@ -1,14 +1,6 @@
 Need to be able to set the minimum width to the minimum width of the word in the body, headline, and button (calculate_headline_minimum_container_width())
 
 TO DO NEXT
-When LOGO POSITION is TOP LEFT
-Text should always be bottom aligned
-canvas_content.text_bottom_aligned = true
-
-When text is bottom aligned
-buttons should be left aligned
-canvas_content.button_bottom_right = false
-
 
 
 ------------------------------------------

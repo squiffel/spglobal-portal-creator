@@ -2043,10 +2043,6 @@
           if (button_label.includes("Show Grid")) {
             canvas_content.show_guides = toggleValue;
           }
-
-          if (button_label.includes("Text bottom aligned")) {
-            canvas_content.text_bottom_aligned = toggleValue;
-          }
         }
 
         if (current_panel_open == "Image") {
@@ -2265,11 +2261,13 @@
             canvas_content.button_style
           );
 
-          // Set font size
-          let toggle_button_location = add_toggle_switch_with_label(
-            "Button bottom right",
-            canvas_content.button_bottom_right
-          );
+          // Set button position (Only visible if the text is top aligned)
+          if (canvas_content.text_bottom_aligned == false) {
+            let toggle_button_location = add_toggle_switch_with_label(
+              "Button bottom right",
+              canvas_content.button_bottom_right
+            );
+          }
 
           // Update labels
           update_font_size_label();
@@ -2289,14 +2287,6 @@
             "logo_position",
             canvas_content.logo.corner.toLowerCase().replace(/_/g, " ")
           );
-
-          // Text bottom aligned
-          if (canvas_content.logo.corner.includes("top")) {
-            add_toggle_switch_with_label(
-              "Text bottom aligned",
-              canvas_content.text_bottom_aligned
-            );
-          }
 
           // Size and position
           if (temp_portal_image.length > 0) {
@@ -2599,6 +2589,7 @@
             // Default is to snap the text to the bottom of the canvas
             if (position_name.includes("top")) {
               canvas_content.text_bottom_aligned = true;
+              canvas_content.button_bottom_right = false;
             }
             update_toolbox_panel("layout_button");
           }
