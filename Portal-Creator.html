@@ -4698,6 +4698,49 @@
           progressBar,
         };
       }
+
+      /* Check if running chrome */
+      function isChromeBrowser() {
+        const isChrome =
+          /Chrome/.test(navigator.userAgent) &&
+          /Google Inc/.test(navigator.vendor);
+        return isChrome;
+      }
+
+      if (!isChromeBrowser()) {
+        const messageContainer = document.createElement("div");
+        messageContainer.style.fontFamily = "sans-serif";
+        messageContainer.style.display = "flex";
+        messageContainer.style.justifyContent = "center";
+        messageContainer.style.alignItems = "center";
+        messageContainer.style.height = "100vh";
+        messageContainer.style.margin = "0";
+
+        const message = document.createElement("div");
+        message.style.textAlign = "center";
+
+        const messageText = document.createElement("p");
+        messageText.textContent =
+          "Sorry! This application will only work in the Chrome browser. Please download and use the latest version.";
+        message.appendChild(messageText);
+
+        const downloadButton = document.createElement("a");
+        downloadButton.href = "https://www.google.com/chrome/";
+        downloadButton.textContent = "Download Chrome";
+        downloadButton.style.display = "inline-block";
+        downloadButton.style.marginTop = "20px";
+        downloadButton.style.padding = "10px 20px";
+        downloadButton.style.backgroundColor = "#4390df";
+        downloadButton.style.color = "white";
+        downloadButton.style.textDecoration = "none";
+        downloadButton.style.border = "none";
+        downloadButton.style.borderRadius = "5px";
+
+        message.appendChild(downloadButton);
+        messageContainer.appendChild(message);
+        document.body.innerHTML = "";
+        document.body.appendChild(messageContainer);
+      }
     </script>
 
     <!-- Baked SVGs -->

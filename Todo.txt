@@ -1,15 +1,8 @@
 Need to be able to set the minimum width to the minimum width of the word in the body, headline, and button (calculate_headline_minimum_container_width())
 
-WORKING on
-Button bottom right
-render_text
-// Button
-        let button_position_y = body_position_y; // Default to below the headline
-        if (canvas_content.body.length > 0) {
-          button_position_y =
-            body_position_y + body_properties.height + headline_margin_bottom;
-        }
-canvas_content.button_bottom_right;
+GLITCH
+Fix issue with top aligned logo causing description text to start above the headline.
+
 
 
 
@@ -37,7 +30,6 @@ Toggle button visiibility
 Toggle description visibility
 CTAs could be dropdowns
 Need to calculate the available SPACE to the right of the LOGO — Check if its an option for the CTA
-Fix issue with top aligned logo causing description text to start above the headline.
 Add an additional MARGIN to the right of the text box when there is an image on the right and space allows for it, so that the description or headline don't get uncomfortablity closePath
 Add auto-balance text to the body copy?
 
@@ -54,8 +46,7 @@ Auto capitalize, font size, can all be smaller buttons
 
 -------------------------------------- NOTES --------------------------------------
 
-Minor fixes
--- Prevent S&P Global being split with _ underscore, then merge back to S&P Global after
+
 
 
 Objectives
@@ -73,7 +64,7 @@ Scope creep
 -- Automatic capitalization of divisions, products, countries
 -- Force best practices through the interface
 -- Image library integration through he media portal
--- Keep track of content created and how created it (Maybe in the future)
+-- Keep track of content created and who created it (Maybe in the future)
 
 -- Styles
 ---- Seek & Prosper
@@ -86,3 +77,7 @@ Scope creep
 
 Downscaling image code
 https://stackoverflow.com/questions/18922880/html5-canvas-resize-downscale-image-high-quality#:~:text=To%20downsample%20an%20image%2C%20we,its%20value%20for%20the%20destination.
+
+STRETCH GOALS
+Minor fixes
+-- Prevent S&P Global being split with _ underscore, then merge back to S&P Global after
