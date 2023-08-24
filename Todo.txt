@@ -17,6 +17,11 @@ Calculate the height of the canvas minus the margins
 
 Calculate the vertical center of the headline + description or just headline
 
+Now need to center the text below the button text section
+
+render_text()
+canvas_content.vertically_centered_text
+
 
 ------------------------------------------
 
