@@ -642,11 +642,10 @@
     </div>
     <div class="right-panel">
       <div class="container">
-        <label class="toolbox_expanded_label" for="widthInput">Width:</label>
-        <input type="number" id="widthInput" value="1200" />
-        <label class="toolbox_expanded_label" for="heightInput">Height:</label>
-        <input type="number" id="heightInput" value="628" />
-        <button onclick="create_canvas()">Create</button>
+        <!-- Change to a login -->
+        <label class="toolbox_expanded_label" for="heightInput">Password</label>
+        <input type="password" id="passwordInput" value="The199" />
+        <button onclick="create_canvas()">Login</button>
       </div>
     </div>
 
@@ -977,6 +976,7 @@
         blue: "#C7DAE0",
       };
 
+      var password = "";
       // Image loading animation
       let image_stop_loading_animation;
 
@@ -1231,8 +1231,35 @@
         }
       }
 
+      // Caesar cipher function to encrypt and decrypt
+      function check_login(input) {
+        const key =
+          "3Zg1zdsb06DSrwtmILiFBQuPykfEROjcYAnT294KCpXvWelhGUJ5HVM8aq7oxN";
+        return input
+          .split("")
+          .map((array) => {
+            const cypher = key.indexOf(array);
+            if (cypher === -1) return array;
+            const check = (cypher + input.length) % key.length;
+            return key.charAt(check);
+          })
+          .join("");
+      }
+
       // Functions
       function create_canvas() {
+        // Load password
+        var password_check = document.getElementById("passwordInput");
+        if (password_check) {
+          password = password_check.value;
+        }
+
+        // Check password
+        if (check_login(password) != "pV56vv") {
+          alert("Please check your password and try again");
+          return;
+        }
+
         var user_set_canvas_size = document.getElementById("widthInput");
         let width, height;
         let uploaded_data = false;
@@ -2148,7 +2175,7 @@
       function pressed_toolbox_button(buttonName) {
         // Buttons do not work if there is no canvas
         if (canvas == undefined) {
-          alert("Create a Canvas first");
+          alert("Please login to start");
           return;
         }
 

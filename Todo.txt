@@ -1,6 +1,19 @@
+
 Need to be able to set the minimum width to the minimum width of the word in the body, headline, and button (calculate_headline_minimum_container_width())
 
 TO DO NEXT
+-- Solve for ONLY SOCIAL MEDIA sizes. Limit all other sizes
+-- Solve for single sign on
+-- See if we can use Github
+-- Solve character limits
+-- Set layout defaults, rather than providing full customization, have fixed layouts they can pick
+-- Tooltips on hover (As a tutorial) on the main menu. Identify what the button does
+
+
+Notes:
+Password protected — Check
+
+
 Text to the RIGHT of the logo for ultra wide formats
 -- Text is vertically centered
 -- Button is bottom right side
