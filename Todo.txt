@@ -2,16 +2,29 @@
 Need to be able to set the minimum width to the minimum width of the word in the body, headline, and button (calculate_headline_minimum_container_width())
 
 TO DO NEXT
--- Solve for ONLY SOCIAL MEDIA sizes. Limit all other sizes
+-- Tooltips on hover (As a tutorial) on the main menu. Identify what the button does
+-- Solve character limits
+----- Toggle on and off description visibility
+----- Toggle on and off button visiibility
+----- Bottom right button should not effect text size. With a vertical stacked image on a Social media landscape canvas, portal size 50%, it currently shrinks the description to fit
+
+-- Check if AUTO-CAPILTALIZE cleans up all copy or just the headline
+---- TURN OFF HORIZONTAL 50-50 layouts on verticals
+
+-- Toggle between font sizes using ICONS
+-- Would like the background color selector be a THEME selector to be cards that show the background color and font color
+
+-- TURN OFF GRID viewBox
+-- TURN OFF "GENERATE RANDOM COPY"
+
 -- Solve for single sign on
 -- See if we can use Github
--- Solve character limits
--- Set layout defaults, rather than providing full customization, have fixed layouts they can pick
--- Tooltips on hover (As a tutorial) on the main menu. Identify what the button does
+-- Spellcheck -- https://github.com/brandonaaron/jquery-spellcheck/blob/master/test.html
 
 
 Notes:
 Password protected — Check "The199"
+-- Solve for ONLY SOCIAL MEDIA sizes. Limit all other sizes
 
 
 Text to the RIGHT of the logo for ultra wide formats

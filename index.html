@@ -1023,6 +1023,8 @@
       canvas_content.portal_color_overlay = false;
       canvas_content.portal_image_flip = [false, false];
       canvas_content.portal_size_percent = 50;
+      canvas_content.portal_size_values = [0, 30, 50, 70, 100];
+      canvas_content.portal_size_slider = 2;
       canvas_content.portal_upload_image_number = 0;
       canvas_content.portal_override_margins = false;
       canvas_content.portal_primary_image_side = true;
@@ -1574,7 +1576,7 @@
           return;
         }
 
-        add_label_to_inside_tools_container("Add Portal");
+        add_label_to_inside_tools_container("Add Image");
 
         const dragDropArea = document.createElement("div");
         dragDropArea.classList.add("drag-drop-area");
@@ -2071,6 +2073,15 @@
           if (button_label.includes("Show Grid")) {
             canvas_content.show_guides = toggleValue;
           }
+          if (button_label.includes("Full image color overlay")) {
+            canvas_content.portal_color_overlay =
+              !canvas_content.portal_color_overlay;
+          }
+          if (button_label.includes("Portal visible margins")) {
+            canvas_content.portal_override_margins =
+              !canvas_content.portal_override_margins;
+            update_toolbox_panel("layout_button");
+          }
         }
 
         if (current_panel_open == "Image") {
@@ -2080,14 +2091,7 @@
             canvas_content.portal_image_flip[n] =
               !canvas_content.portal_image_flip[n];
           }
-          if (button_label.includes("Full image color overlay")) {
-            canvas_content.portal_color_overlay =
-              !canvas_content.portal_color_overlay;
-          }
-          if (button_label.includes("Portal visible margins")) {
-            canvas_content.portal_override_margins =
-              !canvas_content.portal_override_margins;
-          }
+
           if (button_label.includes("Primary image side")) {
             canvas_content.portal_primary_image_side =
               !canvas_content.portal_primary_image_side;
@@ -2240,17 +2244,13 @@
           expand_left_panel();
           current_panel_open = "Text";
 
-          add_button_to_inside_tools_container(
-            "Generate random copy",
-            "random_headline"
-          );
-
           // Set font size
           let toggle_font_size = add_toggle_switch_with_label(
             "Set font size: Small",
             canvas_content.font_size.small
           );
 
+          /*
           // Set offset text
           let toggle_text_offset = add_toggle_switch_with_label(
             "Offset text",
@@ -2261,6 +2261,7 @@
             "Vertically centered text",
             canvas_content.vertically_centered_text
           );
+          */
 
           let headline_label = add_label_to_inside_tools_container("Headline");
           headline_label.id = "headline_label";
@@ -2308,6 +2309,11 @@
             );
           }
 
+          add_button_to_inside_tools_container(
+            "Generate random copy",
+            "random_headline"
+          );
+
           // Update labels
           update_font_size_label();
         }
@@ -2319,110 +2325,8 @@
           // Show Grid
           add_toggle_switch_with_label("Show Grid", canvas_content.show_guides);
 
-          // Update logo position
-          add_label_to_inside_tools_container("Logo Position");
-          create_dropdown_menu(
-            ["top left", "bottom left"], // "top right", "bottom right"
-            "logo_position",
-            canvas_content.logo.corner.toLowerCase().replace(/_/g, " ")
-          );
-
-          // Size and position
-          if (temp_portal_image.length > 0) {
-            // Position
-            add_label_to_inside_tools_container("Portal Position");
-
-            let select_position = create_dropdown_menu(
-              ["top", "right", "bottom", "left"],
-              "portal_side",
-              canvas_content.portal_side
-            );
-
-            // Size
-            add_label_to_inside_tools_container("Portal Size");
-
-            let select_size = create_dropdown_menu(
-              ["100%", "150%", "60%", "50%", "30%", "0%"],
-              "portal_size",
-              canvas_content.portal_size_percent + "%"
-            );
-
-            change_dropdown_menu_text(
-              select_size,
-              "150%",
-              "100% Portal 50% Text"
-            );
-            change_dropdown_menu_text(
-              select_size,
-              "100%",
-              "100% Portal 100% Text"
-            );
-            change_dropdown_menu_text(
-              select_size,
-              "60%",
-              "60% Portal 30% Text"
-            );
-            change_dropdown_menu_text(
-              select_size,
-              "50%",
-              "50% Portal 50% Text"
-            );
-            change_dropdown_menu_text(
-              select_size,
-              "30%",
-              "30% Portal 60% Text"
-            );
-            change_dropdown_menu_text(select_size, "0%", "No Portal 100% Text");
-          }
-
-          /*
-                  // Layout buttons
-                  add_label_to_inside_tools_container("Layout");
-                  add_square_buttons_to_inside_tools_container(
-                    "layout_buttons",
-                    "layout_4_split_assymetrical"
-                  );
-                  add_square_buttons_to_inside_tools_container(
-                    "layout_buttons",
-                    "layout_4_split_symetrical"
-                  );
-                  add_square_buttons_to_inside_tools_container(
-                    "layout_buttons",
-                    "layout_bottom_split_assymetrical"
-                  );
-                  add_square_buttons_to_inside_tools_container(
-                    "layout_buttons",
-                    "layout_bottom_split_symetrical"
-                  );
-                  add_square_buttons_to_inside_tools_container(
-                    "layout_buttons",
-                    "layout_side_split_assymetrical"
-                  );
-                  add_square_buttons_to_inside_tools_container(
-                    "layout_buttons",
-                    "layout_side_split_symetrical"
-                  );
-                  add_square_buttons_to_inside_tools_container(
-                    "layout_buttons",
-                    "layout_3_row"
-                  );
-                  add_square_buttons_to_inside_tools_container(
-                    "layout_buttons",
-                    "layout_3_col"
-                  );
-                  add_square_buttons_to_inside_tools_container(
-                    "layout_buttons",
-                    "layout_2_row"
-                  );
-                  add_square_buttons_to_inside_tools_container(
-                    "layout_buttons",
-                    "layout_2_col"
-                  );
-
-                  */
-
           // Templates
-          add_label_to_inside_tools_container("Canvas Size");
+          add_label_to_inside_tools_container("Template (Size)");
           let select_template = create_dropdown_menu(
             [
               "Select...",
@@ -2449,6 +2353,70 @@
             "canvas_size",
             "Select..."
           );
+
+          // Update logo position
+          add_label_to_inside_tools_container("Logo Position");
+          create_dropdown_menu(
+            ["top left", "bottom left"], // "top right", "bottom right"
+            "logo_position",
+            canvas_content.logo.corner.toLowerCase().replace(/_/g, " ")
+          );
+
+          // Size and position
+          if (temp_portal_image.length > 0) {
+            // Position
+            add_label_to_inside_tools_container("Portal Position");
+            let portal_position_options = ["top", "right", "bottom", "left"];
+            // Landscape mode
+            if (canvas_content.shortestSide == "height") {
+              portal_position_options = ["right", "left"];
+            }
+            // Portrait mode
+            if (canvas_content.shortestSide == "width") {
+              portal_position_options = ["top", "bottom"];
+            }
+            // Square mode
+            if (canvas.width == canvas.height) {
+              portal_position_options = ["top", "right", "bottom", "left"];
+            }
+
+            let select_position = create_dropdown_menu(
+              portal_position_options,
+              "portal_side",
+              canvas_content.portal_side
+            );
+
+            //canvas_content.portal_size_percent
+            let s = canvas_content.portal_count == 2 ? "s" : "";
+            let portal_slider_label_name = "Portal" + s + " size: ";
+            let portal_slider_label = add_label_to_inside_tools_container(
+              portal_slider_label_name +
+                canvas_content.portal_size_percent +
+                "%",
+              0
+            );
+            create_range_slider(
+              canvas_content.portal_size_values.length,
+              canvas_content.portal_size_slider,
+              "portal_size_slider"
+            );
+          }
+
+          // Show margins
+          if (canvas_content.portal_count == 1) {
+            // Margins
+            add_toggle_switch_with_label(
+              "Portal visible margins",
+              canvas_content.portal_override_margins
+            );
+            // Overlay
+            if (is_fullscreen_image()) {
+              add_toggle_switch_with_label(
+                "Full image color overlay",
+                canvas_content.portal_color_overlay
+              );
+            }
+          }
 
           /*
           // Update layout size
@@ -2488,21 +2456,6 @@
           // Portal upload
           add_file_upload_area();
 
-          // Show margins
-          if (canvas_content.portal_count == 1) {
-            // Margins
-            add_toggle_switch_with_label(
-              "Portal visible margins",
-              canvas_content.portal_override_margins
-            );
-            // Overlay
-            if (is_fullscreen_image()) {
-              add_toggle_switch_with_label(
-                "Full image color overlay",
-                canvas_content.portal_color_overlay
-              );
-            }
-          }
           if (canvas_content.portal_count == 2) {
             add_toggle_switch_with_label(
               "Primary image side",
@@ -2516,7 +2469,7 @@
               let img = get_image(i);
               if (img) {
                 let portal_label =
-                  i == 0 ? "Portal [PRIMARY]" : "Portal [Secondary]";
+                  i == 0 ? "Image [PRIMARY]" : "Image [Secondary]";
                 let label = add_label_to_inside_tools_container(portal_label);
                 label.classList.add("portal_label");
                 // Focal point setter
@@ -2639,7 +2592,6 @@
             canvas_content.text_bottom_aligned = false;
             // Default is to snap the text to the bottom of the canvas
             if_delay_render_text_update_text_and_button_position();
-            update_toolbox_panel("layout_button");
           }
 
           if (button_label == "canvas_size") {
@@ -2656,26 +2608,11 @@
             const width = parseInt(match[1]);
             const height = parseInt(match[2]);
 
-            /*
-            let input_box_width = document.getElementById("widthInput");
-            let input_box_height = document.getElementById("heightInput");
-
-            input_box_width.value = width;
-            input_box_height.value = height;
-            */
             canvas_content.canvas_width = width;
             canvas_content.canvas_height = height;
 
             // Update canvas
             create_canvas();
-
-            /*
-            // Update the canvas
-            let submit_button = document.getElementById(
-              "submit_canvas_size_button"
-            );
-            submit_button.click();
-            */
           }
 
           if (button_label == "portal_side") {
@@ -2683,13 +2620,7 @@
             // Clear portal downscaled image
             temp_portal_downscaled_image = [null, null];
           }
-
-          if (button_label == "portal_size") {
-            let value = parseInt(selected_value);
-            canvas_content.portal_size_percent = value;
-            // Clear portal downscaled image
-            temp_portal_downscaled_image = [null, null];
-          }
+          update_toolbox_panel("layout_button");
         }
 
         // Portals
@@ -3137,6 +3068,7 @@
           }
         }
 
+        /*
         // Add top and bottom margins if the PORTAL has margins and is FULL CANVAS
         if (
           canvas_content.portal_count > 0 &&
@@ -3150,6 +3082,7 @@
             canvas_content.marginBottom -= margin;
           }
         }
+        */
 
         // Margin update
         canvas_content.marginWidth =
@@ -3364,13 +3297,15 @@
             estimate_button_width;
         }
 
-        // Limit portal size
-        if (canvas_content.portal_size_percent == 150) {
+        // Limit text area size to 80% max when in Landscape mode and the portal is 0% or 100% of the canvas
+        if (
+          canvas_content.portal_size_percent == 100 ||
+          canvas_content.portal_size_percent == 0 ||
+          canvas_content.portal_count == 0
+        ) {
+          // Limit the width if it's a Landscape canvas
           if (canvas_content.shortestSide == "height") {
-            text_area.width = text_area.width * 0.5;
-          }
-          if (canvas_content.shortestSide == "width") {
-            text_area.height = text_area.height * 0.5;
+            text_area.width = text_area.width * 0.8;
           }
         }
 
@@ -4586,6 +4521,15 @@
           canvas_content.portal_image_scale[i] = incrementPosition;
           document.getElementById("zoom-scale-label").innerText =
             zoom_label_generate(incrementPosition);
+        }
+
+        if (slider.name.includes("portal_size_slider")) {
+          canvas_content.portal_size_percent =
+            canvas_content.portal_size_values[incrementPosition];
+          canvas_content.portal_size_slider = incrementPosition;
+          // Clear portal downscaled image
+          temp_portal_downscaled_image = [null, null];
+          update_toolbox_panel("layout_button");
         }
 
         // Clear portal downscaled image
