@@ -645,7 +645,7 @@
         <!-- Change to a login -->
         <label class="toolbox_expanded_label" for="heightInput">Password</label>
         <input type="password" id="passwordInput" value="The199" />
-        <button onclick="create_canvas()">Login</button>
+        <button onclick="login()">Login</button>
       </div>
     </div>
 
@@ -1246,33 +1246,23 @@
           .join("");
       }
 
+      function login() {
+        password = document.getElementById("passwordInput").value;
+        create_canvas();
+      }
+
       // Functions
       function create_canvas() {
-        // Load password
-        var password_check = document.getElementById("passwordInput");
-        if (password_check) {
-          password = password_check.value;
-        }
-
         // Check password
         if (check_login(password) != "pV56vv") {
           alert("Please check your password and try again");
           return;
         }
-
-        var user_set_canvas_size = document.getElementById("widthInput");
         let width, height;
-        let uploaded_data = false;
 
-        if (user_set_canvas_size) {
-          width = parseInt(document.getElementById("widthInput").value);
-          height = parseInt(document.getElementById("heightInput").value);
-        } else {
-          // If there is no width available go to the saved data
-          width = canvas_content.canvas_width;
-          height = canvas_content.canvas_height;
-          uploaded_data = true;
-        }
+        // If there is no width available go to the saved data
+        width = canvas_content.canvas_width;
+        height = canvas_content.canvas_height;
 
         // Add constraints
         var min_width_resolution = 144;
@@ -1341,15 +1331,12 @@
         // Get canvas type (Vertical, Horizontal, Square)
         get_canvas_type();
 
-        // Goes to defaults if the user isn't loading a save file
-        if (uploaded_data == false) {
-          // Set default to right
-          canvas_content.portal_side = "right";
+        // Set default to right
+        canvas_content.portal_side = "right";
 
-          // Set if vertical set to top
-          if (canvas_content.orientation == "vertical") {
-            canvas_content.portal_side = "top";
-          }
+        // Set if vertical set to top
+        if (canvas_content.orientation == "vertical") {
+          canvas_content.portal_side = "top";
         }
 
         // Fit copy
@@ -1768,7 +1755,7 @@
 
         // set the text and styles for the footer text
         footerText.innerHTML =
-          '<span style="font-weight: bold;">S&amp;P Global</span> | Portal Creator';
+          '<span style="font-weight: bold;">S&amp;P Global</span> | Social Media Creator';
         footerText.style.position = "fixed";
         footerText.style.bottom = "16px";
         footerText.style.right = "16px";
@@ -2435,15 +2422,16 @@
                   */
 
           // Templates
-          add_label_to_inside_tools_container("Templates");
+          add_label_to_inside_tools_container("Canvas Size");
           let select_template = create_dropdown_menu(
             [
               "Select...",
+              "1200x1200 Square",
+              "1200x628 Landscape",
+              "628x1200 Portrait",
               "1920x1080 [Desktop] Landscape",
               "1080x1920 [Desktop] Portrait",
-              "1200x1200 [Social] Square",
-              "1200x628 [Social] Landscape",
-              "628x1200 [Social] Portrait",
+              /*
               "1920x420",
               "1800x300",
               "1500x300",
@@ -2456,11 +2444,13 @@
               "300x600",
               "300x250",
               "160x600",
+              */
             ],
             "canvas_size",
             "Select..."
           );
 
+          /*
           // Update layout size
           add_label_to_inside_tools_container("Custom Size");
           add_text_to_inside_tools_container("Width (min 144, max 1920)");
@@ -2487,6 +2477,7 @@
           submit_button.id = "submit_canvas_size_button";
           submit_button.style.marginTop = "4px";
           convert_to_blue_button_style(submit_button);
+          */
         }
 
         // IMAGES
@@ -2665,17 +2656,26 @@
             const width = parseInt(match[1]);
             const height = parseInt(match[2]);
 
+            /*
             let input_box_width = document.getElementById("widthInput");
             let input_box_height = document.getElementById("heightInput");
 
             input_box_width.value = width;
             input_box_height.value = height;
+            */
+            canvas_content.canvas_width = width;
+            canvas_content.canvas_height = height;
 
+            // Update canvas
+            create_canvas();
+
+            /*
             // Update the canvas
             let submit_button = document.getElementById(
               "submit_canvas_size_button"
             );
             submit_button.click();
+            */
           }
 
           if (button_label == "portal_side") {
