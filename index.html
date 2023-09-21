@@ -463,6 +463,48 @@
       .range-slider input[type="range"] {
         width: 100%;
       }
+
+      /* Tooltip text */
+      .toolbox_button .tooltiptext {
+        opacity: 0; /* Start with opacity 0 */
+        width: 72px;
+        background-color: #4390df;
+        color: #fff;
+        text-align: center;
+        border-radius: 6px;
+        padding: 5px 0;
+        position: absolute;
+        z-index: 1;
+        top: 12px;
+        left: 110%;
+        font-weight: 400;
+        font-size: 16px;
+        transition: opacity 0.3s ease-in-out; /* Add a transition effect */
+      }
+
+      .toolbox_button .tooltiptext::after {
+        content: "";
+        position: absolute;
+        top: 50%;
+        right: 100%;
+        margin-top: -5px;
+        border-width: 5px;
+        border-style: solid;
+        border-color: transparent #4390df transparent transparent;
+        pointer-events: none; /* Disable pointer events to ignore hover on tooltip text */
+      }
+
+      /* Show the tooltip text with opacity when you mouse over the tooltip container */
+      .toolbox_button:hover .tooltiptext {
+        opacity: 1;
+        visibility: visible;
+      }
+
+      /* Hide the tooltip when you are not hovering over the tooltip container */
+      .toolbox_button:not(:hover) .tooltiptext {
+        opacity: 0;
+        visibility: hidden;
+      }
     </style>
   </head>
   <body>
@@ -487,6 +529,7 @@
             fill="#666"
           />
         </svg>
+        <span class="tooltiptext">File</span>
       </button>
       <!-- Color -->
       <button
@@ -508,8 +551,8 @@
             fill="#666"
           />
         </svg>
+        <span class="tooltiptext">Color</span>
       </button>
-
       <!-- Typography -->
       <button
         class="toolbox_button"
@@ -530,6 +573,7 @@
             fill="#666"
           />
         </svg>
+        <span class="tooltiptext">Text</span>
       </button>
       <!-- Images -->
       <button
@@ -551,6 +595,7 @@
             fill="#666"
           />
         </svg>
+        <span class="tooltiptext">Images</span>
       </button>
       <!-- Layout -->
       <button
@@ -572,6 +617,7 @@
             fill="#666"
           />
         </svg>
+        <span class="tooltiptext">Layout</span>
       </button>
       <!-- Logo -->
       <button
@@ -630,6 +676,7 @@
             />
           </g>
         </svg>
+        <span class="tooltiptext">Logo</span>
       </button>
 
       <!-- END BUTTON PANEL -->
@@ -2077,7 +2124,7 @@
             canvas_content.portal_color_overlay =
               !canvas_content.portal_color_overlay;
           }
-          if (button_label.includes("Portal visible margins")) {
+          if (button_label.includes("Show margins")) {
             canvas_content.portal_override_margins =
               !canvas_content.portal_override_margins;
             update_toolbox_panel("layout_button");
@@ -2402,13 +2449,15 @@
             );
           }
 
-          // Show margins
+          // Show margins label
           if (canvas_content.portal_count == 1) {
-            // Margins
-            add_toggle_switch_with_label(
-              "Portal visible margins",
-              canvas_content.portal_override_margins
-            );
+            if (canvas_content.portal_size_percent !== 100) {
+              // Margins
+              add_toggle_switch_with_label(
+                "Show margins",
+                canvas_content.portal_override_margins
+              );
+            }
             // Overlay
             if (is_fullscreen_image()) {
               add_toggle_switch_with_label(
@@ -2865,8 +2914,7 @@
       function is_fullscreen_image() {
         return (
           canvas_content.portal_size_percent >= 100 &&
-          canvas_content.portal_count == 1 &&
-          canvas_content.portal_override_margins == false
+          canvas_content.portal_count == 1
         );
       }
 
@@ -3000,20 +3048,6 @@
           name: logo_name,
           corner: logo_position,
         };
-
-        // Do not render logo if there are two portals and it fills the entire canvas
-        if (canvas_content.portal_size_percent >= 100) {
-          if (
-            canvas_content.portal_count == 2 ||
-            (canvas_content.portal_count == 1 &&
-              canvas_content.portal_override_margins)
-          ) {
-            console.log(
-              "Logo does not show when the image is full screen with margins"
-            );
-            return;
-          }
-        }
 
         // Load as an image
         let image = new Image();
@@ -3624,6 +3658,10 @@
         // Always show margins if it is Double Portal or the margins have been overrided
         if (portal_size || canvas_content.portal_override_margins) {
           fit_margins = true;
+        }
+        // Ignore margins if the image is 100 of the screen
+        if (canvas_content.portal_size_percent == 100) {
+          fit_margins = false;
         }
         // Max 100%
         canvas_size = Math.min(100, canvas_size);
