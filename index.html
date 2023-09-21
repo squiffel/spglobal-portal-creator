@@ -262,6 +262,7 @@
         overflow: hidden; /* Hide scrollbars */
         overflow-y: auto;
         white-space: wrap; /* Prevent text from wrapping to the next line */
+        position: relative;
       }
 
       svg {
@@ -504,6 +505,18 @@
       .toolbox_button:not(:hover) .tooltiptext {
         opacity: 0;
         visibility: hidden;
+      }
+
+      /* Character limit */
+      .exceeded_character_limit {
+        position: absolute;
+        z-index: 100;
+        margin-left: 8px;
+        margin-top: -24px;
+        color: red;
+        font-size: 11px;
+        font-style: italic;
+        text-align: right;
       }
     </style>
   </head>
@@ -1915,31 +1928,56 @@
         if (input.value.length > maxLength) {
           input.value = input.value.substring(0, maxLength);
           input.style.border = "1px solid red";
+          showCharacterLimitExceededMessage(input, maxLength);
         } else {
           input.style.border = "";
+          hideCharacterLimitExceededMessage(input);
         }
       }
 
-      //Input box modified
+      // Function to show character limit exceeded message
+      function showCharacterLimitExceededMessage(input, maxLength) {
+        let messageElement = document.getElementById(input.name + "_message");
+
+        // Create the message element if it doesn't exist
+        if (!messageElement) {
+          messageElement = document.createElement("div");
+          messageElement.id = input.name + "_message";
+          messageElement.classList.add("exceeded_character_limit");
+          input.parentNode.appendChild(messageElement);
+        }
+
+        const message = "Max " + maxLength;
+        messageElement.textContent = message;
+      }
+
+      // Function to hide character limit exceeded message
+      function hideCharacterLimitExceededMessage(input) {
+        const messageElement = document.getElementById(input.name + "_message");
+        if (messageElement) {
+          messageElement.textContent = "";
+        }
+      }
+
+      // Input box modified
       function inputbox_event_listener(event) {
         let button_label = event.target.name;
-        let string_value = event.target.value;
 
         if (button_label == "input_headline") {
           update_character_limit_inputbox(event.target, 70);
-          canvas_content.headline = string_value;
+          canvas_content.headline = event.target.value;
           calculate_headline_minimum_container_width();
         }
 
         if (button_label == "input_body") {
           update_character_limit_inputbox(event.target, 200);
-          canvas_content.body = string_value;
+          canvas_content.body = event.target.value;
           //calculate_headline_minimum_container_width();
         }
 
         if (button_label == "input_cta") {
           update_character_limit_inputbox(event.target, 32);
-          canvas_content.cta = string_value;
+          canvas_content.cta = event.target.value;
           //calculate_headline_minimum_container_width();
         }
 
@@ -2169,13 +2207,18 @@
         const insideToolsContainer = document.querySelector(
           ".inside_tools_container"
         );
+        const div = document.createElement("div");
+        div.style = "display: block";
+
         const inputBox = document.createElement("textarea");
         inputBox.className = "toolbox_expanded_inputbox";
         inputBox.placeholder = "Type...";
         inputBox.value = default_string;
         inputBox.name = "input_" + input_box_name;
         inputBox.addEventListener("input", inputbox_event_listener);
-        insideToolsContainer.appendChild(inputBox);
+
+        div.appendChild(inputBox);
+        insideToolsContainer.appendChild(div);
         return inputBox;
       }
 
