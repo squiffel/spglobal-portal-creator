@@ -2192,7 +2192,7 @@
             canvas_content.portal_color_overlay =
               !canvas_content.portal_color_overlay;
           }
-          if (button_label.includes("Show margins")) {
+          if (button_label.includes("Add margins")) {
             canvas_content.portal_override_margins =
               !canvas_content.portal_override_margins;
             update_toolbox_panel("layout_button");
@@ -2526,8 +2526,11 @@
             );
 
             //canvas_content.portal_size_percent
-            let s = canvas_content.portal_count == 2 ? "s" : "";
-            let portal_slider_label_name = "Portal" + s + " size: ";
+            let slider_range =
+              canvas_content.portal_count != 2
+                ? canvas_content.portal_size_values.length
+                : canvas_content.portal_size_values.length - 1;
+            let portal_slider_label_name = "Portal size: ";
             let portal_slider_label = add_label_to_inside_tools_container(
               portal_slider_label_name +
                 canvas_content.portal_size_percent +
@@ -2535,18 +2538,21 @@
               0
             );
             create_range_slider(
-              canvas_content.portal_size_values.length,
+              slider_range,
               canvas_content.portal_size_slider,
               "portal_size_slider"
             );
           }
 
           // Show margins label
-          if (canvas_content.portal_count == 1) {
+          if (
+            canvas_content.portal_count == 1 &&
+            canvas_content.orientation == "horizontal"
+          ) {
             if (canvas_content.portal_size_percent !== 100) {
               // Margins
               add_toggle_switch_with_label(
-                "Show margins",
+                "Add margins",
                 canvas_content.portal_override_margins
               );
             }
@@ -3265,6 +3271,19 @@
         canvas_content.portal_margins = false;
         canvas_content.portal_count = temp_portal_image.length;
 
+        // If the Canvas is vertical do not show the margins
+        if (canvas_content.orientation == "vertical") {
+          canvas_content.portal_override_margins = false;
+        }
+
+        // No full screen double portals
+        if (
+          canvas_content.portal_size_percent == 100 &&
+          canvas_content.portal_count == 2
+        ) {
+          canvas_content.portal_size_percent = 70;
+        }
+
         // Create ONE Portal image on the canvas
         if (
           canvas_content.portal_count == 1 &&
@@ -3760,6 +3779,7 @@
 
         // Track that we are using portals
         canvas_content.portal = true;
+
         // Always show margins if it is Double Portal or the margins have been overrided
         if (portal_size || canvas_content.portal_override_margins) {
           fit_margins = true;

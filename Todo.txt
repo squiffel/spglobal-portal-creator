@@ -2,9 +2,6 @@
 Need to be able to set the minimum width to the minimum width of the word in the body, headline, and button (calculate_headline_minimum_container_width())
 
 TO DO NEXT
-
-
-
 ----- Still need o the character limits to prevent crazyiness on PORTRAIT 70% image canvases where the description is tiny. Maybe shrink the default headline size. And bottom right corner the button
 -- LIMIT DOUBLE PORTAL to 70% SCALE
 -- AUTOMATE THE BUTTON TO BOTTOM RIGHT in PORTRAIT -- in 70% SCALE or when its out of bounds
