@@ -3,8 +3,14 @@ Need to be able to set the minimum width to the minimum width of the word in the
 
 TO DO NEXT
 -- Solve character limits
+-- Change the text box size
+
 ----- Still need o the character limits to prevent crazyiness on PORTRAIT 70% image canvases where the description is tiny. Maybe shrink the default headline size. And bottom right corner the button
 -- LIMIT DOUBLE PORTAL to 70% SCALE
+-- AUTOMATE THE BUTTON TO BOTTOM RIGHT in PORTRAIT -- in 70% SCALE or when its out of bounds
+------------- Maybe don't change the scale of the description based trying to fit the button, just move it to the bottom right
+
+
 -- MOVE BUTTON POSITION to LAYOUT or AUTOMATE IT TO DROP BOTTOM RIGHT when its out of bounds
 -- No margins on portrait single images
 
@@ -29,6 +35,7 @@ TO DO NEXT
 
 Notes:
 Password protected — Check "The199"
+------------- Changed the minimum font size
 -- Solve for ONLY SOCIAL MEDIA sizes. Limit all other sizes
 ---- TURN OFF HORIZONTAL 50-50 layouts on verticals -- DONE
 -- Tooltips on hover (As a tutorial) on the main menu. Identify what the button does -- DONE
