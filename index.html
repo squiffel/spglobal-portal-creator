@@ -2155,17 +2155,17 @@
             canvas_content.font_size.small = !canvas_content.font_size.small;
           }
 
-          if (button_label.includes("Headline visibility")) {
+          if (button_label.includes("Show headline")) {
             canvas_content.headline_visibility =
               !canvas_content.headline_visibility;
           }
 
-          if (button_label.includes("Description visibility")) {
+          if (button_label.includes("Show description")) {
             canvas_content.description_visibility =
               !canvas_content.description_visibility;
           }
 
-          if (button_label.includes("Button visibility")) {
+          if (button_label.includes("Show button")) {
             canvas_content.cta_visibility = !canvas_content.cta_visibility;
           }
 
@@ -2370,24 +2370,6 @@
             canvas_content.font_size.small
           );
 
-          // Headline
-          add_toggle_switch_with_label(
-            "Headline visibility",
-            canvas_content.headline_visibility
-          );
-
-          // Body
-          add_toggle_switch_with_label(
-            "Description visibility",
-            canvas_content.description_visibility
-          );
-
-          // Call to action
-          add_toggle_switch_with_label(
-            "Button visibility",
-            canvas_content.cta_visibility
-          );
-
           /*
           // Set offset text
           let toggle_text_offset = add_toggle_switch_with_label(
@@ -2450,6 +2432,25 @@
           add_button_to_inside_tools_container(
             "Generate random copy",
             "random_headline"
+          );
+
+          add_label_to_inside_tools_container("Visibility");
+          // Headline
+          add_toggle_switch_with_label(
+            "Show headline",
+            canvas_content.headline_visibility
+          );
+
+          // Body
+          add_toggle_switch_with_label(
+            "Show description",
+            canvas_content.description_visibility
+          );
+
+          // Call to action
+          add_toggle_switch_with_label(
+            "Show button",
+            canvas_content.cta_visibility
           );
 
           // Update labels
@@ -3394,7 +3395,9 @@
           : "";
 
         // Content showing
-        let show_body = canvas_content.body.length > 0;
+        let show_body =
+          canvas_content.body.length > 0 &&
+          canvas_content.description_visibility;
         let show_button =
           canvas_content.cta.length > 0 && canvas_content.cta_visibility;
 
@@ -3501,7 +3504,7 @@
           ? canvas_content.body
           : "";
 
-        let body_properties = add_text_to_canvas(
+        var body_properties = add_text_to_canvas(
           body_text,
           position.x,
           position_headline_and_margin_y,
@@ -3560,7 +3563,7 @@
             button_height;
 
           // Drawing the body copy
-          add_text_to_canvas(
+          body_properties = add_text_to_canvas(
             body_text,
             position.x,
             position_headline_and_margin_y,
@@ -3571,7 +3574,7 @@
             0,
             1.2, // Line height
             400, // Regular
-            false // Render to canvas
+            false // Delay rendering to canvas
           );
 
           // Drawing the headline
@@ -3586,7 +3589,7 @@
             0,
             1.05,
             700,
-            false // Render to canvas
+            false // Delay rendering to canvas
           );
         }
 
@@ -3648,7 +3651,7 @@
               body_properties.x,
               body_properties.y,
               body_properties.width,
-              body_area_available_height //body_properties.height
+              body_properties.height
             );
           }
         }
