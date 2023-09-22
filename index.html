@@ -1078,6 +1078,9 @@
       // Text
       canvas_content.logo_offset_text = false;
       canvas_content.vertically_centered_text = false;
+      canvas_content.headline_visibility = true;
+      canvas_content.description_visibility = true;
+      canvas_content.cta_visibility = true;
 
       // Downscaled images
       temp_portal_downscaled_image = [null, null];
@@ -2152,6 +2155,20 @@
             canvas_content.font_size.small = !canvas_content.font_size.small;
           }
 
+          if (button_label.includes("Headline visibility")) {
+            canvas_content.headline_visibility =
+              !canvas_content.headline_visibility;
+          }
+
+          if (button_label.includes("Description visibility")) {
+            canvas_content.description_visibility =
+              !canvas_content.description_visibility;
+          }
+
+          if (button_label.includes("Button visibility")) {
+            canvas_content.cta_visibility = !canvas_content.cta_visibility;
+          }
+
           if (button_label.includes("Offset text")) {
             canvas_content.logo_offset_text = !canvas_content.logo_offset_text;
           }
@@ -2351,6 +2368,24 @@
           let toggle_font_size = add_toggle_switch_with_label(
             "Set font size: Small",
             canvas_content.font_size.small
+          );
+
+          // Headline
+          add_toggle_switch_with_label(
+            "Headline visibility",
+            canvas_content.headline_visibility
+          );
+
+          // Body
+          add_toggle_switch_with_label(
+            "Description visibility",
+            canvas_content.description_visibility
+          );
+
+          // Call to action
+          add_toggle_switch_with_label(
+            "Button visibility",
+            canvas_content.cta_visibility
           );
 
           /*
@@ -3354,9 +3389,14 @@
           canvas_content.ignore_line_breaks.headline
         );
 
+        let headline_text = canvas_content.headline_visibility
+          ? headline_unformatted
+          : "";
+
         // Content showing
         let show_body = canvas_content.body.length > 0;
-        let show_button = canvas_content.cta.length > 0;
+        let show_button =
+          canvas_content.cta.length > 0 && canvas_content.cta_visibility;
 
         // Move text if its offset
         if (canvas_content.logo_offset_text) {
@@ -3402,7 +3442,7 @@
         // ----------------------- RENDER HEADLINE --------------------------//
         // Render Headline in it is default position
         let headline_properties = add_text_to_canvas(
-          headline_unformatted,
+          headline_text,
           position.x,
           position.y,
           text_area.width,
@@ -3453,10 +3493,16 @@
 
         // First available position below the headline
         let position_headline_and_margin_y =
-          position.y + headline_properties.height + headline_margin;
+          headline_text == ""
+            ? position.y
+            : position.y + headline_properties.height + headline_margin;
+
+        let body_text = canvas_content.description_visibility
+          ? canvas_content.body
+          : "";
 
         let body_properties = add_text_to_canvas(
-          canvas_content.body,
+          body_text,
           position.x,
           position_headline_and_margin_y,
           text_area.width,
@@ -3515,7 +3561,7 @@
 
           // Drawing the body copy
           add_text_to_canvas(
-            canvas_content.body,
+            body_text,
             position.x,
             position_headline_and_margin_y,
             text_area.width,
@@ -3530,7 +3576,7 @@
 
           // Drawing the headline
           add_text_to_canvas(
-            headline_unformatted,
+            headline_text,
             position.x,
             headline_position_y,
             text_area.width,
@@ -3583,7 +3629,7 @@
           );
 
           // Draw guides around headline
-          if (canvas_content.headline.length > 0) {
+          if (headline_text.length > 0) {
             ctx.strokeStyle = "blue";
             ctx.lineWidth = 1;
             ctx.strokeRect(
@@ -3595,7 +3641,7 @@
           }
 
           // Draw guides around body
-          if (canvas_content.body.length > 0) {
+          if (body_text.length > 0) {
             ctx.strokeStyle = "blue";
             ctx.lineWidth = 1;
             ctx.strokeRect(
@@ -4370,8 +4416,10 @@
             text_width_max = calculate_width;
           }
         }
-        const textWidth = text_width_max;
-        const textHeight = textForRendering.length * fontSize * lineHeight;
+        let textWidth = text_width_max;
+        // Render nothing if there is no text
+        let textHeight =
+          text == "" ? 0 : textForRendering.length * fontSize * lineHeight;
 
         // Align text vertically to bottom -- If setting is on
         let snap_y = 0;

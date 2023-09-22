@@ -2,8 +2,8 @@
 Need to be able to set the minimum width to the minimum width of the word in the body, headline, and button (calculate_headline_minimum_container_width())
 
 TO DO NEXT
--- Solve character limits
--- Change the text box size
+
+
 
 ----- Still need o the character limits to prevent crazyiness on PORTRAIT 70% image canvases where the description is tiny. Maybe shrink the default headline size. And bottom right corner the button
 -- LIMIT DOUBLE PORTAL to 70% SCALE
@@ -12,12 +12,8 @@ TO DO NEXT
 
 Move font size to layout?
 
-
 -- MOVE BUTTON POSITION to LAYOUT or AUTOMATE IT TO DROP BOTTOM RIGHT when its out of bounds
 -- No margins on portrait single images
-
------ Toggle on and off description visibility
------ Toggle on and off button visiibility
 ----- Bottom right button should not effect text size. With a vertical stacked image on a Social media landscape canvas, portal size 50%, it currently shrinks the description to fit
 
 
@@ -27,8 +23,8 @@ Move font size to layout?
 -- Toggle between font sizes using ICONS
 -- Would like the background color selector be a THEME selector to be cards that show the background color and font color
 
--- TURN OFF GRID viewBox
--- TURN OFF "GENERATE RANDOM COPY"
+-- Remove GRID viewBox
+-- Remove "GENERATE RANDOM COPY"
 
 -- Solve for single sign on
 -- See if we can use Github
@@ -41,6 +37,8 @@ Password protected — Check "The199"
 -- Solve for ONLY SOCIAL MEDIA sizes. Limit all other sizes
 ---- TURN OFF HORIZONTAL 50-50 layouts on verticals -- DONE
 -- Tooltips on hover (As a tutorial) on the main menu. Identify what the button does -- DONE
+----- Toggle on and off description visibility
+----- Toggle on and off button visiibility
 
 
 Text to the RIGHT of the logo for ultra wide formats
