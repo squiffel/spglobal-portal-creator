@@ -509,11 +509,13 @@
 
       /* Character limit */
       .exceeded_character_limit {
-        position: absolute;
+        /* position: absolute; 
         z-index: 100;
         margin-left: 8px;
         margin-top: -24px;
-        color: red;
+        */
+        margin-bottom: 8px;
+        color: #4390df;
         font-size: 11px;
         font-style: italic;
         text-align: right;
@@ -1221,7 +1223,7 @@
         "Decisive action depends on Essential Intelligence.",
         "Life behind the data.",
         "Powerful impact.",
-        "Placing risk and performance in a greater context is Essential Intelligence.",
+        "Essential Intelligence places risk and performance in context",
         "Embracing resilience and growth.",
         "Navigating energy in transition.",
         "Innovating energy for growth.",
@@ -1233,9 +1235,9 @@
       ];
 
       let random_description = [
-        "With S&P Global, navigate the intricate landscape of energy transitions and complex markets with ease, surpassing your expectations at every turn. As markets grow increasingly complex, our solutions offer a path towards understanding, enabling you to make an impact on tomorrow with confidence.",
-        "As energy transitions and markets become more complex, solutions from S&P Global push past your expectations to help you uncover new levels of understanding.",
-        "With increasing complexities in energy transitions and markets, solutions from S&P Global enhance your comprehension, empowering you to shape the future.",
+        "With S&P Global, confidently navigate complex energy transitions and markets, making an impact on tomorrow.",
+        "As energy transitions and markets become more complex, solutions from S&P Global help you stay informed and uncover new levels of understanding.",
+        "With increasing complexities in energy transitions and markets, solutions from S&P Global enhance comprehension, empowering you to shape the future.",
         "Push past your expectations and uncover new levels of understanding with solutions from S&P Global.",
         "Uncover new levels of understanding with solutions from S&P Global.",
         "Complex markets meet unexpected solutions from S&P Global.",
@@ -1919,20 +1921,7 @@
 
       // Show character limits
       function update_character_limit_inputbox(input, maxLength) {
-        if (input.value.length > maxLength) {
-          input.value = input.value.substring(0, maxLength);
-          input.style.border = "1px solid red";
-          show_character_limit_exceeded_message(input, maxLength);
-        } else {
-          input.style.border = "";
-          hide_character_limit_exceeded_message(input);
-        }
-      }
-
-      // Function to show character limit exceeded message
-      function show_character_limit_exceeded_message(input, maxLength) {
         let messageElement = document.getElementById(input.name + "_message");
-
         // Create the message element if it doesn't exist
         if (!messageElement) {
           messageElement = document.createElement("div");
@@ -1941,15 +1930,32 @@
           input.parentNode.appendChild(messageElement);
         }
 
-        const message = "Max " + maxLength;
-        messageElement.textContent = message;
+        if (input.value.length > maxLength) {
+          input.value = input.value.substring(0, maxLength);
+          input.style.border = "1px solid red";
+          show_character_limit_exceeded_message(input, maxLength);
+        } else {
+          input.style.border = "";
+          hide_character_limit_exceeded_message(input, maxLength);
+        }
+      }
+
+      // Function to show character limit exceeded message
+      function show_character_limit_exceeded_message(input, maxLength) {
+        const messageElement = document.getElementById(input.name + "_message");
+        if (messageElement) {
+          const message = "Max " + maxLength;
+          messageElement.style.color = "red";
+        }
       }
 
       // Function to hide character limit exceeded message
-      function hide_character_limit_exceeded_message(input) {
+      function hide_character_limit_exceeded_message(input, maxLength) {
         const messageElement = document.getElementById(input.name + "_message");
         if (messageElement) {
-          messageElement.textContent = "";
+          messageElement.textContent =
+            "Characters remaining " + (maxLength - input.value.length);
+          messageElement.style.color = "#2c92e5";
         }
       }
 
@@ -1958,19 +1964,19 @@
         let button_label = event.target.name;
 
         if (button_label == "input_headline") {
-          update_character_limit_inputbox(event.target, 72);
+          update_character_limit_inputbox(event.target, 65); // Max recommended headline length
           canvas_content.headline = event.target.value;
           calculate_headline_minimum_container_width();
         }
 
         if (button_label == "input_body") {
-          update_character_limit_inputbox(event.target, 180);
+          update_character_limit_inputbox(event.target, 150); // Max recommended description length
           canvas_content.body = event.target.value;
           //calculate_headline_minimum_container_width();
         }
 
         if (button_label == "input_cta") {
-          update_character_limit_inputbox(event.target, 24);
+          update_character_limit_inputbox(event.target, 20); // Max recommended CTA length
           canvas_content.cta = event.target.value;
           //calculate_headline_minimum_container_width();
         }
