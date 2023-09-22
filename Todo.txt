@@ -10,6 +10,8 @@ TO DO NEXT
 -- AUTOMATE THE BUTTON TO BOTTOM RIGHT in PORTRAIT -- in 70% SCALE or when its out of bounds
 ------------- Maybe don't change the scale of the description based trying to fit the button, just move it to the bottom right
 
+Move font size to layout?
+
 
 -- MOVE BUTTON POSITION to LAYOUT or AUTOMATE IT TO DROP BOTTOM RIGHT when its out of bounds
 -- No margins on portrait single images

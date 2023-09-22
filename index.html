@@ -1384,14 +1384,6 @@
         // Clear downscaled images
         temp_portal_downscaled_image = [null, null];
 
-        // Update the input boxes
-        let inputbox_width = document.getElementById("widthInput");
-        let inputbox_height = document.getElementById("wheightInput");
-        if (inputbox_width) {
-          document.getElementById("widthInput").value = width;
-          document.getElementById("heightInput").value = height;
-        }
-
         // Get canvas type (Vertical, Horizontal, Square)
         get_canvas_type();
 
@@ -1930,15 +1922,15 @@
         if (input.value.length > maxLength) {
           input.value = input.value.substring(0, maxLength);
           input.style.border = "1px solid red";
-          showCharacterLimitExceededMessage(input, maxLength);
+          show_character_limit_exceeded_message(input, maxLength);
         } else {
           input.style.border = "";
-          hideCharacterLimitExceededMessage(input);
+          hide_character_limit_exceeded_message(input);
         }
       }
 
       // Function to show character limit exceeded message
-      function showCharacterLimitExceededMessage(input, maxLength) {
+      function show_character_limit_exceeded_message(input, maxLength) {
         let messageElement = document.getElementById(input.name + "_message");
 
         // Create the message element if it doesn't exist
@@ -1954,7 +1946,7 @@
       }
 
       // Function to hide character limit exceeded message
-      function hideCharacterLimitExceededMessage(input) {
+      function hide_character_limit_exceeded_message(input) {
         const messageElement = document.getElementById(input.name + "_message");
         if (messageElement) {
           messageElement.textContent = "";
@@ -1966,19 +1958,19 @@
         let button_label = event.target.name;
 
         if (button_label == "input_headline") {
-          update_character_limit_inputbox(event.target, 70);
+          update_character_limit_inputbox(event.target, 72);
           canvas_content.headline = event.target.value;
           calculate_headline_minimum_container_width();
         }
 
         if (button_label == "input_body") {
-          update_character_limit_inputbox(event.target, 200);
+          update_character_limit_inputbox(event.target, 180);
           canvas_content.body = event.target.value;
           //calculate_headline_minimum_container_width();
         }
 
         if (button_label == "input_cta") {
-          update_character_limit_inputbox(event.target, 32);
+          update_character_limit_inputbox(event.target, 24);
           canvas_content.cta = event.target.value;
           //calculate_headline_minimum_container_width();
         }
@@ -2376,7 +2368,7 @@
             "headline",
             canvas_content.headline
           );
-          headline_button.style.height = "100px";
+          headline_button.style.height = "72px";
           add_button_to_inside_tools_container(
             "Auto capitalize",
             "brand-voice-headline"
@@ -2392,7 +2384,7 @@
             "body",
             canvas_content.body
           );
-          description_button.style.height = "200px";
+          description_button.style.height = "128px";
 
           let cta_label = add_label_to_inside_tools_container("Call to action");
           cta_label.id = "cta_label";
