@@ -3534,12 +3534,6 @@
           false
         );
 
-        // Identify where the text bounding box Y position
-        let text_area_position_y = position.y;
-        if (canvas_content.text_bottom_aligned) {
-          text_area_position_y = canvas_content.marginBottom - text_area.height;
-        }
-
         // Text boxe sizes
         let body_height = show_body ? body_properties.height : 0;
         let body_margin = show_body ? headline_margin : 0;
@@ -3553,12 +3547,17 @@
             ? canvas_content.marginBottom - button_height
             : 0;
 
+          // Remove body margin if the button is not visible
+          body_margin = show_button ? body_margin : 0;
+
+          // Headline posiiton
           position_headline_and_margin_y =
             canvas_content.marginBottom -
             body_height -
             body_margin -
             button_height;
 
+          // Headline position
           headline_position_y =
             canvas_content.marginBottom -
             headline_height -
@@ -3571,21 +3570,70 @@
           headline_properties.y = headline_position_y;
         }
 
+        // Identify where the text bounding box Y position
+        let text_area_position_y = position.y;
+        if (canvas_content.text_bottom_aligned) {
+          text_area_position_y = canvas_content.marginBottom - text_area.height;
+        }
+
         // COLLISION DETECTION
         var button_out_of_bounds = false;
         var button_overlapping_logo = false;
 
-        // Button collision detectuion
-        if (
-          button_position_y + button_properties.height >
-            position.y + text_area.height &&
-          !canvas_content.text_bottom_aligned
+        // Check if text is exceeding the boundary
+        function is_within_text_area_boundingbox(
+          name,
+          position_y,
+          area_height,
+          safe_area_position_y,
+          safe_area_height
         ) {
-          console.log("Button is out of bounds");
+          // Wiggle room
+          let padding = 4;
+          // Check if text is out of bounds
+          if (
+            position_y + area_height >
+            safe_area_position_y + safe_area_height + padding
+          ) {
+            console.log(name + " out of bottom bounds");
+            return false;
+          }
+          if (position_y < safe_area_position_y - padding) {
+            console.log(name + " out of top bounds");
+            return false;
+          }
+          return true;
+        }
+
+        let headline_within_bounds = is_within_text_area_boundingbox(
+          "Headline",
+          headline_position_y,
+          headline_height + 1,
+          text_area_position_y,
+          text_area.height
+        );
+
+        let body_within_bounds = is_within_text_area_boundingbox(
+          "Body",
+          position_headline_and_margin_y,
+          body_height + 1,
+          text_area_position_y,
+          text_area.height
+        );
+
+        let button_within_bounds = is_within_text_area_boundingbox(
+          "Button",
+          button_position_y,
+          button_properties.height,
+          text_area_position_y,
+          text_area.height
+        );
+
+        if (button_within_bounds == false) {
           // Render the button in the bottom right hand corner
           button_position_y = canvas_content.marginBottom - button_height;
           button_position_x = canvas_content.marginRight - button_width;
-          button_out_of_bounds = true;
+          // Check if colliding with the logo
           if (
             button_position_x <
             canvas_content.marginLeft + canvas_content.logo.width + logo_padding
@@ -3595,24 +3643,7 @@
           }
         }
 
-        // Check if text is exceeding the boundary
-
-        /// RENDERING PASS
-        // RENDER THE BODY
-        body_properties = add_text_to_canvas(
-          body_text,
-          position.x,
-          position_headline_and_margin_y,
-          text_area.width,
-          body_height + 1,
-          body_font_size,
-          canvas_content.color_font,
-          0,
-          1.2, // Line height
-          400, // Regular
-          true // Render text
-        );
-
+        // RENDERING PASS
         // RENDER THE HEADLINE
         add_text_to_canvas(
           headline_text,
@@ -3625,6 +3656,21 @@
           0,
           1.05,
           700,
+          true // Render text
+        );
+
+        // RENDER THE BODY
+        body_properties = add_text_to_canvas(
+          body_text,
+          position.x,
+          position_headline_and_margin_y,
+          text_area.width,
+          body_height + 1,
+          body_font_size,
+          canvas_content.color_font,
+          0,
+          1.2, // Line height
+          400, // Regular
           true // Render text
         );
 
