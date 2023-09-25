@@ -3185,22 +3185,6 @@
           }
         }
 
-        /*
-        // Add top and bottom margins if the PORTAL has margins and is FULL CANVAS
-        if (
-          canvas_content.portal_count > 0 &&
-          canvas_content.portal_size_percent >= 100
-        ) {
-          if (
-            canvas_content.portal_margins ||
-            canvas_content.portal_override_margins
-          ) {
-            canvas_content.marginTop += margin;
-            canvas_content.marginBottom -= margin;
-          }
-        }
-        */
-
         // Margin update
         canvas_content.marginWidth =
           canvas_content.marginRight - canvas_content.marginLeft;
@@ -3234,13 +3218,6 @@
               position.width,
               position.height
             );
-            /*
-            console.log(
-              `${name} -- width: ${parseInt(
-                position.width
-              )} x height: ${parseInt(position.height)}`
-            );
-            */
           }, 100);
         }
       }
@@ -3582,11 +3559,8 @@
         }
 
         // COLLISION DETECTION
-        var button_out_of_bounds = false;
-        var button_overlapping_logo = false;
-
         // Check if text is exceeding the boundary
-        function is_within_text_area_boundingbox(
+        function is_outside_boundingbox(
           name,
           position_y,
           area_height,
@@ -3600,17 +3574,17 @@
             position_y + area_height >
             safe_area_position_y + safe_area_height + padding
           ) {
-            console.log(name + " out of bottom bounds");
-            return false;
+            //console.log(name + " out of bottom bounds");
+            return true;
           }
           if (position_y < safe_area_position_y - padding) {
-            console.log(name + " out of top bounds");
-            return false;
+            //console.log(name + " out of top bounds");
+            return true;
           }
-          return true;
+          return false;
         }
 
-        let headline_within_bounds = is_within_text_area_boundingbox(
+        let headline_outside_bounds = is_outside_boundingbox(
           "Headline",
           headline_position_y,
           headline_height + 1,
@@ -3618,7 +3592,7 @@
           text_area.height
         );
 
-        let body_within_bounds = is_within_text_area_boundingbox(
+        let body_outside_bounds = is_outside_boundingbox(
           "Body",
           position_headline_and_margin_y,
           body_height + 1,
@@ -3626,7 +3600,7 @@
           text_area.height
         );
 
-        let button_within_bounds = is_within_text_area_boundingbox(
+        let button_outside_bounds = is_outside_boundingbox(
           "Button",
           button_position_y,
           button_properties.height,
@@ -3634,7 +3608,9 @@
           text_area.height
         );
 
-        if (button_within_bounds == false) {
+        var button_overlapping_logo = false;
+
+        if (button_outside_bounds == true) {
           // Render the button in the bottom right hand corner
           button_position_y =
             canvas_content.marginBottom - button_properties.height;
@@ -3684,7 +3660,7 @@
         // RENDER THE BUTTON
         let button;
         if (show_button) {
-          button = add_to_canvas_cta_button(
+          button_properties = add_to_canvas_cta_button(
             canvas_content.cta,
             button_font_size,
             "bold",
@@ -3702,11 +3678,20 @@
         canvas_content.font_size.cta = button_font_size;
         update_font_size_label();
 
-        // Draw text guides
-        if (canvas_content.show_guides) {
+        // Draw error messages
+        let found_error =
+          headline_outside_bounds +
+          body_outside_bounds +
+          button_outside_bounds +
+          button_overlapping_logo;
+
+        console.log(found_error);
+
+        if (found_error > 0) {
           // Draw guides around total available text area
-          ctx.strokeStyle = "red";
+          ctx.strokeStyle = "blue"; // Set stroke color to blue
           ctx.lineWidth = 1;
+          ctx.setLineDash([4, 4]); // Set the line to be dashed with a pattern of 5 pixels on and 5 pixels off
           ctx.strokeRect(
             position.x,
             text_area_position_y,
@@ -3714,30 +3699,89 @@
             text_area.height
           );
 
+          // Error message
+          function drawTextInRedRectangle(ctx, text, boundingBox) {
+            // Set the font and text style
+            ctx.font = "12px Arial";
+            ctx.fillStyle = "white";
+
+            // Calculate the width and height of the text
+            const textWidth = ctx.measureText(text).width;
+            const textHeight = 12; // 12px font size
+
+            // Calculate the position of the red rectangle inside the bounding box
+            const rectX = boundingBox.x + boundingBox.width - textWidth - 6; // 6px padding from right
+            const rectY = boundingBox.y + boundingBox.height - textHeight - 6; // 6px padding from bottom
+            const rectWidth = textWidth + 12; // 6px padding on both sides
+            const rectHeight = textHeight + 12; // 6px padding on both sides
+
+            // Draw the red rectangle
+            ctx.fillStyle = "red";
+            ctx.fillRect(rectX, rectY, rectWidth, rectHeight);
+
+            // Draw the white text inside the red rectangle
+            ctx.fillStyle = "white";
+            ctx.fillText(text, rectX + 6, rectY + 6 + 12); // 6px padding on both sides
+          }
+
           // Draw guides around headline
-          if (headline_text.length > 0) {
-            ctx.strokeStyle = "blue";
-            ctx.lineWidth = 1;
+          if (headline_text.length > 0 && headline_outside_bounds) {
+            ctx.strokeStyle = "red";
+            ctx.lineWidth = 2;
             ctx.strokeRect(
               headline_properties.x,
               headline_properties.y,
               headline_properties.width,
               headline_properties.height
             );
+            drawTextInRedRectangle(
+              ctx,
+              "Error: Headline is outside safe text zone",
+              headline_properties
+            );
           }
 
           // Draw guides around body
-          if (body_text.length > 0) {
-            ctx.strokeStyle = "blue";
-            ctx.lineWidth = 1;
+          if (body_text.length > 0 && body_outside_bounds) {
+            ctx.strokeStyle = "red";
+            ctx.lineWidth = 2;
             ctx.strokeRect(
               body_properties.x,
               body_properties.y,
               body_properties.width,
               body_properties.height
             );
+            drawTextInRedRectangle(
+              ctx,
+              "Error: Body is outside safe text zone",
+              body_properties
+            );
+          }
+
+          // Draw guides around button
+          if (
+            canvas_content.cta.length > 0 &&
+            button_outside_bounds &&
+            button_overlapping_logo
+          ) {
+            ctx.strokeStyle = "red";
+            ctx.lineWidth = 3;
+            ctx.strokeRect(
+              button_properties.x,
+              button_properties.y,
+              button_properties.width,
+              button_properties.height
+            );
+            drawTextInRedRectangle(
+              ctx,
+              "Error: Button is overlapping logo",
+              button_properties
+            );
           }
         }
+
+        // To turn off dashed lines and revert to a solid line
+        ctx.setLineDash([]); // Reset the line dash pattern to an empty array
       }
 
       // Wraps an input text into a specified number of lines, balancing text content and ensuring certain phrases are not split across lines.
