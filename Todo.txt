@@ -2,6 +2,13 @@
 Need to be able to set the minimum width to the minimum width of the word in the body, headline, and button (calculate_headline_minimum_container_width())
 
 TO DO NEXT
+Character limit isn't registering with pasted in text
+Only show font size setting when you can change it?
+
+
+"Clarifying uncertainty with insight." headline creates a weird glitch on 75% with image
+
+
 When the button is bottom right, don't let it effect the font size?
 What to do when a collision has been calculated? Do i just block the download button and explain why?
 
