@@ -2,15 +2,17 @@
 Need to be able to set the minimum width to the minimum width of the word in the body, headline, and button (calculate_headline_minimum_container_width())
 
 TO DO NEXT
+//add_to_canvas_cta_button
+-- AUTOMATE THE BUTTON TO BOTTOM RIGHT --- IF IT IS OUT OF BOUNDS. Then do not calculate with the 
+
 ----- Still need o the character limits to prevent crazyiness on PORTRAIT 70% image canvases where the description is tiny. Maybe shrink the default headline size. And bottom right corner the button
--- LIMIT DOUBLE PORTAL to 70% SCALE
--- AUTOMATE THE BUTTON TO BOTTOM RIGHT in PORTRAIT -- in 70% SCALE or when its out of bounds
+
 ------------- Maybe don't change the scale of the description based trying to fit the button, just move it to the bottom right
 
 Move font size to layout?
 
 -- MOVE BUTTON POSITION to LAYOUT or AUTOMATE IT TO DROP BOTTOM RIGHT when its out of bounds
--- No margins on portrait single images
+
 ----- Bottom right button should not effect text size. With a vertical stacked image on a Social media landscape canvas, portal size 50%, it currently shrinks the description to fit
 
 
@@ -36,6 +38,8 @@ Password protected — Check "The199"
 -- Tooltips on hover (As a tutorial) on the main menu. Identify what the button does -- DONE
 ----- Toggle on and off description visibility
 ----- Toggle on and off button visiibility
+-- LIMIT DOUBLE PORTAL to 70% SCALE
+-- No margins on portrait single images
 
 
 Text to the RIGHT of the logo for ultra wide formats
