@@ -3352,12 +3352,7 @@
         };
 
         // If the text is not being moved, render in the available space
-        let delay_render_text =
-          canvas_content.text_bottom_aligned +
-            canvas_content.vertically_centered_text >
-          0
-            ? true
-            : false;
+        let delay_render_text = canvas_content.text_bottom_aligned;
 
         // Default text area available
         let text_area = {
@@ -3567,6 +3562,7 @@
             button_overlapping_logo = true;
           }
         }
+        // Check if text is exceeding the boundary
 
         // If the text position needs to be moved, we have pre-caculated the headline and body copy size and delayed rendering the text
         if (delay_render_text) {
