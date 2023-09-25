@@ -2223,6 +2223,7 @@
         inputBox.placeholder = "Type...";
         inputBox.value = default_string;
         inputBox.name = "input_" + input_box_name;
+        inputBox.id = "input_" + input_box_name;
         inputBox.addEventListener("input", inputbox_event_listener);
 
         div.appendChild(inputBox);
@@ -2656,6 +2657,8 @@
         inputBox.type = "number";
         inputBox.value = canvas_content.headline.split(/\r?\n/).length;
         inputBox.min = 1;
+        inputBox.name = "inputNumber";
+        inputBox.id = "inputNumber";
         inputBox.classList.add("number-input");
 
         const button = document.createElement("button");
@@ -3231,11 +3234,13 @@
               position.width,
               position.height
             );
+            /*
             console.log(
               `${name} -- width: ${parseInt(
                 position.width
               )} x height: ${parseInt(position.height)}`
             );
+            */
           }, 100);
         }
       }
@@ -3631,8 +3636,10 @@
 
         if (button_within_bounds == false) {
           // Render the button in the bottom right hand corner
-          button_position_y = canvas_content.marginBottom - button_height;
-          button_position_x = canvas_content.marginRight - button_width;
+          button_position_y =
+            canvas_content.marginBottom - button_properties.height;
+          button_position_x =
+            canvas_content.marginRight - button_properties.width;
           // Check if colliding with the logo
           if (
             button_position_x <

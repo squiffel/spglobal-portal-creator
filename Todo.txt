@@ -2,23 +2,12 @@
 Need to be able to set the minimum width to the minimum width of the word in the body, headline, and button (calculate_headline_minimum_container_width())
 
 TO DO NEXT
-Calculating collisions
-
-//add_to_canvas_cta_button
--- AUTOMATE THE BUTTON TO BOTTOM RIGHT --- IF IT IS OUT OF BOUNDS. Then do not calculate with the 
-
------ Still need o the character limits to prevent crazyiness on PORTRAIT 70% image canvases where the description is tiny. Maybe shrink the default headline size. And bottom right corner the button
-
-------------- Maybe don't change the scale of the description based trying to fit the button, just move it to the bottom right
-
-Move font size to layout?
+When the button is bottom right, don't let it effect the font size?
+What to do when a collision has been calculated? Do i just block the download button and explain why?
 
 -- MOVE BUTTON POSITION to LAYOUT or AUTOMATE IT TO DROP BOTTOM RIGHT when its out of bounds
 
------ Bottom right button should not effect text size. With a vertical stacked image on a Social media landscape canvas, portal size 50%, it currently shrinks the description to fit
-
-
--- Check if AUTO-CAPILTALIZE cleans up all copy or just the headline
+-- Check if AUTO-CAPILTALIZE cleans up all copy or just the headline --- Maybe just remove AUTO-CAPITALIZE?
 
 
 -- Toggle between font sizes using ICONS
