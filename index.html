@@ -2697,7 +2697,7 @@
       }
 
       // Update button position
-      function if_delay_render_text_update_text_and_button_position() {
+      function if_logo_top_aligned_set_text_bottom_aligned() {
         if (canvas_content.logo.corner.includes("top")) {
           canvas_content.text_bottom_aligned = true;
         }
@@ -2720,7 +2720,7 @@
             canvas_content.logo.corner = position_name;
             canvas_content.text_bottom_aligned = false;
             // Default is to snap the text to the bottom of the canvas
-            if_delay_render_text_update_text_and_button_position();
+            if_logo_top_aligned_set_text_bottom_aligned();
           }
 
           if (button_label == "canvas_size") {
@@ -3336,7 +3336,7 @@
 
       function render_text() {
         // Text and button alignment have to follow strict rules -- Updating to follow those rules
-        if_delay_render_text_update_text_and_button_position();
+        if_logo_top_aligned_set_text_bottom_aligned();
 
         let logo_padding = canvas_content.logo.min_padding * 1.5;
 
@@ -3350,9 +3350,6 @@
           x: canvas_content.marginLeft,
           y: canvas_content.marginTop,
         };
-
-        // If the text is not being moved, render in the available space
-        let delay_render_text = canvas_content.text_bottom_aligned;
 
         // Default text area available
         let text_area = {
@@ -3439,11 +3436,12 @@
         }
 
         // ----------------------- RENDER HEADLINE --------------------------//
-        // Render Headline in it is default position
+        // Calculate the headline size
+        var headline_position_y = position.y;
         let headline_properties = add_text_to_canvas(
           headline_text,
           position.x,
-          position.y,
+          headline_position_y,
           text_area.width,
           text_area.height,
           font_size,
@@ -3451,7 +3449,7 @@
           0,
           1.05,
           700,
-          delay_render_text
+          false
         );
 
         // Constrain headline font size to specific sizes
@@ -3500,6 +3498,7 @@
           ? canvas_content.body
           : "";
 
+        // Calculate the body size
         var body_properties = add_text_to_canvas(
           body_text,
           position.x,
@@ -3511,7 +3510,7 @@
           0,
           1.2, // Line height
           400, // Regular
-          delay_render_text
+          false // Do not render
         );
 
         // Button -- Default calculations for position
@@ -3523,6 +3522,7 @@
           : position_headline_and_margin_y;
         let button_position_x = position.x;
 
+        // Calculate the button size
         let button_properties = add_to_canvas_cta_button(
           canvas_content.cta,
           button_font_size,
@@ -3534,16 +3534,48 @@
           false
         );
 
-        // Identify where the text area begins
+        // Identify where the text bounding box Y position
         let text_area_position_y = position.y;
         if (canvas_content.text_bottom_aligned) {
           text_area_position_y = canvas_content.marginBottom - text_area.height;
         }
 
-        // CHECK FOR COLLISIONS
+        // Text boxe sizes
+        let body_height = show_body ? body_properties.height : 0;
+        let body_margin = show_body ? headline_margin : 0;
+
+        let headline_height = headline_properties.height;
+
+        // If the text position needs to be moved, we have pre-caculated the headline and body copy size and delayed rendering the text
+        if (canvas_content.text_bottom_aligned) {
+          // Move button to the bottom -- If shifted
+          button_position_y = show_button
+            ? canvas_content.marginBottom - button_height
+            : 0;
+
+          position_headline_and_margin_y =
+            canvas_content.marginBottom -
+            body_height -
+            body_margin -
+            button_height;
+
+          headline_position_y =
+            canvas_content.marginBottom -
+            headline_height -
+            headline_margin -
+            body_height -
+            body_margin -
+            button_height;
+
+          // Update headline properties
+          headline_properties.y = headline_position_y;
+        }
+
+        // COLLISION DETECTION
         var button_out_of_bounds = false;
         var button_overlapping_logo = false;
-        // Check if the button is out of bounds. Text must be top aligned
+
+        // Button collision detectuion
         if (
           button_position_y + button_properties.height >
             position.y + text_area.height &&
@@ -3562,78 +3594,41 @@
             button_overlapping_logo = true;
           }
         }
+
         // Check if text is exceeding the boundary
 
-        // If the text position needs to be moved, we have pre-caculated the headline and body copy size and delayed rendering the text
-        if (delay_render_text) {
-          // Text boxe sizes
-          let body_height = show_body ? body_properties.height : 0;
-          let body_margin = show_body ? headline_margin : 0;
+        /// RENDERING PASS
+        // RENDER THE BODY
+        body_properties = add_text_to_canvas(
+          body_text,
+          position.x,
+          position_headline_and_margin_y,
+          text_area.width,
+          body_height + 1,
+          body_font_size,
+          canvas_content.color_font,
+          0,
+          1.2, // Line height
+          400, // Regular
+          true // Render text
+        );
 
-          let headline_height = headline_properties.height;
+        // RENDER THE HEADLINE
+        add_text_to_canvas(
+          headline_text,
+          position.x,
+          headline_position_y,
+          text_area.width,
+          headline_height + 1,
+          font_size,
+          canvas_content.color_font,
+          0,
+          1.05,
+          700,
+          true // Render text
+        );
 
-          // Headline + Description + Button total height
-          let textframe_height =
-            headline_height +
-            headline_margin +
-            body_height +
-            body_margin +
-            button_height;
-
-          // Move button to the bottom -- If shifted
-          button_position_y = show_button
-            ? canvas_content.marginBottom - button_height
-            : 0;
-
-          let position_headline_and_margin_y =
-            canvas_content.marginBottom -
-            body_height -
-            body_margin -
-            button_height;
-
-          let headline_position_y =
-            canvas_content.marginBottom -
-            headline_height -
-            headline_margin -
-            body_height -
-            body_margin -
-            button_height;
-
-          // Update headline properties
-          headline_properties.y = headline_position_y;
-
-          // Drawing the body copy
-          body_properties = add_text_to_canvas(
-            body_text,
-            position.x,
-            position_headline_and_margin_y,
-            text_area.width,
-            body_height + 1,
-            body_font_size,
-            canvas_content.color_font,
-            0,
-            1.2, // Line height
-            400, // Regular
-            false // Delay rendering to canvas
-          );
-
-          // Drawing the headline
-          add_text_to_canvas(
-            headline_text,
-            position.x,
-            headline_position_y,
-            text_area.width,
-            headline_height + 1,
-            font_size,
-            canvas_content.color_font,
-            0,
-            1.05,
-            700,
-            false // Delay rendering to canvas
-          );
-        }
-
-        // Create button
+        // RENDER THE BUTTON
         let button;
         if (show_button) {
           button = add_to_canvas_cta_button(
@@ -4295,7 +4290,7 @@
         letterSpacing,
         defaultLineHeight,
         fontWeight,
-        delayRenderingText
+        renderText
       ) {
         // Get the width of the text
         function get_text_width(text, fontSize, letterSpacing) {
@@ -4482,7 +4477,7 @@
             i * fontSize * lineHeight +
             fontSize * offset_y;
           // Add superscript, trademark and copywriting
-          if (!delayRenderingText) {
+          if (renderText) {
             draw_text_with_superscript(line, position_x, calculated_position_y);
           }
         }

@@ -2,6 +2,8 @@
 Need to be able to set the minimum width to the minimum width of the word in the body, headline, and button (calculate_headline_minimum_container_width())
 
 TO DO NEXT
+Calculating collisions
+
 //add_to_canvas_cta_button
 -- AUTOMATE THE BUTTON TO BOTTOM RIGHT --- IF IT IS OUT OF BOUNDS. Then do not calculate with the 
 
