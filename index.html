@@ -3484,6 +3484,7 @@
         let button_height = show_button
           ? button_padding * 2 + button_font_size
           : 0;
+        // Only used to check how much space the body copy would have with the button below it
         let button_margin_above = show_button ? content_margin : 0;
 
         let button_width =
@@ -3502,16 +3503,10 @@
         let body_font_size = typescale[headline_fixed_font_size].body;
 
         // First available position below the headline
-        let position_body_y =
+        let body_position_y =
           headline_text == ""
             ? position.y
             : position.y + headline_properties.height + headline_margin;
-        console.log(
-          "Headline height " +
-            headline_properties.height +
-            " margin " +
-            headline_margin
-        );
 
         let body_text = canvas_content.description_visibility
           ? canvas_content.body
@@ -3521,7 +3516,7 @@
         var body_properties = add_text_to_canvas(
           body_text,
           position.x,
-          position_body_y,
+          body_position_y,
           text_area.width,
           body_area_available_height,
           body_font_size,
@@ -3537,8 +3532,8 @@
         let cta_text = canvas_content.cta_visibility ? canvas_content.cta : "";
         let body_margin = show_body && show_button ? content_margin : 0;
         let button_position_y = show_body
-          ? position_body_y + body_properties.height + body_margin
-          : position_body_y;
+          ? body_position_y + body_properties.height + body_margin
+          : body_position_y;
         let button_position_x = position.x;
 
         // Calculate the button size
@@ -3565,7 +3560,7 @@
             : 0;
 
           // Body posiiton
-          position_body_y =
+          body_position_y =
             canvas_content.marginBottom -
             body_height -
             body_margin -
@@ -3573,7 +3568,7 @@
 
           // Headline position
           headline_position_y =
-            position_body_y - headline_height - headline_margin;
+            body_position_y - headline_height - headline_margin;
 
           // Update headline properties
           headline_properties.y = headline_position_y;
@@ -3584,6 +3579,93 @@
         if (canvas_content.text_bottom_aligned) {
           text_area.y = canvas_content.marginBottom - text_area.height;
         }
+
+        // RECALCULATE
+        console.log("pre-render data");
+
+        console.log(
+          "Headline height " +
+            headline_properties.height +
+            " margin " +
+            headline_margin
+        );
+
+        console.log(
+          "body height: " + body_properties.height + " margin: " + body_margin
+        );
+        console.log("button height: " + button_properties.height);
+
+        // RECALCULATE HEADLINE
+        headline_properties = add_text_to_canvas(
+          headline_text,
+          position.x,
+          headline_position_y,
+          text_area.width,
+          headline_height + 1,
+          font_size,
+          canvas_content.color_font,
+          0,
+          1.05,
+          700,
+          false // Render text
+        );
+
+        // RECALCULATE BODY
+        body_properties = add_text_to_canvas(
+          body_text,
+          position.x,
+          body_position_y,
+          text_area.width,
+          body_height + 1,
+          body_font_size,
+          canvas_content.color_font,
+          0,
+          1.2, // Line height
+          400, // Regular
+          false // Render text
+        );
+
+        console.log("recalculated data");
+        // Console log test
+        console.log(
+          "Headline height " +
+            headline_properties.height +
+            " margin " +
+            headline_margin
+        );
+
+        console.log(
+          "body height: " + body_properties.height + " margin: " + body_margin
+        );
+        console.log("button height: " + button_properties.height);
+
+        // Calculate total height of the container
+        let total_content_height =
+          headline_properties.height +
+          body_properties.height +
+          button_properties.height +
+          headline_margin +
+          body_margin;
+
+        // Determine the starting location of the container
+        let text_initial_position_y = canvas_content.text_bottom_aligned
+          ? canvas_content.marginBottom - total_content_height
+          : canvas_content.marginTop;
+
+        // Recalculate y positions
+        headline_position_y = text_initial_position_y;
+
+        body_position_y =
+          text_initial_position_y +
+          headline_properties.height +
+          headline_margin;
+
+        button_position_y =
+          text_initial_position_y +
+          headline_properties.height +
+          headline_margin +
+          body_properties.height +
+          body_margin;
 
         // COLLISION DETECTION
         // Check if text is exceeding the boundary
@@ -3621,7 +3703,7 @@
 
         let body_outside_bounds = is_outside_boundingbox(
           "Body",
-          position_body_y,
+          body_position_y,
           body_height + 1,
           text_area.y,
           text_area.height
@@ -3653,24 +3735,14 @@
           }
         }
 
-        // RENDERING PASS
         // RENDER THE HEADLINE
-
-        let total_content_height =
-          headline_properties.height +
-          body_properties.height +
-          button_properties.height +
-          headline_margin +
-          body_margin;
-        console.log("body margin: " + body_margin);
-
-        add_text_to_canvas(
+        headline_properties = add_text_to_canvas(
           headline_text,
           position.x,
           headline_position_y,
           text_area.width,
-          headline_height + 1,
-          font_size,
+          headline_properties.height + 1,
+          headline_properties.font_size,
           canvas_content.color_font,
           0,
           1.05,
@@ -3682,10 +3754,10 @@
         body_properties = add_text_to_canvas(
           body_text,
           position.x,
-          position_body_y,
+          body_position_y,
           text_area.width,
-          body_height + 1,
-          body_font_size,
+          body_properties.height + 1,
+          body_properties.font_size,
           canvas_content.color_font,
           0,
           1.2, // Line height
@@ -3729,9 +3801,9 @@
           ctx.setLineDash([4, 4]); // Set the line to be dashed with a pattern of 5 pixels on and 5 pixels off
           ctx.strokeRect(
             position.x,
-            headline_position_y,
+            text_area.y,
             text_area.width,
-            total_content_height //text_area.height
+            text_area.height
           );
 
           function drawVerticalTextInBlueLabel(ctx, text, boundingBox) {
@@ -3811,7 +3883,7 @@
             ctx.lineWidth = 2;
             ctx.strokeRect(
               headline_properties.x,
-              headline_properties.y,
+              headline_position_y,
               headline_properties.width,
               headline_properties.height
             );
@@ -3829,7 +3901,7 @@
             ctx.lineWidth = 2;
             ctx.strokeRect(
               body_properties.x,
-              body_properties.y,
+              body_position_y,
               body_properties.width,
               body_properties.height
             );
@@ -3849,7 +3921,7 @@
             ctx.lineWidth = 3;
             ctx.strokeRect(
               button_properties.x,
-              button_properties.y,
+              button_position_y,
               button_properties.width,
               button_properties.height
             );
