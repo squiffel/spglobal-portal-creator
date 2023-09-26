@@ -352,14 +352,22 @@
         background-color: #e8f0f5;
       }
 
+      /* Updated CSS */
       .color-indicator {
-        width: 12px;
-        height: 12px;
+        width: 22px;
+        height: 22px;
         border: 1px solid #666666;
         position: absolute;
         right: 16px;
         top: 50%;
         transform: translateY(-50%);
+        display: flex;
+        justify-content: center;
+        align-items: center; /* Center vertically */
+      }
+
+      .color-indicator span {
+        font-size: 11px;
       }
 
       .text-container {
@@ -1565,10 +1573,20 @@
       }
 
       // Color indicator
-      function add_color_indicator(button, rgb) {
+      function add_color_indicator(button, rgb, fontColor) {
         const colorIndicator = document.createElement("div");
         colorIndicator.classList.add("color-indicator");
         colorIndicator.style.backgroundColor = rgb;
+
+        // Create a span element for the letters "Aa"
+        const letters = document.createElement("span");
+        letters.textContent = "Aa";
+        letters.style.fontSize = "11px";
+        letters.style.color = fontColor;
+
+        // Append the letters to the colorIndicator
+        colorIndicator.appendChild(letters);
+
         button.style.position = "relative";
         button.appendChild(colorIndicator);
       }
@@ -2187,7 +2205,7 @@
             canvas_content.portal_color_overlay =
               !canvas_content.portal_color_overlay;
           }
-          if (button_label.includes("Add margins")) {
+          if (button_label.includes("Margins")) {
             canvas_content.portal_override_margins =
               !canvas_content.portal_override_margins;
             update_toolbox_panel("layout_button");
@@ -2303,26 +2321,31 @@
         if (buttonName === "color_button") {
           expand_left_panel();
           current_panel_open = "Color";
-          add_label_to_inside_tools_container("Background color");
+          add_label_to_inside_tools_container("Color");
           add_color_indicator(
             add_button_to_inside_tools_container("White"),
-            spglobal_colors.white
+            spglobal_colors.white,
+            "black"
           );
           add_color_indicator(
             add_button_to_inside_tools_container("Black"),
-            spglobal_colors.black
+            spglobal_colors.black,
+            "white"
           );
           add_color_indicator(
             add_button_to_inside_tools_container("Red"),
-            spglobal_colors.red
+            spglobal_colors.red,
+            "white"
           );
           add_color_indicator(
             add_button_to_inside_tools_container("Yellow"),
-            spglobal_colors.yellow
+            spglobal_colors.yellow,
+            "black"
           );
           add_color_indicator(
             add_button_to_inside_tools_container("Blue"),
-            spglobal_colors.blue
+            spglobal_colors.blue,
+            "black"
           );
         }
 
@@ -2376,10 +2399,13 @@
             canvas_content.headline
           );
           headline_button.style.height = "72px";
+
+          /*
           add_button_to_inside_tools_container(
             "Auto capitalize",
             "brand-voice-headline"
           );
+          */
 
           // Auto-wordwrap
           add_text_wrap_button_and_input();
@@ -2469,7 +2495,7 @@
           );
 
           // Update logo position
-          add_label_to_inside_tools_container("Logo Position");
+          add_label_to_inside_tools_container("Logo Alignment");
           create_dropdown_menu(
             ["top left", "bottom left"], // "top right", "bottom right"
             "logo_position",
@@ -2479,7 +2505,7 @@
           // Size and position
           if (temp_portal_image.length > 0) {
             // Position
-            add_label_to_inside_tools_container("Portal Position");
+            add_label_to_inside_tools_container("Portal Alignment");
             let portal_position_options = ["top", "right", "bottom", "left"];
             // Landscape mode
             if (canvas_content.shortestSide == "height") {
@@ -2527,7 +2553,7 @@
             if (canvas_content.portal_size_percent !== 100) {
               // Margins
               add_toggle_switch_with_label(
-                "Add margins",
+                "Margins",
                 canvas_content.portal_override_margins
               );
             }
@@ -2804,20 +2830,20 @@
       };
 
       function update_color_scheme(color) {
-        color = color.toLowerCase();
+        color = color.toLowerCase().slice(0, -2);
         // Set background color
         canvas_content.background_color = spglobal_colors[color];
         // Select the correct color scheme
         canvas_content.color_font = spglobal_colors.black;
         canvas_content.color_wordmark = spglobal_colors.red;
 
-        if (color == "yellow" || color == "blue") {
+        if (color.includes("yellow") || color.includes("blue")) {
           canvas_content.color_wordmark = spglobal_colors.black;
         }
-        if (color == "black") {
+        if (color.includes("black")) {
           canvas_content.color_font = spglobal_colors.white;
         }
-        if (color == "red") {
+        if (color.includes("red")) {
           canvas_content.color_font = spglobal_colors.white;
           canvas_content.color_wordmark = spglobal_colors.white;
         }

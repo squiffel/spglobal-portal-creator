@@ -2,30 +2,18 @@
 Need to be able to set the minimum width to the minimum width of the word in the body, headline, and button (calculate_headline_minimum_container_width())
 
 TO DO NEXT
-Character limit isn't registering with pasted in text
+
 Only show font size setting when you can change it?
-
-
 "Clarifying uncertainty with insight." headline creates a weird glitch on 75% with image
-
-
-When the button is bottom right, don't let it effect the font size?
-What to do when a collision has been calculated? Do i just block the download button and explain why?
-
--- MOVE BUTTON POSITION to LAYOUT or AUTOMATE IT TO DROP BOTTOM RIGHT when its out of bounds
-
 -- Check if AUTO-CAPILTALIZE cleans up all copy or just the headline --- Maybe just remove AUTO-CAPITALIZE?
-
 
 -- Toggle between font sizes using ICONS
 -- Would like the background color selector be a THEME selector to be cards that show the background color and font color
 
--- Remove GRID viewBox
--- Remove "GENERATE RANDOM COPY"
+-- Spellcheck -- https://github.com/brandonaaron/jquery-spellcheck/blob/master/test.html
 
 -- Solve for single sign on
 -- See if we can use Github
--- Spellcheck -- https://github.com/brandonaaron/jquery-spellcheck/blob/master/test.html
 
 
 Notes:
@@ -38,6 +26,7 @@ Password protected — Check "The199"
 ----- Toggle on and off button visiibility
 -- LIMIT DOUBLE PORTAL to 70% SCALE
 -- No margins on portrait single images
+-- Remove "GENERATE RANDOM COPY"
 
 
 Text to the RIGHT of the logo for ultra wide formats
