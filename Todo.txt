@@ -8,7 +8,7 @@ Only show font size setting when you can change it?
 -- Check if AUTO-CAPILTALIZE cleans up all copy or just the headline --- Maybe just remove AUTO-CAPITALIZE?
 
 -- Toggle between font sizes using ICONS
--- Would like the background color selector be a THEME selector to be cards that show the background color and font color
+
 
 -- Spellcheck -- https://github.com/brandonaaron/jquery-spellcheck/blob/master/test.html
 
@@ -27,6 +27,7 @@ Password protected — Check "The199"
 -- LIMIT DOUBLE PORTAL to 70% SCALE
 -- No margins on portrait single images
 -- Remove "GENERATE RANDOM COPY"
+-- Would like the background color selector be a THEME selector to be cards that show the background color and font color
 
 
 Text to the RIGHT of the logo for ultra wide formats

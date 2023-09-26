@@ -2354,7 +2354,19 @@
           current_panel_open = "File";
           // Select logo
           add_label_to_inside_tools_container("Image");
-          add_button_to_inside_tools_container("Download", "download_template");
+          let download_label =
+            canvas_content.error > 0
+              ? "Fix errors before downloading"
+              : "Download";
+          let download_button = add_button_to_inside_tools_container(
+            download_label,
+            "download_template"
+          );
+          if (canvas_content.error > 0) {
+            download_button.style.color = "red";
+            download_button.style.border = "1px solid red";
+          }
+
           add_label_to_inside_tools_container("Template");
           add_button_to_inside_tools_container(
             "Save template",
@@ -3796,7 +3808,7 @@
             );
             drawTextInRedRectangle(
               ctx,
-              "Error: Outside safe area",
+              "Error: Text exceeds safe area",
               headline_properties
             );
           }
@@ -3813,7 +3825,7 @@
             );
             drawTextInRedRectangle(
               ctx,
-              "Error: Outside safe area",
+              "Error: Text exceeds safe area",
               body_properties
             );
           }
@@ -3834,7 +3846,7 @@
             );
             drawTextInRedRectangle(
               ctx,
-              "Error: Overlapping logo",
+              "Error: Text overlaps logo",
               button_properties
             );
           }
