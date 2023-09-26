@@ -1,3 +1,5 @@
+"With S&P Global, confidently navigate complex energy transitions and markets, making an impact on tomorrow."
+"Clarifying with uncertainity. Clarifying with"
 
 Need to be able to set the minimum width to the minimum width of the word in the body, headline, and button (calculate_headline_minimum_container_width())
 

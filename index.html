@@ -1080,7 +1080,7 @@
       };
 
       // Errors
-      canvas_content.error = false;
+      canvas_content.error = 0;
 
       // Buton
       canvas_content.button_style = "solid";
@@ -3446,8 +3446,8 @@
           }
         }
 
-        // ----------------------- RENDER HEADLINE --------------------------//
-        // Calculate the headline size
+        // ----------------------- CALCULATE HEADLINE --------------------------//
+        // Calculate the initial headline size  -- Do not render
         var headline_position_y = position.y;
         let headline_properties = add_text_to_canvas(
           headline_text,
@@ -3470,11 +3470,12 @@
 
         // Calculate the margins between text
         let minimum_margin = 8;
-        let headline_margin =
+        let content_margin =
           headline_properties.font_size == 16
             ? 4
             : Math.max(headline_fixed_font_size * 0.5, minimum_margin);
-        headline_margin = show_body || show_button ? headline_margin : 0; // Collapse margin if there is no content below the headline
+        headline_margin = show_body || show_button ? content_margin : 0; // Collapse margin if there is no content below the headline
+        headline_margin = headline_text == "" ? 0 : headline_margin; // Collapse headline margin if there is no text
 
         // Precalculate BUTTON size so that it can removed from the available space
         let button_padding = calculate_button_padding(canvas.height);
@@ -3483,13 +3484,13 @@
         let button_height = show_button
           ? button_padding * 2 + button_font_size
           : 0;
-        let button_margin_above = show_button ? headline_margin : 0;
+        let button_margin_above = show_button ? content_margin : 0;
 
         let button_width =
           button_padding * 2 + estimate_button_text_size(button_font_size);
 
-        // ----------------------- RENDER BODY --------------------------//
-        // Margin between text is half the headline size or a minimum of 16px
+        // ----------------------- CALCULATE BODY --------------------------//
+        // Figure out how much area the BODY has left to be rendered in. The headline and button take up X amount of the available space.
         let body_area_available_height =
           text_area.height -
           headline_properties.height -
@@ -3497,23 +3498,30 @@
           button_height -
           button_margin_above;
 
+        // Fix the font size to a specific typescale
         let body_font_size = typescale[headline_fixed_font_size].body;
 
         // First available position below the headline
-        let position_headline_and_margin_y =
+        let position_body_y =
           headline_text == ""
             ? position.y
             : position.y + headline_properties.height + headline_margin;
+        console.log(
+          "Headline height " +
+            headline_properties.height +
+            " margin " +
+            headline_margin
+        );
 
         let body_text = canvas_content.description_visibility
           ? canvas_content.body
           : "";
 
-        // Calculate the body size
+        // Calculate the body size -- Do not render
         var body_properties = add_text_to_canvas(
           body_text,
           position.x,
-          position_headline_and_margin_y,
+          position_body_y,
           text_area.width,
           body_area_available_height,
           body_font_size,
@@ -3524,18 +3532,18 @@
           false // Do not render
         );
 
-        // Button -- Default calculations for position
+        // ----------------------- CALCULATE BUTTON --------------------------//
         // Buttons are positioned under the body unless there is no body then they are below the headline
+        let cta_text = canvas_content.cta_visibility ? canvas_content.cta : "";
+        let body_margin = show_body && show_button ? content_margin : 0;
         let button_position_y = show_body
-          ? position_headline_and_margin_y +
-            body_properties.height +
-            headline_margin
-          : position_headline_and_margin_y;
+          ? position_body_y + body_properties.height + body_margin
+          : position_body_y;
         let button_position_x = position.x;
 
         // Calculate the button size
         let button_properties = add_to_canvas_cta_button(
-          canvas_content.cta,
+          cta_text,
           button_font_size,
           "bold",
           canvas_content.button_style,
@@ -3547,8 +3555,6 @@
 
         // Text boxe sizes
         let body_height = show_body ? body_properties.height : 0;
-        let body_margin = show_body ? headline_margin : 0;
-
         let headline_height = headline_properties.height;
 
         // If the text position needs to be moved, we have pre-caculated the headline and body copy size and delayed rendering the text
@@ -3558,11 +3564,8 @@
             ? canvas_content.marginBottom - button_height
             : 0;
 
-          // Remove body margin if the button is not visible
-          body_margin = show_button ? body_margin : 0;
-
-          // Headline posiiton
-          position_headline_and_margin_y =
+          // Body posiiton
+          position_body_y =
             canvas_content.marginBottom -
             body_height -
             body_margin -
@@ -3570,12 +3573,7 @@
 
           // Headline position
           headline_position_y =
-            canvas_content.marginBottom -
-            headline_height -
-            headline_margin -
-            body_height -
-            body_margin -
-            button_height;
+            position_body_y - headline_height - headline_margin;
 
           // Update headline properties
           headline_properties.y = headline_position_y;
@@ -3623,7 +3621,7 @@
 
         let body_outside_bounds = is_outside_boundingbox(
           "Body",
-          position_headline_and_margin_y,
+          position_body_y,
           body_height + 1,
           text_area.y,
           text_area.height
@@ -3657,6 +3655,15 @@
 
         // RENDERING PASS
         // RENDER THE HEADLINE
+
+        let total_content_height =
+          headline_properties.height +
+          body_properties.height +
+          button_properties.height +
+          headline_margin +
+          body_margin;
+        console.log("body margin: " + body_margin);
+
         add_text_to_canvas(
           headline_text,
           position.x,
@@ -3675,7 +3682,7 @@
         body_properties = add_text_to_canvas(
           body_text,
           position.x,
-          position_headline_and_margin_y,
+          position_body_y,
           text_area.width,
           body_height + 1,
           body_font_size,
@@ -3690,7 +3697,7 @@
         let button;
         if (show_button) {
           button_properties = add_to_canvas_cta_button(
-            canvas_content.cta,
+            cta_text,
             button_font_size,
             "bold",
             canvas_content.button_style,
@@ -3715,16 +3722,16 @@
 
         console.log(canvas_content.error);
 
-        if (canvas_content.error > 0) {
+        if (canvas_content.error > -1) {
           // Draw guides around total available text area
           ctx.strokeStyle = "blue"; // Set stroke color to blue
           ctx.lineWidth = 1;
           ctx.setLineDash([4, 4]); // Set the line to be dashed with a pattern of 5 pixels on and 5 pixels off
           ctx.strokeRect(
             position.x,
-            text_area.y,
+            headline_position_y,
             text_area.width,
-            text_area.height
+            total_content_height //text_area.height
           );
 
           function drawVerticalTextInBlueLabel(ctx, text, boundingBox) {
@@ -3774,6 +3781,7 @@
 
           // Error message
           function drawTextInRedRectangle(ctx, text, boundingBox) {
+            return;
             // Set the font and text style
             ctx.font = "12px Arial";
 
@@ -3797,7 +3805,8 @@
           }
 
           // Draw guides around headline
-          if (headline_text.length > 0 && headline_outside_bounds) {
+          if (headline_text.length > 0) {
+            // && headline_outside_bounds
             ctx.strokeStyle = error_color;
             ctx.lineWidth = 2;
             ctx.strokeRect(
@@ -3814,7 +3823,8 @@
           }
 
           // Draw guides around body
-          if (body_text.length > 0 && body_outside_bounds) {
+          if (body_text.length > 0) {
+            // && body_outside_bounds
             ctx.strokeStyle = error_color;
             ctx.lineWidth = 2;
             ctx.strokeRect(
@@ -3832,9 +3842,8 @@
 
           // Draw guides around button
           if (
-            canvas_content.cta.length > 0 &&
-            button_outside_bounds &&
-            button_overlapping_logo
+            canvas_content.cta.length >
+            0 /*  && button_outside_bounds && button_overlapping_logo */
           ) {
             ctx.strokeStyle = error_color;
             ctx.lineWidth = 3;
@@ -4107,6 +4116,10 @@
         y,
         render = true
       ) {
+        if (text == "") {
+          return { x: x, y: y, width: 0, height: 0 };
+        }
+
         ctx.save();
 
         fontFamily = "Akkurat LL";
