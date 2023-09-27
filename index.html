@@ -716,7 +716,12 @@
         <label class="toolbox_expanded_label" for="passwordInput"
           >Password</label
         >
-        <input type="password" id="passwordInput" value="The199" />
+        <input
+          type="password"
+          id="passwordInput"
+          value="The199"
+          onkeydown="handleKeyPress(event)"
+        />
         <button onclick="login()">Login</button>
       </div>
     </div>
@@ -726,318 +731,6 @@
       var canvas, ctx;
 
       create_footer_text();
-
-      // Brand words for Title Case
-      const capitalizationArray = [
-        "Dow Jones Indices",
-        "Platts",
-        "Platts LIVE",
-        "S&P Cheese Ratings",
-        "S&P",
-        "S&P Global",
-        "S&P Global Ratings",
-        "Market Intelligence",
-        "Commodity Insights",
-        "Essential Intelligence",
-        "S&P Global Mobility",
-        "Engineering Solutions",
-        "S&P Global Marketplace",
-        "Sustainable1",
-        "SPIVA",
-        "Cappitech",
-        "Indices",
-        "Energy Transition",
-        "IHS Markit",
-        "Kensho",
-        "Dimensions Pro",
-        "Capital IQ Pro",
-        "Xpressfeed",
-        "5G",
-        "4G",
-        "API",
-        "EV",
-        "ESG",
-        "Seek & Prosper",
-        "Ratings360",
-        "CLO",
-        "U.S.",
-        "iBoxx",
-        "EUR",
-        "Trucost",
-      ];
-
-      // Country list
-      const countryList = [
-        "Atlantic",
-        "Arctic",
-        "Indian",
-        "Pacific",
-        "Asia",
-        "Africa",
-        "America",
-        "North America",
-        "South America",
-        "Antartica",
-        "Europe",
-        "Oceania",
-        "Afghanistan",
-        "Åland Islands",
-        "Albania",
-        "Algeria",
-        "American Samoa",
-        "Andorra",
-        "Angola",
-        "Anguilla",
-        "Antarctica",
-        "Antigua and Barbuda",
-        "Argentina",
-        "Armenia",
-        "Aruba",
-        "Australia",
-        "Austria",
-        "Azerbaijan",
-        "Bahamas",
-        "Bahrain",
-        "Bangladesh",
-        "Barbados",
-        "Belarus",
-        "Belgium",
-        "Belize",
-        "Benin",
-        "Bermuda",
-        "Bhutan",
-        "Bolivia",
-        "Bonaire, Sint Eustatius and Saba",
-        "Bosnia and Herzegovina",
-        "Botswana",
-        "Bouvet Island",
-        "Brazil",
-        "Britain",
-        "British",
-        "British Indian Ocean Territory",
-        "Brunei Darussalam",
-        "Bulgaria",
-        "Burkina Faso",
-        "Burundi",
-        "Cabo Verde",
-        "Cambodia",
-        "Cameroon",
-        "Canada",
-        "Cayman Islands",
-        "Central African Republic",
-        "Chad",
-        "Chile",
-        "China",
-        "Christmas Island",
-        "Cocos (Keeling) Islands",
-        "Colombia",
-        "Comoros",
-        "Congo (the Democratic Republic of the)",
-        "Congo",
-        "Cook Islands",
-        "Costa Rica",
-        "Croatia",
-        "Cuba",
-        "Curaçao",
-        "Cyprus",
-        "Czechia",
-        "Côte d'Ivoire",
-        "Denmark",
-        "Djibouti",
-        "Dominica",
-        "Dominican Republic",
-        "Ecuador",
-        "Egypt",
-        "El Salvador",
-        "Equatorial Guinea",
-        "Eritrea",
-        "Estonia",
-        "Eswatini",
-        "Ethiopia",
-        "England",
-        "Falkland Islands [Malvinas]",
-        "Faroe Islands",
-        "Fiji",
-        "Finland",
-        "France",
-        "French Guiana",
-        "French Polynesia",
-        "French Southern Territories",
-        "Gabon",
-        "Gambia",
-        "Georgia",
-        "Germany",
-        "Ghana",
-        "Gibraltar",
-        "Greece",
-        "Greenland",
-        "Grenada",
-        "Guadeloupe",
-        "Guam",
-        "Guatemala",
-        "Guernsey",
-        "Guinea",
-        "Guinea-Bissau",
-        "Guyana",
-        "Haiti",
-        "Heard Island and McDonald Islands",
-        "Holy See",
-        "Honduras",
-        "Hong Kong",
-        "Hungary",
-        "Iceland",
-        "India",
-        "Indonesia",
-        "Iran (Islamic Republic of)",
-        "Iraq",
-        "Ireland",
-        "Isle of Man",
-        "Israel",
-        "Italy",
-        "Jamaica",
-        "Japan",
-        "Jersey",
-        "Jordan",
-        "Kazakhstan",
-        "Kenya",
-        "Kiribati",
-        "Korea (the Democratic People's Republic of)",
-        "Korea (the Republic of)",
-        "Kuwait",
-        "Kyrgyzstan",
-        "Lao People's Democratic Republic",
-        "Latvia",
-        "Lebanon",
-        "Lesotho",
-        "Liberia",
-        "Libya",
-        "Liechtenstein",
-        "Lithuania",
-        "Luxembourg",
-        "Macao",
-        "Madagascar",
-        "Malawi",
-        "Malaysia",
-        "Maldives",
-        "Mali",
-        "Malta",
-        "Marshall Islands",
-        "Martinique",
-        "Mauritania",
-        "Mauritius",
-        "Mayotte",
-        "Mexico",
-        "Micronesia (Federated States of)",
-        "Moldova (the Republic of)",
-        "Monaco",
-        "Mongolia",
-        "Montenegro",
-        "Montserrat",
-        "Morocco",
-        "Mozambique",
-        "Myanmar",
-        "Namibia",
-        "Nauru",
-        "Nepal",
-        "Netherlands",
-        "New Caledonia",
-        "New Zealand",
-        "Nicaragua",
-        "Niger",
-        "Nigeria",
-        "Niue",
-        "Norfolk Island",
-        "Northern Mariana Islands",
-        "Norway",
-        "Oman",
-        "Pakistan",
-        "Palau",
-        "Palestine, State of",
-        "Panama",
-        "Papua New Guinea",
-        "Paraguay",
-        "Peru",
-        "Philippines",
-        "Pitcairn",
-        "Poland",
-        "Portugal",
-        "Puerto Rico",
-        "Qatar",
-        "Republic of North Macedonia",
-        "Romania",
-        "Russian Federation",
-        "Rwanda",
-        "Réunion",
-        "Saint Barthélemy",
-        "Saint Helena, Ascension and Tristan da Cunha",
-        "Saint Kitts and Nevis",
-        "Saint Lucia",
-        "Saint Martin (French part)",
-        "Saint Pierre and Miquelon",
-        "Saint Vincent and the Grenadines",
-        "Samoa",
-        "San Marino",
-        "Sao Tome and Principe",
-        "Saudi Arabia",
-        "Senegal",
-        "Serbia",
-        "Seychelles",
-        "Sierra Leone",
-        "Singapore",
-        "Sint Maarten (Dutch part)",
-        "Slovakia",
-        "Slovenia",
-        "Solomon Islands",
-        "Somalia",
-        "South Africa",
-        "South Georgia and the South Sandwich Islands",
-        "South Sudan",
-        "Spain",
-        "Sri Lanka",
-        "Sudan",
-        "Suriname",
-        "Svalbard and Jan Mayen",
-        "Sweden",
-        "Switzerland",
-        "Syrian Arab Republic",
-        "Taiwan",
-        "Tajikistan",
-        "Tanzania, United Republic of",
-        "Thailand",
-        "Timor-Leste",
-        "Togo",
-        "Tokelau",
-        "Tonga",
-        "Trinidad and Tobago",
-        "Tunisia",
-        "Turkey",
-        "Turkmenistan",
-        "Turks and Caicos Islands",
-        "Tuvalu",
-        "Uganda",
-        "Ukraine",
-        "United Arab Emirates",
-        "UK",
-        "United Kingdom",
-        "Great Britain",
-        "Ireland",
-        "United States Minor Outlying Islands",
-        "United States of America",
-        "U.S.",
-        "USA",
-        "Uruguay",
-        "Uzbekistan",
-        "Vanuatu",
-        "Venezuela",
-        "Viet Nam",
-        "Virgin Islands",
-        "Virgin Islands",
-        "Wallis and Futuna",
-        "Western Sahara",
-        "Yemen",
-        "Zambia",
-        "Zimbabwe",
-      ];
 
       // enums
       var spglobal_colors = {
@@ -1324,6 +1017,13 @@
       function login() {
         password = document.getElementById("passwordInput").value;
         create_canvas();
+      }
+
+      // Function to handle the "Enter" key press
+      function handleKeyPress(event) {
+        if (event.key === "Enter") {
+          login();
+        }
       }
 
       // Functions
@@ -1835,7 +1535,7 @@
 
         // set the text and styles for the footer text
         footerText.innerHTML =
-          '<span style="font-weight: bold;">S&amp;P Global</span> | Social Media Creator';
+          '<span style="font-weight: bold;">S&P Global</span> | Spark Social'; // QuickPost —— Reach -- Spark Social -- Influence -- Vision
         footerText.style.position = "fixed";
         footerText.style.bottom = "16px";
         footerText.style.right = "16px";
@@ -2059,18 +1759,6 @@
         }
 
         if (current_panel_open == "Text") {
-          // Auto format
-          if (event.target.name == "brand-voice-headline") {
-            canvas_content.headline = format_string_to_brand_style(
-              canvas_content.headline
-            );
-            document.getElementsByName("input_headline")[0].value =
-              canvas_content.headline;
-            // Fit the text in the space
-            calculate_headline_minimum_container_width();
-            // Update the panel
-            update_toolbox_panel("text_button");
-          }
           // Generate random headline
           if (event.target.name == "random_headline") {
             generate_random_copy();
@@ -2197,7 +1885,7 @@
               !canvas_content.vertically_centered_text;
           }
 
-          if (button_label.includes("Set font size: Small")) {
+          if (button_label.includes("Small")) {
             canvas_content.font_size.small = !canvas_content.font_size.small;
           }
         }
@@ -2250,6 +1938,7 @@
         inputBox.id = "input_" + input_box_name;
         inputBox.addEventListener("input", inputbox_event_listener);
         inputBox.addEventListener("paste", inputbox_event_listener);
+        inputBox.setAttribute("spellcheck", "true");
 
         div.appendChild(inputBox);
         insideToolsContainer.appendChild(div);
@@ -2275,6 +1964,8 @@
           }
           // Update canvas
           create_canvas();
+          // Resize
+          handle_window_resize();
         };
 
         reader.readAsText(file);
@@ -2398,12 +2089,6 @@
           expand_left_panel();
           current_panel_open = "Text";
 
-          // Set font size
-          let toggle_font_size = add_toggle_switch_with_label(
-            "Set font size: Small",
-            canvas_content.font_size.small
-          );
-
           let headline_label = add_label_to_inside_tools_container("Headline");
           headline_label.id = "headline_label";
           //add_text_to_inside_tools_container("Label here");
@@ -2421,8 +2106,10 @@
           );
           */
 
+          /*
           // Auto-wordwrap
           add_text_wrap_button_and_input();
+          */
 
           let body_label = add_label_to_inside_tools_container("Body");
           body_label.id = "body_label";
@@ -2451,6 +2138,13 @@
             "random_headline"
           );
           */
+          add_label_to_inside_tools_container("Font size");
+
+          // Set font size
+          let toggle_font_size = add_toggle_switch_with_label(
+            "Small",
+            canvas_content.font_size.small
+          );
 
           add_label_to_inside_tools_container("Visibility");
           // Headline
@@ -2682,7 +2376,7 @@
         textBalance.classList.add("text_balance");
 
         const label1 = document.createElement("label");
-        label1.textContent = "Auto-wordwrap";
+        label1.textContent = "Wordwrap";
 
         const inputBox = document.createElement("input");
         inputBox.type = "number";
@@ -3748,8 +3442,6 @@
           ? body_font_size
           : body_properties.font_size;
 
-        console.log("body_area height: " + body_area_available_height);
-
         // RENDER THE BODY
         body_properties = add_text_to_canvas(
           body_text,
@@ -3800,6 +3492,8 @@
         canvas_content.font_size.body = body_properties.font_size;
         canvas_content.font_size.cta = button_font_size;
         update_font_size_label();
+
+        // Update properties
 
         // Draw error messages
         canvas_content.error =
@@ -3894,7 +3588,7 @@
             ctx.lineWidth = 2;
             ctx.strokeRect(
               headline_properties.x,
-              headline_position_y,
+              headline_properties.y,
               headline_properties.width,
               headline_properties.height
             );
@@ -3911,7 +3605,7 @@
             ctx.lineWidth = 2;
             ctx.strokeRect(
               body_properties.x,
-              body_position_y,
+              body_properties.y,
               body_properties.width,
               body_properties.height
             );
@@ -3932,7 +3626,7 @@
             ctx.lineWidth = 3;
             ctx.strokeRect(
               button_properties.x,
-              button_position_y,
+              button_properties.y,
               button_properties.width,
               button_properties.height
             );
@@ -3947,6 +3641,8 @@
         // To turn off dashed lines and revert to a solid line
         ctx.setLineDash([]); // Reset the line dash pattern to an empty array
       }
+
+      //function show_error_state()
 
       // Wraps an input text into a specified number of lines, balancing text content and ensuring certain phrases are not split across lines.
       function balance_text_wrap(text, numberOfLines) {
@@ -4895,41 +4591,6 @@
 
         // Step 4: Combine the sentences back into a single string, adding a period and a space between them
         const result = capitalizedSentences.join(". ");
-
-        return result;
-      }
-
-      // Brand voice
-      function format_string_to_brand_style(string) {
-        // Remove formating
-        let cleared_formating = clear_formatting(string);
-
-        let capitalize_brand_words = replace_with_capitalized(
-          cleared_formating,
-          capitalizationArray
-        );
-
-        console.log(capitalize_brand_words);
-
-        let capitalize_countries = convert_countries_to_sentence_case(
-          capitalize_brand_words
-        );
-
-        let capitalize_first_word =
-          capitalize_after_period(capitalize_countries);
-
-        return capitalize_first_word;
-      }
-
-      function convert_countries_to_sentence_case(inputStr) {
-        const regex = new RegExp("\\b(" + countryList.join("|") + ")\\b", "gi");
-        const result = inputStr.replace(regex, (matchedCountry) => {
-          // Find the correct format of the matched country from the list
-          const correctFormat = countryList.find(
-            (country) => country.toLowerCase() === matchedCountry.toLowerCase()
-          );
-          return correctFormat || matchedCountry;
-        });
 
         return result;
       }

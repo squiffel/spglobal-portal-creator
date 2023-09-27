@@ -1,10 +1,26 @@
 Need to be able to set the minimum width to the minimum width of the word in the body, headline, and button (calculate_headline_minimum_container_width())
 
+Spark Social
+
 TO DO NEXT
-Bottom right button shouldn't effect description size
--- Fix font size change so that the margin doesnt shift and doesnt get as small as it currently does
+-- Enter should open the login
+-- Drag and drop replaced the primary image --- TWO PORTALS
+-- Add a note that you can have up to TWO portals
+-- Its not obvious that you can make the portal a full sized background
+----- Make it a toggle for 100%
+----- Image is the canvas background -- "Image background"
+-- COLORS DONT UPDATE IF YOU CLICK THE ICONS
+-- Move visibility buttons below their label
+-- REMOVE BOTTOM LEFT AND TOP LEFT from logo alignment
+-- TEXT ERROR SHOULD GO OVER THE IMAGE
+-- PUT ERRORS in the left side panel
+
+-- Do we want to add a reason for the logo placement?
+
+
+-- Explain there are hidden RETURNS in the copy. Add a CLEAR returns button when they are there.
 -- Toggle between font sizes using ICONS
--- Spellcheck -- https://github.com/brandonaaron/jquery-spellcheck/blob/master/test.html
+
 
 -- Solve for single sign on
 -- See if we can use Github
@@ -23,6 +39,8 @@ Password protected — Check "The199"
 -- Remove "GENERATE RANDOM COPY"
 -- Would like the background color selector be a THEME selector to be cards that show the background color and font color
 -- Check if you are exceeding the WIDTH of the text box and issue error
+-- Uploading TEMPLATES created a weird scenario
+-- Spellcheck -- https://github.com/brandonaaron/jquery-spellcheck/blob/master/test.html
 
 
 Text to the RIGHT of the logo for ultra wide formats
