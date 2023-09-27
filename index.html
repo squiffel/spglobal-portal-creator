@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>S&P Portal Creator</title>
+    <title>S&P Global | Spark Social</title>
     <style>
       html,
       body {
@@ -364,6 +364,7 @@
         display: flex;
         justify-content: center;
         align-items: center; /* Center vertically */
+        pointer-events: none;
       }
 
       .color-indicator span {
@@ -1275,7 +1276,8 @@
       }
 
       // Color indicator
-      function add_color_indicator(button, rgb, fontColor) {
+      function add_color_indicator(name, rgb, fontColor) {
+        let button = add_button_to_inside_tools_container(name);
         const colorIndicator = document.createElement("div");
         colorIndicator.classList.add("color-indicator");
         colorIndicator.style.backgroundColor = rgb;
@@ -1285,7 +1287,6 @@
         letters.textContent = "Aa";
         letters.style.fontSize = "11px";
         letters.style.color = fontColor;
-
         // Append the letters to the colorIndicator
         colorIndicator.appendChild(letters);
 
@@ -1394,6 +1395,10 @@
         });
 
         dragDropArea.addEventListener("drop", function (event) {
+          // Image to change
+          canvas_content.portal_upload_image_number =
+            canvas_content.portal_count;
+
           if (event.dataTransfer.files.length > 0) {
             const file = event.dataTransfer.files[0];
             if (file.type === "image/png" || file.type === "image/jpeg") {
@@ -2015,31 +2020,11 @@
           expand_left_panel();
           current_panel_open = "Color";
           add_label_to_inside_tools_container("Color");
-          add_color_indicator(
-            add_button_to_inside_tools_container("White"),
-            spglobal_colors.white,
-            "black"
-          );
-          add_color_indicator(
-            add_button_to_inside_tools_container("Black"),
-            spglobal_colors.black,
-            "white"
-          );
-          add_color_indicator(
-            add_button_to_inside_tools_container("Red"),
-            spglobal_colors.red,
-            "white"
-          );
-          add_color_indicator(
-            add_button_to_inside_tools_container("Yellow"),
-            spglobal_colors.yellow,
-            "black"
-          );
-          add_color_indicator(
-            add_button_to_inside_tools_container("Blue"),
-            spglobal_colors.blue,
-            "black"
-          );
+          add_color_indicator("White", spglobal_colors.white, "black");
+          add_color_indicator("Black", spglobal_colors.black, "white");
+          add_color_indicator("Red", spglobal_colors.red, "white");
+          add_color_indicator("Yellow", spglobal_colors.yellow, "black");
+          add_color_indicator("Blue", spglobal_colors.blue, "black");
         }
 
         if (buttonName === "file_button") {
@@ -2538,6 +2523,7 @@
       };
 
       function update_color_scheme(color) {
+        console.log(color);
         color = color.toLowerCase().slice(0, -2);
         // Set background color
         canvas_content.background_color = spglobal_colors[color];

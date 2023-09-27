@@ -3,13 +3,10 @@ Need to be able to set the minimum width to the minimum width of the word in the
 Spark Social
 
 TO DO NEXT
--- Enter should open the login
--- Drag and drop replaced the primary image --- TWO PORTALS
 -- Add a note that you can have up to TWO portals
 -- Its not obvious that you can make the portal a full sized background
 ----- Make it a toggle for 100%
 ----- Image is the canvas background -- "Image background"
--- COLORS DONT UPDATE IF YOU CLICK THE ICONS
 -- Move visibility buttons below their label
 -- REMOVE BOTTOM LEFT AND TOP LEFT from logo alignment
 -- TEXT ERROR SHOULD GO OVER THE IMAGE
