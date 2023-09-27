@@ -1090,7 +1090,7 @@
       canvas_content.vertically_centered_text = false;
       canvas_content.headline_visibility = true;
       canvas_content.description_visibility = true;
-      canvas_content.cta_visibility = true;
+      canvas_content.cta_visibility = false;
 
       // Downscaled images
       temp_portal_downscaled_image = [null, null];
@@ -1122,7 +1122,7 @@
 
       // Typography scale
       const typescale = {
-        96: { body: 48, cta: 32 },
+        80: { body: 48, cta: 32 },
         64: { body: 32, cta: 22 },
         48: { body: 24, cta: 18 },
         32: { body: 22, cta: 16 },
@@ -1140,7 +1140,7 @@
         return 4;
       }
 
-      const typescale_map = [96, 64, 48, 32, 24, 22, 18, 16];
+      const typescale_map = [80, 64, 48, 32, 24, 22, 18, 16];
 
       // Downscale the font size
       function reduce_font_size(inputValue) {
@@ -1174,7 +1174,7 @@
       function estimate_typescale(width, height) {
         let area = width * height;
         if (area > 1000000) {
-          return 96;
+          return 80;
         } else if (area <= 1000000 && area > 600000) {
           return 64;
         } else if (area <= 600000 && area > 250000) {
@@ -1222,8 +1222,7 @@
         headline_label.innerText =
           "Headline: " + canvas_content.font_size.headline + "px";
         body_label.innerText = "Body: " + canvas_content.font_size.body + "px";
-        cta_label.innerText =
-          "Call To Action: " + canvas_content.font_size.cta + "px";
+        cta_label.innerText = "Button: " + canvas_content.font_size.cta + "px";
       }
 
       // Random initial headline
@@ -1403,7 +1402,10 @@
         canvas_content.portal_side = "right";
 
         // Set if vertical set to top
-        if (canvas_content.orientation == "vertical") {
+        if (
+          canvas_content.orientation == "vertical" ||
+          canvas_content.orientation == "square"
+        ) {
           canvas_content.portal_side = "top";
         }
 
@@ -2431,7 +2433,7 @@
           );
           description_button.style.height = "128px";
 
-          let cta_label = add_label_to_inside_tools_container("Call to action");
+          let cta_label = add_label_to_inside_tools_container("Button");
           cta_label.id = "cta_label";
 
           add_input_box_to_inside_tools_container("cta", canvas_content.cta);
@@ -3423,37 +3425,6 @@
         let show_button =
           canvas_content.cta.length > 0 && canvas_content.cta_visibility;
 
-        /*
-        // Move text if its offset
-        if (canvas_content.logo_offset_text) {
-          // Logo + Padding
-          let logo_and_margin = canvas_content.logo.width + logo_padding;
-
-          // Shift text over
-          position.x = canvas_content.marginLeft + logo_and_margin;
-
-          // If button is bottom right
-          let estimate_button_padding = calculate_button_padding(canvas.height);
-          let estimate_button_font_size =
-            typescale[round_to_nearest_typescale(estimate_headline_size)].cta;
-
-          // Calculate estimated button width
-          let estimate_button_width = 0;
-          if (show_button) {
-            estimate_button_width =
-              estimate_button_padding * 2 +
-              estimate_button_text_size(estimate_button_font_size) +
-              logo_padding;
-          }
-
-          // Reduce text area size
-          text_area.width =
-            canvas_content.marginWidth -
-            logo_and_margin -
-            estimate_button_width;
-        }
-        */
-
         // Limit text area size to 80% max when in Landscape mode and the portal is 0% or 100% of the canvas
         if (
           canvas_content.portal_size_percent == 100 ||
@@ -3564,7 +3535,7 @@
           button_padding,
           button_position_x,
           button_position_y,
-          false
+          false // do not render
         );
 
         // Text boxe sizes
@@ -3599,23 +3570,6 @@
           text_area.y = canvas_content.marginBottom - text_area.height;
         }
 
-        /*
-        // RECALCULATE
-        console.log("pre-render data");
-
-        console.log(
-          "Headline height " +
-            headline_properties.height +
-            " margin " +
-            headline_margin
-        );
-
-        console.log(
-          "body height: " + body_properties.height + " margin: " + body_margin
-        );
-        console.log("button height: " + button_properties.height);
-        */
-
         // RECALCULATE HEADLINE
         headline_properties = add_text_to_canvas(
           headline_text,
@@ -3645,22 +3599,6 @@
           400, // Regular
           false // Render text
         );
-
-        /*
-        console.log("recalculated data");
-        // Console log test
-        console.log(
-          "Headline height " +
-            headline_properties.height +
-            " margin " +
-            headline_margin
-        );
-
-        console.log(
-          "body height: " + body_properties.height + " margin: " + body_margin
-        );
-        console.log("button height: " + button_properties.height);
-        */
 
         // Calculate total height of the container
         let total_content_height =
@@ -3727,7 +3665,7 @@
           return false;
         }
 
-        let headline_outside_bounds = is_outside_boundingbox(
+        var headline_outside_bounds = is_outside_boundingbox(
           "Headline",
           position.x,
           headline_position_y,
@@ -3739,7 +3677,7 @@
           text_area.width
         );
 
-        let body_outside_bounds = is_outside_boundingbox(
+        var body_outside_bounds = is_outside_boundingbox(
           "Body",
           position.x,
           body_position_y,
@@ -3751,7 +3689,7 @@
           text_area.width
         );
 
-        let button_outside_bounds = is_outside_boundingbox(
+        var button_outside_bounds = is_outside_boundingbox(
           "Button",
           position.x,
           button_position_y,
@@ -3763,15 +3701,19 @@
           text_area.width
         );
 
+        // Check if button is out of bounds
         var button_overlapping_logo = false;
-
+        var button_bottom_right = false;
+        // Check if the button is outside of the bounds
         if (button_outside_bounds == true) {
           // Render the button in the bottom right hand corner
           button_position_y =
             canvas_content.marginBottom - button_properties.height;
           button_position_x =
             canvas_content.marginRight - button_properties.width;
-          // Check if colliding with the logo
+          // Set button to bottom right
+          button_bottom_right = true;
+
           if (
             button_position_x <
             canvas_content.marginLeft + canvas_content.logo.width + logo_padding
@@ -3796,20 +3738,47 @@
           true // Render text
         );
 
+        // Body area changes if the button is bottom right
+        body_area_available_height = button_bottom_right
+          ? text_area.height - headline_properties.height - headline_margin
+          : body_properties.height + 1;
+
+        // Reset to original estimated body text size
+        body_font_size = button_bottom_right
+          ? body_font_size
+          : body_properties.font_size;
+
+        console.log("body_area height: " + body_area_available_height);
+
         // RENDER THE BODY
         body_properties = add_text_to_canvas(
           body_text,
           position.x,
           body_position_y,
           text_area.width,
-          body_properties.height + 1,
-          body_properties.font_size,
+          body_area_available_height,
+          body_font_size,
           canvas_content.color_font,
           0,
           1.2, // Line height
           400, // Regular
           true // Render text
         );
+
+        // Check body collision again
+        if (button_bottom_right) {
+          body_outside_bounds = is_outside_boundingbox(
+            "Body",
+            position.x,
+            body_position_y,
+            body_properties.height,
+            body_properties.width,
+            position.x,
+            text_area.y,
+            text_area.height,
+            text_area.width
+          );
+        }
 
         // RENDER THE BUTTON
         let button;

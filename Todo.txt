@@ -1,8 +1,8 @@
 Need to be able to set the minimum width to the minimum width of the word in the body, headline, and button (calculate_headline_minimum_container_width())
 
 TO DO NEXT
--- Check if you are exceeding the WIDTH of the text box and issue error
-
+Bottom right button shouldn't effect description size
+-- Fix font size change so that the margin doesnt shift and doesnt get as small as it currently does
 -- Toggle between font sizes using ICONS
 -- Spellcheck -- https://github.com/brandonaaron/jquery-spellcheck/blob/master/test.html
 
@@ -22,6 +22,7 @@ Password protected — Check "The199"
 -- No margins on portrait single images
 -- Remove "GENERATE RANDOM COPY"
 -- Would like the background color selector be a THEME selector to be cards that show the background color and font color
+-- Check if you are exceeding the WIDTH of the text box and issue error
 
 
 Text to the RIGHT of the logo for ultra wide formats
