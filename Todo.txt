@@ -1,17 +1,9 @@
-"With S&P Global, confidently navigate complex energy transitions and markets, making an impact on tomorrow."
-"Clarifying with uncertainity. Clarifying with"
-
 Need to be able to set the minimum width to the minimum width of the word in the body, headline, and button (calculate_headline_minimum_container_width())
 
 TO DO NEXT
-
-Only show font size setting when you can change it?
-"Clarifying uncertainty with insight." headline creates a weird glitch on 75% with image
--- Check if AUTO-CAPILTALIZE cleans up all copy or just the headline --- Maybe just remove AUTO-CAPITALIZE?
+-- Check if you are exceeding the WIDTH of the text box and issue error
 
 -- Toggle between font sizes using ICONS
-
-
 -- Spellcheck -- https://github.com/brandonaaron/jquery-spellcheck/blob/master/test.html
 
 -- Solve for single sign on

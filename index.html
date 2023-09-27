@@ -3377,23 +3377,41 @@
           canvas.height
         );
 
-        // Downscale the font if the user picks a smaller font
-        if (canvas_content.font_size.small) {
-          estimate_headline_size = round_to_nearest_typescale(
-            estimate_headline_size - 1
-          );
-        }
-
-        // Initial guess at largest font size
-        font_size = estimate_headline_size;
-
-        // Remove line breaks if user has turned off formating
         // Headline
         let headline_unformatted = remove_new_lines_and_return_lines(
           canvas_content.headline,
           canvas_content.ignore_line_breaks.headline
         );
 
+        // Downscale the font if the user picks a smaller font
+        if (canvas_content.font_size.small) {
+          // Precalculate the size of the text then downscale
+          headline_properties = add_text_to_canvas(
+            headline_unformatted,
+            position.x,
+            position.y,
+            text_area.width,
+            text_area.height,
+            estimate_headline_size,
+            canvas_content.color_font,
+            0,
+            1.05,
+            700,
+            false
+          );
+
+          estimate_headline_size = round_to_nearest_typescale(
+            headline_properties.font_size - 1
+          );
+        }
+
+        // Initial guess at largest font size
+        font_size = estimate_headline_size;
+
+        // Calculate the position
+        var headline_position_y = position.y;
+
+        // Remove line breaks if user has turned off formating
         let headline_text = canvas_content.headline_visibility
           ? headline_unformatted
           : "";
@@ -3405,6 +3423,7 @@
         let show_button =
           canvas_content.cta.length > 0 && canvas_content.cta_visibility;
 
+        /*
         // Move text if its offset
         if (canvas_content.logo_offset_text) {
           // Logo + Padding
@@ -3433,6 +3452,7 @@
             logo_and_margin -
             estimate_button_width;
         }
+        */
 
         // Limit text area size to 80% max when in Landscape mode and the portal is 0% or 100% of the canvas
         if (
@@ -3448,8 +3468,7 @@
 
         // ----------------------- CALCULATE HEADLINE --------------------------//
         // Calculate the initial headline size  -- Do not render
-        var headline_position_y = position.y;
-        let headline_properties = add_text_to_canvas(
+        headline_properties = add_text_to_canvas(
           headline_text,
           position.x,
           headline_position_y,
@@ -3580,6 +3599,7 @@
           text_area.y = canvas_content.marginBottom - text_area.height;
         }
 
+        /*
         // RECALCULATE
         console.log("pre-render data");
 
@@ -3594,6 +3614,7 @@
           "body height: " + body_properties.height + " margin: " + body_margin
         );
         console.log("button height: " + button_properties.height);
+        */
 
         // RECALCULATE HEADLINE
         headline_properties = add_text_to_canvas(
@@ -3625,6 +3646,7 @@
           false // Render text
         );
 
+        /*
         console.log("recalculated data");
         // Console log test
         console.log(
@@ -3638,6 +3660,7 @@
           "body height: " + body_properties.height + " margin: " + body_margin
         );
         console.log("button height: " + button_properties.height);
+        */
 
         // Calculate total height of the container
         let total_content_height =
@@ -3671,23 +3694,34 @@
         // Check if text is exceeding the boundary
         function is_outside_boundingbox(
           name,
+          position_x,
           position_y,
           area_height,
+          area_width,
+          safe_area_position_x,
           safe_area_position_y,
-          safe_area_height
+          safe_area_height,
+          safe_area_width
         ) {
           // Wiggle room
           let padding = 4;
-          // Check if text is out of bounds
+          // Exceeds the bottom
           if (
             position_y + area_height >
             safe_area_position_y + safe_area_height + padding
           ) {
-            //console.log(name + " out of bottom bounds");
             return true;
           }
+          // Exceeds the top
           if (position_y < safe_area_position_y - padding) {
-            //console.log(name + " out of top bounds");
+            return true;
+          }
+          // Exceeds the width
+          if (
+            position_x + area_width >
+            safe_area_position_x + safe_area_width + padding
+          ) {
+            console.log(name + " exceeds width");
             return true;
           }
           return false;
@@ -3695,26 +3729,38 @@
 
         let headline_outside_bounds = is_outside_boundingbox(
           "Headline",
+          position.x,
           headline_position_y,
           headline_height + 1,
+          headline_properties.width,
+          position.x,
           text_area.y,
-          text_area.height
+          text_area.height,
+          text_area.width
         );
 
         let body_outside_bounds = is_outside_boundingbox(
           "Body",
+          position.x,
           body_position_y,
           body_height + 1,
+          body_properties.width,
+          position.x,
           text_area.y,
-          text_area.height
+          text_area.height,
+          text_area.width
         );
 
         let button_outside_bounds = is_outside_boundingbox(
           "Button",
+          position.x,
           button_position_y,
           button_properties.height,
+          button_properties.width,
+          position.x,
           text_area.y,
-          text_area.height
+          text_area.height,
+          text_area.width
         );
 
         var button_overlapping_logo = false;
@@ -3792,9 +3838,7 @@
           body_outside_bounds +
           button_overlapping_logo;
 
-        console.log(canvas_content.error);
-
-        if (canvas_content.error > -1) {
+        if (canvas_content.error > 0) {
           // Draw guides around total available text area
           ctx.strokeStyle = "blue"; // Set stroke color to blue
           ctx.lineWidth = 1;
@@ -3853,7 +3897,6 @@
 
           // Error message
           function drawTextInRedRectangle(ctx, text, boundingBox) {
-            return;
             // Set the font and text style
             ctx.font = "12px Arial";
 
@@ -3877,8 +3920,7 @@
           }
 
           // Draw guides around headline
-          if (headline_text.length > 0) {
-            // && headline_outside_bounds
+          if (headline_text.length > 0 && headline_outside_bounds) {
             ctx.strokeStyle = error_color;
             ctx.lineWidth = 2;
             ctx.strokeRect(
@@ -3889,14 +3931,13 @@
             );
             drawTextInRedRectangle(
               ctx,
-              "Error: Text exceeds safe area",
+              "Error: Outside safe area",
               headline_properties
             );
           }
 
           // Draw guides around body
-          if (body_text.length > 0) {
-            // && body_outside_bounds
+          if (body_text.length > 0 && body_outside_bounds) {
             ctx.strokeStyle = error_color;
             ctx.lineWidth = 2;
             ctx.strokeRect(
@@ -3907,15 +3948,16 @@
             );
             drawTextInRedRectangle(
               ctx,
-              "Error: Text exceeds safe area",
+              "Error: Outside safe area",
               body_properties
             );
           }
 
           // Draw guides around button
           if (
-            canvas_content.cta.length >
-            0 /*  && button_outside_bounds && button_overlapping_logo */
+            canvas_content.cta.length > 0 &&
+            button_outside_bounds &&
+            button_overlapping_logo
           ) {
             ctx.strokeStyle = error_color;
             ctx.lineWidth = 3;
@@ -3927,7 +3969,7 @@
             );
             drawTextInRedRectangle(
               ctx,
-              "Error: Text overlaps logo",
+              "Error: Overlaps logo",
               button_properties
             );
           }
