@@ -4,11 +4,7 @@ Spark Social
 
 TO DO NEXT
 -- Add a note that you can have up to TWO portals
--- Its not obvious that you can make the portal a full sized background
------ Make it a toggle for 100%
------ Image is the canvas background -- "Image background"
--- Move visibility buttons below their label
--- REMOVE BOTTOM LEFT AND TOP LEFT from logo alignment
+
 -- TEXT ERROR SHOULD GO OVER THE IMAGE
 -- PUT ERRORS in the left side panel
 
