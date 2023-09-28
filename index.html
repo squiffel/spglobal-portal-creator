@@ -3481,6 +3481,69 @@
           ? body_font_size
           : body_properties.font_size;
 
+        // If top aligned recalculate all the positions to prevent a coding glitch
+        if (canvas_content.text_bottom_aligned == false) {
+          body_position_y =
+            text_initial_position_y +
+            headline_properties.height +
+            headline_margin;
+
+          button_position_y =
+            text_initial_position_y +
+            headline_properties.height +
+            headline_margin +
+            body_properties.height +
+            body_margin;
+
+          body_outside_bounds = is_outside_boundingbox(
+            "Body",
+            position.x,
+            body_position_y,
+            body_height + 1,
+            body_properties.width,
+            position.x,
+            text_area.y,
+            text_area.height,
+            text_area.width
+          );
+
+          var button_outside_bounds = is_outside_boundingbox(
+            "Button",
+            position.x,
+            button_position_y,
+            button_properties.height,
+            button_properties.width,
+            position.x,
+            text_area.y,
+            text_area.height,
+            text_area.width
+          );
+
+          // Recalculate
+          button_overlapping_logo = false;
+          button_bottom_right = false;
+          // Check if the button is outside of the bounds
+          if (button_outside_bounds == true) {
+            // Render the button in the bottom right hand corner
+            button_position_y =
+              canvas_content.marginBottom - button_properties.height;
+            button_position_x =
+              canvas_content.marginRight - button_properties.width;
+            // Set button to bottom right
+            button_bottom_right = true;
+
+            if (
+              button_position_x <
+              canvas_content.marginLeft +
+                canvas_content.logo.width +
+                logo_padding
+            ) {
+              console.log("Button is overlapping logo");
+              button_overlapping_logo = true;
+            }
+          }
+        }
+
         // RENDER THE BODY
         body_properties = add_text_to_canvas(
           body_text,
@@ -3577,7 +3640,7 @@
               headline_properties,
               body_properties,
               button_properties,
-              true // show all
+              show_boundingboxes // show all
             );
           }, delayInSeconds * 1000); // Convert seconds to milliseconds
         }
@@ -3672,7 +3735,8 @@
 
           // Draw guides around headline
           if (
-            (headline_text.length > 0 && headline_outside_bounds) ||
+            (headline_text.length > 0 &&
+              canvas_content.error.headline_outside_bounds) ||
             show_boundingboxes
           ) {
             ctx.strokeStyle = error_color;
@@ -3692,7 +3756,8 @@
 
           // Draw guides around body
           if (
-            (body_text.length > 0 && body_outside_bounds) ||
+            (body_text.length > 0 &&
+              canvas_content.error.body_outside_bounds) ||
             show_boundingboxes
           ) {
             ctx.strokeStyle = error_color;
@@ -3713,8 +3778,7 @@
           // Draw guides around button
           if (
             canvas_content.cta.length > 0 &&
-            button_outside_bounds &&
-            button_overlapping_logo
+            canvas_content.error.button_overlapping_logo
           ) {
             ctx.strokeStyle = error_color;
             ctx.lineWidth = 3;

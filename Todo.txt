@@ -1,6 +1,5 @@
-This causes a glitch on 70% but it isn't worth solving
-Essential Intelligence places risk and performance in context
-Uncover new levels of understanding with solutions from S&P Global.
+Glitches:
+Sometimes the SLIDER Doesnt register on the first slide
 
 Need to be able to set the minimum width to the minimum width of the word in the body, headline, and button (calculate_headline_minimum_container_width())
 
