@@ -3,16 +3,10 @@ Need to be able to set the minimum width to the minimum width of the word in the
 Spark Social
 
 TO DO NEXT
--- Add a note that you can have up to TWO portals
-
 -- TEXT ERROR SHOULD GO OVER THE IMAGE
 -- PUT ERRORS in the left side panel
-
--- Do we want to add a reason for the logo placement?
-
-
 -- Explain there are hidden RETURNS in the copy. Add a CLEAR returns button when they are there.
--- Toggle between font sizes using ICONS
+-- Explain there are WIDOWS in the copy
 
 
 -- Solve for single sign on

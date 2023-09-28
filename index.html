@@ -2220,7 +2220,7 @@
               canvas_content.portal_side
             );
 
-            let slider_range = canvas_content.portal_size_values.length;
+            let slider_range = canvas_content.portal_size_values.length - 1; // Cap at 70%
             let portal_slider_label_name = "Portal size: ";
             let portal_slider_label = add_label_to_inside_tools_container(
               portal_slider_label_name +
@@ -2696,7 +2696,7 @@
                 canvas_content.color_font != spglobal_colors.black
                   ? "#000000"
                   : "#ffffff";
-              render_background(color, 0.3);
+              render_background(color, 0.4);
             }
             // Render text overlay
             render_text();
