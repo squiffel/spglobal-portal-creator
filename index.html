@@ -1993,6 +1993,7 @@
           var parsedData = JSON.parse(contents);
           // Store the parsed data in canvas_content
           canvas_content = parsedData;
+          console.log("File data:");
           console.log(canvas_content);
           // Load images
           for (var i = 0; i < canvas_content.portal_image_src.length; i++) {
@@ -2587,7 +2588,6 @@
       };
 
       function update_color_scheme(color) {
-        console.log(color);
         color = color.toLowerCase().slice(0, -2);
         // Set background color
         canvas_content.background_color = spglobal_colors[color];
@@ -3353,7 +3353,6 @@
           text_initial_position_y +
           headline_properties.height +
           headline_margin;
-        console.log("Body position 2 " + body_position_y);
 
         button_position_y =
           text_initial_position_y +
@@ -3743,7 +3742,7 @@
         let split_words = text.split(" ");
         const words = merge_spglobal_and_dow_strings(split_words); // Merges S&P Global into one word
         const avgCharsPerLine = text.length / numberOfLines;
-        console.log(`number of lines: ${numberOfLines}`);
+        //console.log(`number of lines: ${numberOfLines}`);
 
         let lines = [];
         let currentLine = "";
