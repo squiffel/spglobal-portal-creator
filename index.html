@@ -774,7 +774,13 @@
       };
 
       // Errors
-      canvas_content.error = 0;
+      canvas_content.error = {
+        text_outside_bounds: 0,
+        headline_widow: false,
+        headline_special_characters: 0,
+        body_widow: false,
+        body_special_characters: 0,
+      };
 
       // Buton
       canvas_content.button_style = "solid";
@@ -1708,13 +1714,15 @@
         if (button_label == "input_body") {
           update_character_limit_inputbox(event.target, 150); // Max recommended description length
           canvas_content.body = event.target.value;
-          //calculate_headline_minimum_container_width();
         }
 
         if (button_label == "input_cta") {
+          // Remove newline and return line special characters
+          const cleanedValue = event.target.value.replace(/(\r\n|\n|\r)/g, "");
+          event.target.value = cleanedValue;
+          // Update box
           update_character_limit_inputbox(event.target, 20); // Max recommended CTA length
           canvas_content.cta = event.target.value;
-          //calculate_headline_minimum_container_width();
         }
 
         update_canvas();
@@ -1728,7 +1736,7 @@
         if (current_panel_open == "File") {
           // Download image
           if (button_label.includes("Download")) {
-            if (canvas_content.error > 0) {
+            if (canvas_content.error.text_outside_bounds > 0) {
               alert("Resolve errors before downloading");
               return;
             }
@@ -2049,14 +2057,14 @@
           // Select logo
           add_label_to_inside_tools_container("Image");
           let download_label =
-            canvas_content.error > 0
+            canvas_content.error.text_outside_bounds > 0
               ? "Fix errors before downloading"
               : "Download";
           let download_button = add_button_to_inside_tools_container(
             download_label,
             "download_template"
           );
-          if (canvas_content.error > 0) {
+          if (canvas_content.error.text_outside_bounds > 0) {
             download_button.style.color = "red";
             download_button.style.border = "1px solid red";
           }
@@ -2275,35 +2283,6 @@
               );
             }
           }
-
-          /*
-          // Update layout size
-          add_label_to_inside_tools_container("Custom Size");
-          add_text_to_inside_tools_container("Width (min 144, max 1920)");
-          let btn = add_input_box_to_inside_tools_container("width");
-          btn.value = canvas.width;
-          btn.id = "widthInput";
-          btn.classList.add("input_fixed_height");
-          add_text_to_inside_tools_container("Height (min 88, max 1920)");
-          btn = add_input_box_to_inside_tools_container("height");
-          btn.value = canvas.height;
-          btn.id = "heightInput";
-          btn.classList.add("input_fixed_height");
-
-          let margin_label = add_text_to_inside_tools_container(
-            "Margins: " +
-              calculate_canvas_margin(canvas.width, canvas.height) +
-              "px"
-          );
-          margin_label.id = "margin_label";
-          margin_label.style.marginBottom = "4px";
-          margin_label.style.marginBottom = "8px";
-
-          let submit_button = add_button_to_inside_tools_container("Submit");
-          submit_button.id = "submit_canvas_size_button";
-          submit_button.style.marginTop = "4px";
-          convert_to_blue_button_style(submit_button);
-          */
         }
 
         // IMAGES
@@ -3485,15 +3464,51 @@
         canvas_content.font_size.cta = button_font_size;
         update_font_size_label();
 
-        // Update properties
-
-        // Draw error messages
-        canvas_content.error =
+        // Create error messages
+        canvas_content.error.text_outside_bounds =
           headline_outside_bounds +
           body_outside_bounds +
           button_overlapping_logo;
 
-        if (canvas_content.error > 0) {
+        // Text errors
+        canvas_content.error.headline_widow = headline_properties.widow;
+        canvas_content.error.headline_special_characters =
+          headline_properties.special_characters;
+
+        canvas_content.error.body_widow = body_properties.widow;
+        canvas_content.error.body_special_characters =
+          body_properties.special_characters;
+
+        function logDictionaryKeysAndValues(dictionary) {
+          for (const key in dictionary) {
+            if (dictionary.hasOwnProperty(key)) {
+              console.log(`${key}: ${dictionary[key]}`);
+            }
+          }
+        }
+        // Call the function to print the errors
+        logDictionaryKeysAndValues(canvas_content.error);
+
+        if (canvas_content.error.text_outside_bounds > 0) {
+          const delayInSeconds = 0.2; // Replace x with the number of seconds you want to delay
+          setTimeout(() => {
+            show_errors(
+              position,
+              text_area,
+              headline_properties,
+              body_properties,
+              button_properties
+            );
+          }, delayInSeconds * 1000); // Convert seconds to milliseconds
+        }
+
+        function show_errors(
+          position,
+          text_area,
+          headline_properties,
+          body_properties,
+          button_properties
+        ) {
           // Draw guides around total available text area
           ctx.strokeStyle = "blue"; // Set stroke color to blue
           ctx.lineWidth = 1;
@@ -3535,7 +3550,7 @@
             ctx.restore();
           }
 
-          drawVerticalTextInBlueLabel(ctx, "Safe area", {
+          drawVerticalTextInBlueLabel(ctx, "Text safe area", {
             x: position.x,
             y: text_area.y,
             width: text_area.width,
@@ -3629,7 +3644,6 @@
             );
           }
         }
-
         // To turn off dashed lines and revert to a solid line
         ctx.setLineDash([]); // Reset the line dash pattern to an empty array
       }
@@ -4366,6 +4380,8 @@
           }
         }
 
+        const original_text = text;
+
         // Text processing
         // Clean up input text -- Remove multiple new lines and replace return lines with new lines
         text = remove_duplicate_new_lines(text);
@@ -4422,6 +4438,9 @@
         ctx.font = `${fontWeight} ${fontSize}px Akkurat LL`;
 
         let offset_y = 0.75; // First line has too much padding
+        var widow_result = false;
+        var isSingleWord = false;
+
         for (let i = 0; i < textForRendering.length; i++) {
           const line = textForRendering[i];
           let calculated_position_y =
@@ -4429,11 +4448,21 @@
             position_y +
             i * fontSize * lineHeight +
             fontSize * offset_y;
+
+          // Check if the last line is a widow (contains no whitespace)
+          if (i === textForRendering.length - 1 && !/\s/.test(line)) {
+            widow_result = true;
+          }
+
           // Add superscript, trademark and copywriting
           if (renderText) {
             draw_text_with_superscript(line, position_x, calculated_position_y);
           }
         }
+
+        // Count special characters (\r and \n)
+        const special_characters_count =
+          (text.match(/\r/g) || []).length + (text.match(/\n/g) || []).length;
 
         // Return results
         return {
@@ -4442,6 +4471,9 @@
           y: position_y,
           width: textWidth,
           height: textHeight,
+          text: original_text,
+          widow: widow_result,
+          special_characters: special_characters_count,
         };
       }
 
