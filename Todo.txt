@@ -1,3 +1,4 @@
+This causes a glitch on 70% but it isn't worth solving
 Essential Intelligence places risk and performance in context
 Uncover new levels of understanding with solutions from S&P Global.
 
@@ -6,12 +7,6 @@ Need to be able to set the minimum width to the minimum width of the word in the
 Spark Social
 
 TO DO NEXT
--- TEXT ERROR SHOULD GO OVER THE IMAGE
--- PUT ERRORS in the left side panel
--- Explain there are hidden RETURNS in the copy. Add a CLEAR returns button when they are there.
--- Explain there are WIDOWS in the copy
-
-
 -- Solve for single sign on
 -- See if we can use Github
 

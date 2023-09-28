@@ -726,7 +726,7 @@
         <input
           type="password"
           id="passwordInput"
-          value="The199"
+          value=""
           onkeydown="handleKeyPress(event)"
         />
         <button onclick="login()">Login</button>
@@ -3353,6 +3353,7 @@
           text_initial_position_y +
           headline_properties.height +
           headline_margin;
+        console.log("Body position 2 " + body_position_y);
 
         button_position_y =
           text_initial_position_y +
@@ -3562,9 +3563,13 @@
           }
         }
         // Call the function to print the errors
-        log_dictionary_keys_and_values(canvas_content.error);
+        //log_dictionary_keys_and_values(canvas_content.error);
 
-        if (canvas_content.error.text_outside_bounds > 0) {
+        let show_boundingboxes = true;
+        if (
+          canvas_content.error.text_outside_bounds > 0 ||
+          show_boundingboxes
+        ) {
           const delayInSeconds = 0.2; // Replace x with the number of seconds you want to delay
           setTimeout(() => {
             show_errors(
@@ -3572,7 +3577,8 @@
               text_area,
               headline_properties,
               body_properties,
-              button_properties
+              button_properties,
+              true // show all
             );
           }, delayInSeconds * 1000); // Convert seconds to milliseconds
         }
@@ -3582,7 +3588,8 @@
           text_area,
           headline_properties,
           body_properties,
-          button_properties
+          button_properties,
+          show_boundingboxes
         ) {
           // Draw guides around total available text area
           ctx.strokeStyle = "blue"; // Set stroke color to blue
@@ -3665,7 +3672,10 @@
           }
 
           // Draw guides around headline
-          if (headline_text.length > 0 && headline_outside_bounds) {
+          if (
+            (headline_text.length > 0 && headline_outside_bounds) ||
+            show_boundingboxes
+          ) {
             ctx.strokeStyle = error_color;
             ctx.lineWidth = 2;
             ctx.strokeRect(
@@ -3682,7 +3692,10 @@
           }
 
           // Draw guides around body
-          if (body_text.length > 0 && body_outside_bounds) {
+          if (
+            (body_text.length > 0 && body_outside_bounds) ||
+            show_boundingboxes
+          ) {
             ctx.strokeStyle = error_color;
             ctx.lineWidth = 2;
             ctx.strokeRect(
