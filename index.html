@@ -3401,7 +3401,7 @@
         ) {
           // Don't check if its not visible
           if (visible == false) {
-            console.log(name + ": " + visible);
+            //console.log(name + ": " + visible);
             return false;
           }
           // Wiggle room
@@ -3411,12 +3411,12 @@
             position_y + area_height >
             safe_area_position_y + safe_area_height + padding
           ) {
-            console.log(name + " exceeds bottom");
+            //console.log(name + " exceeds bottom");
             return true;
           }
           // Exceeds the top
           if (position_y < safe_area_position_y - padding) {
-            console.log(name + " exceeds top");
+            //console.log(name + " exceeds top");
             return true;
           }
           // Exceeds the width
@@ -3424,7 +3424,7 @@
             position_x + area_width >
             safe_area_position_x + safe_area_width + padding
           ) {
-            console.log(name + " exceeds width");
+            //console.log(name + " exceeds width");
             return true;
           }
           return false;
@@ -3469,11 +3469,19 @@
           cta_text.length > 0
         );
 
+        // Oddly specific square rules
+        const square_force_button_bottom_right =
+          canvas_content.orientation == "square" &&
+          canvas_content.portal_size_percent > 30 &&
+          canvas_content.text_bottom_aligned == false &&
+          (canvas_content.portal_side == "top" ||
+            canvas_content.portal_side == "bottom");
+
         // Check if button is out of bounds
         var button_overlapping_logo = false;
         var button_bottom_right = false;
         // Check if the button is outside of the bounds
-        if (button_outside_bounds == true) {
+        if (button_outside_bounds == true || square_force_button_bottom_right) {
           // Render the button in the bottom right hand corner
           button_position_y =
             canvas_content.marginBottom - button_properties.height;
@@ -3560,7 +3568,10 @@
           button_overlapping_logo = false;
           button_bottom_right = false;
           // Check if the button is outside of the bounds
-          if (button_outside_bounds == true) {
+          if (
+            button_outside_bounds == true ||
+            square_force_button_bottom_right
+          ) {
             // Render the button in the bottom right hand corner
             button_position_y =
               canvas_content.marginBottom - button_properties.height;
