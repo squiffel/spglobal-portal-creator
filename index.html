@@ -2082,7 +2082,10 @@
           project_name_inputbox.style.height = "40px";
           add_label_to_inside_tools_container("FILE");
           // Create error label
-          if (canvas_content.error.text_outside_bounds > 0) {
+          if (
+            canvas_content.error.text_outside_bounds > 0 ||
+            canvas_content.error.button_overlapping_logo
+          ) {
             let error_label = add_label_to_inside_tools_container("Error");
             error_label.style.color = "red";
 
@@ -2105,14 +2108,18 @@
           }
 
           let download_label =
-            canvas_content.error.text_outside_bounds > 0
+            canvas_content.error.text_outside_bounds > 0 ||
+            canvas_content.error.button_overlapping_logo
               ? "Fix errors before downloading"
               : "Download";
           let download_button = add_button_to_inside_tools_container(
             download_label,
             "download_template"
           );
-          if (canvas_content.error.text_outside_bounds > 0) {
+          if (
+            canvas_content.error.text_outside_bounds > 0 ||
+            canvas_content.error.button_overlapping_logo
+          ) {
             download_button.style.color = "red";
             download_button.style.border = "1px solid red";
           }
@@ -3389,8 +3396,14 @@
           safe_area_position_x,
           safe_area_position_y,
           safe_area_height,
-          safe_area_width
+          safe_area_width,
+          visible
         ) {
+          // Don't check if its not visible
+          if (visible == false) {
+            console.log(name + ": " + visible);
+            return false;
+          }
           // Wiggle room
           let padding = 4;
           // Exceeds the bottom
@@ -3398,10 +3411,12 @@
             position_y + area_height >
             safe_area_position_y + safe_area_height + padding
           ) {
+            console.log(name + " exceeds bottom");
             return true;
           }
           // Exceeds the top
           if (position_y < safe_area_position_y - padding) {
+            console.log(name + " exceeds top");
             return true;
           }
           // Exceeds the width
@@ -3424,7 +3439,8 @@
           position.x,
           text_area.y,
           text_area.height,
-          text_area.width
+          text_area.width,
+          headline_text.length > 0
         );
 
         var body_outside_bounds = is_outside_boundingbox(
@@ -3436,7 +3452,8 @@
           position.x,
           text_area.y,
           text_area.height,
-          text_area.width
+          text_area.width,
+          body_text.length > 0
         );
 
         var button_outside_bounds = is_outside_boundingbox(
@@ -3448,7 +3465,8 @@
           position.x,
           text_area.y,
           text_area.height,
-          text_area.width
+          text_area.width,
+          cta_text.length > 0
         );
 
         // Check if button is out of bounds
@@ -3521,7 +3539,8 @@
             position.x,
             text_area.y,
             text_area.height,
-            text_area.width
+            text_area.width,
+            body_text.length > 0
           );
 
           var button_outside_bounds = is_outside_boundingbox(
@@ -3533,7 +3552,8 @@
             position.x,
             text_area.y,
             text_area.height,
-            text_area.width
+            text_area.width,
+            cta_text.length > 0
           );
 
           // Recalculate
@@ -3587,7 +3607,8 @@
             position.x,
             text_area.y,
             text_area.height,
-            text_area.width
+            text_area.width,
+            body_text.length > 0
           );
         }
 
@@ -3614,9 +3635,7 @@
 
         // Create error messages
         canvas_content.error.text_outside_bounds =
-          headline_outside_bounds +
-          body_outside_bounds +
-          button_overlapping_logo;
+          headline_outside_bounds + body_outside_bounds;
 
         // Text errors
         // Headline
@@ -3647,6 +3666,7 @@
         let show_boundingboxes = false;
         if (
           canvas_content.error.text_outside_bounds > 0 ||
+          canvas_content.error.button_overlapping_logo ||
           show_boundingboxes
         ) {
           const delayInSeconds = 0.2; // Replace x with the number of seconds you want to delay
@@ -3671,15 +3691,24 @@
           show_boundingboxes
         ) {
           // Draw guides around total available text area
-          ctx.strokeStyle = "blue"; // Set stroke color to blue
-          ctx.lineWidth = 1;
-          ctx.setLineDash([4, 4]); // Set the line to be dashed with a pattern of 5 pixels on and 5 pixels off
-          ctx.strokeRect(
-            position.x,
-            text_area.y,
-            text_area.width,
-            text_area.height
-          );
+          if (canvas_content.error.text_outside_bounds > 0) {
+            ctx.strokeStyle = "blue"; // Set stroke color to blue
+            ctx.lineWidth = 1;
+            ctx.setLineDash([4, 4]); // Set the line to be dashed with a pattern of 5 pixels on and 5 pixels off
+            ctx.strokeRect(
+              position.x,
+              text_area.y,
+              text_area.width,
+              text_area.height
+            );
+
+            drawVerticalTextInBlueLabel(ctx, "Text safe area", {
+              x: position.x,
+              y: text_area.y,
+              width: text_area.width,
+              height: text_area.height,
+            });
+          }
 
           function drawVerticalTextInBlueLabel(ctx, text, boundingBox) {
             // Set the font and text style
@@ -3711,21 +3740,6 @@
             ctx.restore();
           }
 
-          drawVerticalTextInBlueLabel(ctx, "Text safe area", {
-            x: position.x,
-            y: text_area.y,
-            width: text_area.width,
-            height: text_area.height,
-          });
-
-          var error_color = "red";
-          var error_text_color = "white";
-
-          if (canvas_content.background_color == spglobal_colors.red) {
-            var error_color = "white";
-            var error_text_color = "red";
-          }
-
           // Error message
           function drawTextInRedRectangle(ctx, text, boundingBox) {
             // Set the font and text style
@@ -3748,6 +3762,14 @@
             // Draw the white text inside the red rectangle
             ctx.fillStyle = error_text_color;
             ctx.fillText(text, rectX + 6, rectY + 6 + 12); // 6px padding on both sides
+          }
+
+          var error_color = "red";
+          var error_text_color = "white";
+
+          if (canvas_content.background_color == spglobal_colors.red) {
+            var error_color = "white";
+            var error_text_color = "red";
           }
 
           // Draw guides around headline
