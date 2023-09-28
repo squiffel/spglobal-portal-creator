@@ -728,6 +728,7 @@
           id="passwordInput"
           value=""
           onkeydown="handleKeyPress(event)"
+          autocomplete="current-password"
         />
         <button onclick="login()">Login</button>
       </div>
@@ -793,6 +794,9 @@
 
       // Buton
       canvas_content.button_style = "solid";
+
+      // Canvas name
+      canvas_content.project_name = "Spark-Social";
 
       // Text
       canvas_content.logo_offset_text = false;
@@ -1213,7 +1217,7 @@
         const formattedDate = `${today.getDate()}-${
           today.getMonth() + 1
         }-${today.getFullYear()}`;
-        link.download = `CI-Event-${formattedDate}.png`;
+        link.download = canvas_content.project_name + `-${formattedDate}.png`;
         link.click();
       }
 
@@ -1734,6 +1738,10 @@
           canvas_content.cta = event.target.value;
         }
 
+        if (button_label == "input_project") {
+          canvas_content.project_name = event.target.value;
+        }
+
         update_canvas();
       }
 
@@ -2065,8 +2073,14 @@
           expand_left_panel();
           current_panel_open = "File";
           // Select logo
+          add_label_to_inside_tools_container("FILENAME");
+          // Project name setting
+          let project_name_inputbox = add_input_box_to_inside_tools_container(
+            "project",
+            canvas_content.project_name
+          );
+          project_name_inputbox.style.height = "40px";
           add_label_to_inside_tools_container("FILE");
-
           // Create error label
           if (canvas_content.error.text_outside_bounds > 0) {
             let error_label = add_label_to_inside_tools_container("Error");
@@ -2999,8 +3013,11 @@
         canvas_content.portal_margins = false;
         canvas_content.portal_count = temp_portal_image.length;
 
-        // If the Canvas is vertical do not show the margins
-        if (canvas_content.orientation == "vertical") {
+        // If the Canvas is vertical or square do not show the margins
+        if (
+          canvas_content.orientation == "vertical" ||
+          canvas_content.orientation == "square"
+        ) {
           canvas_content.portal_override_margins = false;
         }
 
