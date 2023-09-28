@@ -379,6 +379,12 @@
         margin-bottom: 8px;
       }
 
+      .text-container br {
+        content: "\00a0"; /* Add space between lines */
+        display: block;
+        margin: 0.5rem 0; /* Adjust the value as needed */
+      }
+
       .focal_point_canvas {
         border-radius: 4px;
         border: 2px solid #cccccc;
@@ -776,10 +782,13 @@
       // Errors
       canvas_content.error = {
         text_outside_bounds: 0,
+        headline_outside_bounds: false,
         headline_widow: false,
         headline_special_characters: 0,
+        body_outside_bounds: false,
         body_widow: false,
         body_special_characters: 0,
+        button_outside_bounds: false,
       };
 
       // Buton
@@ -2055,7 +2064,31 @@
           expand_left_panel();
           current_panel_open = "File";
           // Select logo
-          add_label_to_inside_tools_container("Image");
+          add_label_to_inside_tools_container("FILE");
+
+          // Create error label
+          if (canvas_content.error.text_outside_bounds > 0) {
+            let error_label = add_label_to_inside_tools_container("Error");
+            error_label.style.color = "red";
+
+            let error_string = "";
+            if (canvas_content.error.text_outside_bounds) {
+              error_string += "</br>Text exceeds safe area.";
+            }
+            if (canvas_content.error.button_overlapping_logo) {
+              error_string += "</br>Button is too close to the logo.";
+            }
+            error_string +=
+              "</br>Try altering the copy length, font size or layout to resolve";
+
+            // Remove the first <br>
+            error_string = error_string.replace("<br>", "");
+
+            let error_message_container =
+              add_text_to_inside_tools_container(error_string);
+            error_message_container.style.color = "red";
+          }
+
           let download_label =
             canvas_content.error.text_outside_bounds > 0
               ? "Fix errors before downloading"
@@ -2067,6 +2100,41 @@
           if (canvas_content.error.text_outside_bounds > 0) {
             download_button.style.color = "red";
             download_button.style.border = "1px solid red";
+          }
+
+          // Create recommendations list
+          if (
+            canvas_content.error.headline_widow ||
+            canvas_content.error.body_widow ||
+            canvas_content.error.body_special_characters ||
+            canvas_content.error.headline_special_characters
+          ) {
+            add_label_to_inside_tools_container("Notes");
+
+            let error_string = "";
+            if (canvas_content.error.headline_widow) {
+              error_string += "</br>Headline has a widow on canvas.";
+            }
+            if (canvas_content.error.body_widow) {
+              error_string += "</br>Body has a widow on canvas.";
+            }
+            if (canvas_content.error.headline_special_characters) {
+              error_string +=
+                "</br>Headline copy includes (" +
+                canvas_content.error.headline_special_characters +
+                ") line break(s) that may effect layout.";
+            }
+            if (canvas_content.error.body_special_characters) {
+              error_string +=
+                "</br>Body copy includes (" +
+                canvas_content.error.body_special_characters +
+                ") line break(s) that may effect layout.";
+            }
+            // Remove the first <br>
+            error_string = error_string.replace("<br>", "");
+
+            let error_message =
+              add_text_to_inside_tools_container(error_string);
           }
 
           add_label_to_inside_tools_container("Template");
@@ -3471,15 +3539,22 @@
           button_overlapping_logo;
 
         // Text errors
+        // Headline
+        canvas_content.error.headline_outside_bounds = headline_outside_bounds;
         canvas_content.error.headline_widow = headline_properties.widow;
         canvas_content.error.headline_special_characters =
           headline_properties.special_characters;
 
+        // Body
+        canvas_content.error.body_outside_bounds = body_outside_bounds;
         canvas_content.error.body_widow = body_properties.widow;
         canvas_content.error.body_special_characters =
           body_properties.special_characters;
 
-        function logDictionaryKeysAndValues(dictionary) {
+        // Button
+        canvas_content.error.button_overlapping_logo = button_overlapping_logo;
+
+        function log_dictionary_keys_and_values(dictionary) {
           for (const key in dictionary) {
             if (dictionary.hasOwnProperty(key)) {
               console.log(`${key}: ${dictionary[key]}`);
@@ -3487,7 +3562,7 @@
           }
         }
         // Call the function to print the errors
-        logDictionaryKeysAndValues(canvas_content.error);
+        log_dictionary_keys_and_values(canvas_content.error);
 
         if (canvas_content.error.text_outside_bounds > 0) {
           const delayInSeconds = 0.2; // Replace x with the number of seconds you want to delay
@@ -3601,7 +3676,7 @@
             );
             drawTextInRedRectangle(
               ctx,
-              "Error: Outside safe area",
+              "Text exceeds safe area",
               headline_properties
             );
           }
@@ -3618,7 +3693,7 @@
             );
             drawTextInRedRectangle(
               ctx,
-              "Error: Outside safe area",
+              "Text exceeds safe area",
               body_properties
             );
           }
@@ -3639,7 +3714,7 @@
             );
             drawTextInRedRectangle(
               ctx,
-              "Error: Overlaps logo",
+              "Button overlaps logo",
               button_properties
             );
           }
