@@ -1,0 +1,26 @@
+/* Regular Font */
+@font-face {
+  font-family: "YourFontName"; /* Replace with your desired font name */
+  src: url("data:application/font-woff;charset=utf-8;base64,YourRegularBase64String")
+    format("woff2");
+  font-weight: normal; /* Specify the font weight for regular */
+  font-style: normal; /* Specify the font style for regular (usually 'normal') */
+}
+
+/* Bold Font */
+@font-face {
+  font-family: "YourFontName"; /* Same font name as regular */
+  src: url("data:application/font-woff;charset=utf-8;base64,YourBoldBase64String")
+    format("woff2");
+  font-weight: bold; /* Specify the font weight for bold */
+  font-style: normal; /* Specify the font style for bold (usually 'normal') */
+}
+
+/* Italic Font */
+@font-face {
+  font-family: "YourFontName"; /* Same font name as regular */
+  src: url("data:application/font-woff;charset=utf-8;base64,YourItalicBase64String")
+    format("woff2");
+  font-weight: normal; /* Specify the font weight for italic */
+  font-style: italic; /* Specify the font style for italic */
+}
