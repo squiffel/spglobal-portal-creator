@@ -549,7 +549,7 @@
         background-color: #f1f1f1;
         padding: 8px;
         cursor: pointer;
-        color: black;
+        color: #4390df;
         font-weight: bold;
         font-size: 14px;
         position: relative; /* Added position relative */
@@ -571,6 +571,7 @@
         padding: 10px;
         font-size: 14px;
         user-select: none; /* Prevent text selection */
+        color: #666666;
       }
 
       /* Style for open state */
@@ -1449,7 +1450,7 @@
 
         addAccordion(
           "Portals",
-          "You can upload up to two portal images. \nThe blue dot over the image represents the focal point. The canvas will try to center the image on that focal point. \nMargins are only available for Single Portal image and can be set in the Layout Panel. \nImages may take a while to load, while they are processing a blue progress loading bar can be seen at the top of the application. \nImages cannot be rotated, only flipped horizontally.",
+          "You can upload up to two portal images. \nThe blue dot over the image represents the focal point. The canvas will try to center the image on that focal point. \nMargins are only available for single portal image and can be set in the Layout Panel. \nImages may take a while to load, while they are processing a blue progress loading bar can be seen at the top of the application. \nImages cannot be rotated, only flipped horizontally.",
           false
         );
         add_label_to_inside_tools_container("Add Image");
@@ -1708,10 +1709,16 @@
 
       // FAQ Accordion
       // Function to add an accordion to the left side panel
-      function addAccordion(closedStateCopy, openStateCopy, isOpen) {
+      function addAccordion(
+        closedStateCopy,
+        openStateCopy,
+        isOpen,
+        setMarginTop = "0px"
+      ) {
         // Create a new accordion element
         const accordion = document.createElement("div");
         accordion.classList.add("accordion");
+        accordion.style.marginTop = setMarginTop;
 
         // Create the accordion title
         const title = document.createElement("div");
@@ -2211,6 +2218,44 @@
         if (buttonName === "file_button") {
           expand_left_panel();
           current_panel_open = "File";
+
+          addAccordion(
+            "File",
+            "Download images. \nSave files to your computer to edit at a later date or share with others.",
+            false
+          );
+
+          // Create recommendations list
+          if (
+            canvas_content.error.headline_widow ||
+            canvas_content.error.body_widow ||
+            canvas_content.error.body_special_characters ||
+            canvas_content.error.headline_special_characters
+          ) {
+            let error_string = "";
+            if (canvas_content.error.headline_widow) {
+              error_string += "\nHeadline has a widow on canvas.";
+            }
+            if (canvas_content.error.body_widow) {
+              error_string += "\nBody has a widow on canvas.";
+            }
+            if (canvas_content.error.headline_special_characters) {
+              error_string +=
+                "\nHeadline copy includes (" +
+                canvas_content.error.headline_special_characters +
+                ") line break(s) that may effect layout.";
+            }
+            if (canvas_content.error.body_special_characters) {
+              error_string +=
+                "\nBody copy includes (" +
+                canvas_content.error.body_special_characters +
+                ") line break(s) that may effect layout.";
+            }
+            // Remove the first <br>
+            error_string = error_string.replace("\n", "");
+            addAccordion("Potential issues", error_string, false);
+          }
+
           // Select logo
           add_label_to_inside_tools_container("FILENAME");
           // Project name setting
@@ -2272,50 +2317,15 @@
             "Open File (.JSON)",
             "import_template"
           );
-          let save_json_label = add_text_to_inside_tools_container(
-            "Save an editable version of your design to your computer."
-          );
-          save_json_label.style.marginTop = "8px";
-
-          // Create recommendations list
-          if (
-            canvas_content.error.headline_widow ||
-            canvas_content.error.body_widow ||
-            canvas_content.error.body_special_characters ||
-            canvas_content.error.headline_special_characters
-          ) {
-            add_label_to_inside_tools_container("Notes");
-
-            let error_string = "";
-            if (canvas_content.error.headline_widow) {
-              error_string += "</br>Headline has a widow on canvas.";
-            }
-            if (canvas_content.error.body_widow) {
-              error_string += "</br>Body has a widow on canvas.";
-            }
-            if (canvas_content.error.headline_special_characters) {
-              error_string +=
-                "</br>Headline copy includes (" +
-                canvas_content.error.headline_special_characters +
-                ") line break(s) that may effect layout.";
-            }
-            if (canvas_content.error.body_special_characters) {
-              error_string +=
-                "</br>Body copy includes (" +
-                canvas_content.error.body_special_characters +
-                ") line break(s) that may effect layout.";
-            }
-            // Remove the first <br>
-            error_string = error_string.replace("<br>", "");
-
-            let error_message =
-              add_text_to_inside_tools_container(error_string);
-          }
         }
 
         if (buttonName === "logo_button") {
           expand_left_panel();
-          current_panel_open = "Logo";
+          addAccordion(
+            "Logo",
+            "The color of the logo is automatically updated based on the background color",
+            false
+          );
 
           // Select logo
           add_label_to_inside_tools_container("Logo");
@@ -2405,6 +2415,11 @@
           expand_left_panel();
           current_panel_open = "Layout";
 
+          addAccordion(
+            "Layout",
+            "Set the size of the canvas. \nIn general logo should be placed at the bottom of the canvas. \nThe portal size can be updated if you upload an image in the image panel.",
+            false
+          );
           // Templates
           add_label_to_inside_tools_container("Template (Size)");
           let select_template = create_dropdown_menu(
