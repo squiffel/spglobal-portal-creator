@@ -244,6 +244,7 @@
         color: #707070;
         text-transform: uppercase;
         letter-spacing: 0.1em;
+        user-select: none;
       }
 
       .toolbox_expanded_inputbox {
@@ -535,6 +536,47 @@
         font-style: italic;
         text-align: right;
       }
+
+      /* Add CSS for accordion */
+      .accordion {
+        display: flex;
+        flex-direction: column;
+        border: 1px solid #ccc;
+        margin-bottom: 10px;
+      }
+
+      .accordion-title {
+        background-color: #f1f1f1;
+        padding: 10px;
+        cursor: pointer;
+        color: black;
+        font-weight: bold;
+        font-size: 14px;
+        position: relative; /* Added position relative */
+        user-select: none; /* Prevent text selection */
+      }
+
+      .accordion-title::after {
+        content: "+"; /* Default content */
+        position: absolute;
+        right: 10px; /* Adjust the position as needed */
+      }
+
+      .accordion.open .accordion-title::after {
+        content: "-"; /* Change content to "-" when open */
+      }
+
+      .accordion-content {
+        display: none;
+        padding: 10px;
+        font-size: 14px;
+        user-select: none; /* Prevent text selection */
+      }
+
+      /* Style for open state */
+      .accordion.open .accordion-content {
+        display: block;
+      }
     </style>
   </head>
   <body>
@@ -707,6 +749,29 @@
           </g>
         </svg>
         <span class="tooltiptext">Logo</span>
+      </button>
+      <!-- Help -->
+      <button
+        class="toolbox_button"
+        name="help_button"
+        onclick="pressed_toolbox_button(this.name)"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="23"
+          height="23"
+          viewBox="0 0 23 23"
+        >
+          <path
+            id="Path_11100"
+            data-name="Path 11100"
+            d="M20.844-8.625a9.344,9.344,0,0,0-4.672-8.092,9.344,9.344,0,0,0-9.344,0A9.344,9.344,0,0,0,2.156-8.625,9.344,9.344,0,0,0,6.828-.533a9.344,9.344,0,0,0,9.344,0A9.344,9.344,0,0,0,20.844-8.625ZM0-8.625a11.5,11.5,0,0,1,5.75-9.959,11.5,11.5,0,0,1,11.5,0A11.5,11.5,0,0,1,23-8.625a11.5,11.5,0,0,1-5.75,9.959,11.5,11.5,0,0,1-11.5,0A11.5,11.5,0,0,1,0-8.625Zm7.547-3.234a2.517,2.517,0,0,1,2.516-2.516h2.556a2.835,2.835,0,0,1,2.835,2.835,2.843,2.843,0,0,1-1.424,2.462l-1.451.831v1.42H10.422V-9.5l.544-.31,1.99-1.141a.679.679,0,0,0,.341-.588.678.678,0,0,0-.678-.678H10.063a.36.36,0,0,0-.359.359v.292H7.547Zm2.875,6.828h2.156v2.156H10.422Z"
+            transform="translate(0 20.125)"
+            fill="#666"
+          />
+        </svg>
+
+        <span class="tooltiptext">Help</span>
       </button>
 
       <!-- END BUTTON PANEL -->
@@ -1637,6 +1702,44 @@
         return button;
       }
 
+      // FAQ Accordion
+      // Function to add an accordion to the left side panel
+      function addAccordion(closedStateCopy, openStateCopy, isOpen) {
+        // Create a new accordion element
+        const accordion = document.createElement("div");
+        accordion.classList.add("accordion");
+
+        // Create the accordion title
+        const title = document.createElement("div");
+        title.classList.add("accordion-title");
+        title.textContent = closedStateCopy;
+
+        // Create the accordion content
+        const content = document.createElement("div");
+        content.classList.add("accordion-content");
+        content.textContent = openStateCopy;
+
+        if (isOpen) {
+          accordion.classList.add("open");
+        }
+        content.style.display = isOpen ? "block" : "none";
+
+        // Toggle accordion state when the title is clicked
+        title.addEventListener("click", () => {
+          accordion.classList.toggle("open");
+          content.style.display =
+            content.style.display === "block" ? "none" : "block";
+        });
+
+        // Append title and content to the accordion
+        accordion.appendChild(title);
+        accordion.appendChild(content);
+
+        // Add the accordion to the side panel
+        const sidePanel = document.querySelector(".inside_tools_container");
+        sidePanel.appendChild(accordion);
+      }
+
       // Add labels
       function add_label_to_inside_tools_container(
         label_string,
@@ -2392,6 +2495,30 @@
               );
             }
           }
+        }
+
+        // HELP
+        if (buttonName === "help_button") {
+          expand_left_panel();
+          current_panel_open = "Help";
+
+          // Notes
+          add_label_to_inside_tools_container("Knowledge Center");
+          addAccordion(
+            "Welcome",
+            "The 199 Social Media content creation tool.",
+            false
+          );
+          addAccordion(
+            "Color Panel",
+            "Allows you to set the background color and font",
+            false
+          );
+          addAccordion(
+            "Text Panel",
+            "Special characters like'new line' or 'return' can be added to force the canvas to break the text at a specific point in the paragraph. To check if you have any special characters, they will be flagged in the 'File Panel'. The font size automatically resizes to fit the text area based on the largest word. ",
+            false
+          );
         }
 
         // IMAGES
