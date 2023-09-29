@@ -1447,7 +1447,11 @@
           return;
         }
 
-        add_text_to_inside_tools_container("Upload up to 2 portal images");
+        addAccordion(
+          "Portals",
+          "You can upload up to two portal images. \nThe blue dot over the image represents the focal point. The canvas will try to center the image on that focal point. \nMargins are only available for Single Portal image and can be set in the Layout Panel. \nImages may take a while to load, while they are processing a blue progress loading bar can be seen at the top of the application. \nImages cannot be rotated, only flipped horizontally.",
+          false
+        );
         add_label_to_inside_tools_container("Add Image");
 
         const dragDropArea = document.createElement("div");
@@ -1717,7 +1721,20 @@
         // Create the accordion content
         const content = document.createElement("div");
         content.classList.add("accordion-content");
-        content.textContent = openStateCopy;
+
+        // Split the openStateCopy string into lines and add margin between them
+        const lines = openStateCopy.split("\n");
+        lines.forEach((line, index) => {
+          const lineElement = document.createElement("div");
+          lineElement.textContent = line;
+
+          // Add margin to all lines except the last one
+          if (index < lines.length - 1) {
+            lineElement.style.marginBottom = "8px";
+          }
+
+          content.appendChild(lineElement);
+        });
 
         if (isOpen) {
           accordion.classList.add("open");
@@ -2179,7 +2196,11 @@
         if (buttonName === "color_button") {
           expand_left_panel();
           current_panel_open = "Color";
-          add_label_to_inside_tools_container("Color");
+          addAccordion(
+            "Color",
+            "Allows you to set the background color and font",
+            false
+          );
           add_color_indicator("White", spglobal_colors.white, "black");
           add_color_indicator("Black", spglobal_colors.black, "white");
           add_color_indicator("Red", spglobal_colors.red, "white");
@@ -2309,6 +2330,11 @@
         if (buttonName === "text_button") {
           expand_left_panel();
           current_panel_open = "Text";
+          addAccordion(
+            "Text",
+            "Special characters like'new line' or 'return' can be added to force the canvas to break the text at a specific point in the paragraph. To check if you have any special characters, they will be flagged in the 'File Panel'. \nThe font size automatically resizes to fit the text area based on the largest word. ",
+            false
+          );
           add_label_to_inside_tools_container("FONT SIZE");
           // Set font size
           let toggle_font_size = add_toggle_switch_with_label(
@@ -2507,16 +2533,6 @@
           addAccordion(
             "Welcome",
             "The 199 Social Media content creation tool.",
-            false
-          );
-          addAccordion(
-            "Color Panel",
-            "Allows you to set the background color and font",
-            false
-          );
-          addAccordion(
-            "Text Panel",
-            "Special characters like'new line' or 'return' can be added to force the canvas to break the text at a specific point in the paragraph. To check if you have any special characters, they will be flagged in the 'File Panel'. The font size automatically resizes to fit the text area based on the largest word. ",
             false
           );
         }
