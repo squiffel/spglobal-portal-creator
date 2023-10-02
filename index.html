@@ -792,7 +792,7 @@
         <input
           type="password"
           id="passwordInput"
-          value=""
+          value="The199"
           onkeydown="handleKeyPress(event)"
           autocomplete="current-password"
         />
@@ -842,7 +842,7 @@
       canvas_content.font_size = {
         headline: 96,
         body: 48,
-        cta: 32,
+        button: 32,
         small: false,
       };
 
@@ -859,7 +859,7 @@
       };
 
       // Buton
-      canvas_content.button_style = "solid";
+      canvas_content.button_style = "none";
 
       // Canvas name
       canvas_content.project_name = "Spark-Social";
@@ -868,8 +868,8 @@
       canvas_content.logo_offset_text = false;
       canvas_content.vertically_centered_text = false;
       canvas_content.headline_visibility = true;
-      canvas_content.description_visibility = true;
-      canvas_content.cta_visibility = false;
+      canvas_content.body_visibility = true;
+      canvas_content.button_visibility = false;
 
       // Downscaled images
       temp_portal_downscaled_image = [null, null];
@@ -901,12 +901,12 @@
 
       // Typography scale
       const typescale = {
-        80: { body: 48, cta: 32 },
-        64: { body: 32, cta: 22 },
-        48: { body: 24, cta: 18 },
-        32: { body: 22, cta: 16 },
-        24: { body: 22, cta: 16 },
-        22: { body: 22, cta: 16 },
+        80: { body: 48, button: 32 },
+        64: { body: 32, button: 22 },
+        48: { body: 24, button: 18 },
+        32: { body: 22, button: 16 },
+        24: { body: 22, button: 16 },
+        22: { body: 22, button: 16 },
       };
 
       // Button height
@@ -1005,10 +1005,10 @@
             "Body: " + canvas_content.font_size.body + "px";
         }
         // Update button
-        let cta_label = document.getElementById("cta_label");
-        if (cta_label) {
-          cta_label.innerText =
-            "Button: " + canvas_content.font_size.cta + "px";
+        let button_label = document.getElementById("button_label");
+        if (button_label) {
+          button_label.innerText =
+            "Button: " + canvas_content.font_size.button + "px";
         }
       }
 
@@ -1030,7 +1030,7 @@
         "Creating benchmarks for progress.",
       ];
 
-      let random_description = [
+      let random_body = [
         "With S&P Global, confidently navigate complex energy transitions and markets, making an impact on tomorrow.",
         "As energy transitions and markets become more complex, solutions from S&P Global help you stay informed and uncover new levels of understanding.",
         "With increasing complexities in energy transitions and markets, solutions from S&P Global enhance comprehension, empowering you to shape the future.",
@@ -1042,7 +1042,7 @@
         "Impact tomorrow.",
       ];
 
-      let random_cta = [
+      let random_button = [
         "Learn more",
         "Explore our dataset",
         "Uncover insights now",
@@ -1059,11 +1059,9 @@
         canvas_content.headline =
           random_headlines[Math.floor(Math.random() * random_headlines.length)];
         canvas_content.body =
-          random_description[
-            Math.floor(Math.random() * random_description.length)
-          ];
-        canvas_content.cta =
-          random_cta[Math.floor(Math.random() * random_cta.length)];
+          random_body[Math.floor(Math.random() * random_body.length)];
+        canvas_content.button =
+          random_button[Math.floor(Math.random() * random_button.length)];
       }
 
       generate_random_copy();
@@ -1702,6 +1700,7 @@
         button.className = "toolbox_expanded_button";
         button.textContent = label_string;
         button.name = name;
+        console.log(button.textContent);
         button.addEventListener("click", panel_button_clicked);
         insideToolsContainer.appendChild(button);
         return button;
@@ -1852,17 +1851,17 @@
         }
 
         if (button_label == "input_body") {
-          update_character_limit_inputbox(event.target, 150); // Max recommended description length
+          update_character_limit_inputbox(event.target, 150); // Max recommended body length
           canvas_content.body = event.target.value;
         }
 
-        if (button_label == "input_cta") {
+        if (button_label == "input_button") {
           // Remove newline and return line special characters
           const cleanedValue = event.target.value.replace(/(\r\n|\n|\r)/g, "");
           event.target.value = cleanedValue;
           // Update box
-          update_character_limit_inputbox(event.target, 20); // Max recommended CTA length
-          canvas_content.cta = event.target.value;
+          update_character_limit_inputbox(event.target, 20); // Max recommended button length
+          canvas_content.button = event.target.value;
         }
 
         if (button_label == "input_project") {
@@ -1935,14 +1934,15 @@
             document.getElementsByName("input_body")[0].value =
               canvas_content.body;
             // Update headline box
-            document.getElementsByName("input_cta")[0].value =
-              canvas_content.cta;
+            document.getElementsByName("input_button")[0].value =
+              canvas_content.button;
           }
         }
 
         // Logo type
         if (current_panel_open == "Logo") {
           var logo_name = button_label.toLowerCase().replace(/ /g, "_");
+          console.log(logo_name);
           canvas_content.logo.name = "spg_" + logo_name;
         }
 
@@ -2034,14 +2034,14 @@
             update_toolbox_panel("text_button");
           }
 
-          if (button_label.includes("Show description")) {
-            canvas_content.description_visibility =
-              !canvas_content.description_visibility;
+          if (button_label.includes("Show body")) {
+            canvas_content.body_visibility = !canvas_content.body_visibility;
             update_toolbox_panel("text_button");
           }
 
           if (button_label.includes("Show button")) {
-            canvas_content.cta_visibility = !canvas_content.cta_visibility;
+            canvas_content.button_visibility =
+              !canvas_content.button_visibility;
             update_toolbox_panel("text_button");
           }
 
@@ -2321,6 +2321,7 @@
 
         if (buttonName === "logo_button") {
           expand_left_panel();
+          current_panel_open = "Logo";
           addAccordion(
             "Logo",
             "The color of the logo is automatically updated based on the background color",
@@ -2342,7 +2343,7 @@
           current_panel_open = "Text";
           addAccordion(
             "Text",
-            "Special characters like'new line' or 'return' can be added to force the canvas to break the text at a specific point in the paragraph. To check if you have any special characters, they will be flagged in the 'File Panel'. \nThe font size automatically resizes to fit the text area based on the largest word. ",
+            "Hidden characters 'new line' and 'return' will break text onto the next line. A list of hidden characters can be found in the 'File Panel'.\nThe font size automatically resizes to fit the text area based on the widest word.\nButtons are generally unneccessary in Social Media",
             false
           );
           add_label_to_inside_tools_container("FONT SIZE");
@@ -2374,34 +2375,37 @@
 
           // Body
           add_toggle_switch_with_label(
-            "Show description",
-            canvas_content.description_visibility
+            "Show body",
+            canvas_content.body_visibility
           );
 
-          if (canvas_content.description_visibility) {
+          if (canvas_content.body_visibility) {
             let body_label = add_label_to_inside_tools_container("Body");
             body_label.id = "body_label";
 
-            let description_button = add_input_box_to_inside_tools_container(
+            let body_button = add_input_box_to_inside_tools_container(
               "body",
               canvas_content.body
             );
-            description_button.style.height = "128px";
+            body_button.style.height = "128px";
           }
           // Button
           add_toggle_switch_with_label(
             "Show button",
-            canvas_content.cta_visibility
+            canvas_content.button_visibility
           );
 
-          if (canvas_content.cta_visibility) {
-            let cta_label = add_label_to_inside_tools_container("Button");
-            cta_label.id = "cta_label";
-            add_input_box_to_inside_tools_container("cta", canvas_content.cta);
+          if (canvas_content.button_visibility) {
+            let button_label = add_label_to_inside_tools_container("Button");
+            button_label.id = "button_label";
+            add_input_box_to_inside_tools_container(
+              "button",
+              canvas_content.button
+            );
 
             add_label_to_inside_tools_container("Button Style");
             let select_position = create_dropdown_menu(
-              ["solid", "outline", "none"],
+              ["none", "outline", "solid"],
               "button_style",
               canvas_content.button_style
             );
@@ -2890,12 +2894,9 @@
           ctx.rect(pos_x, pos_y, maskRectWidth, maskRectHeight);
           ctx.clip();
 
-          // Flip the image horizontally
-          let transformed_image = flip_image_horizontally(image, image_flip);
-
           // Downscale image
           let downscale_ratio = 1 / scaleFactor;
-          let downscaled_image = transformed_image;
+          let downscaled_image = image;
           // Only downscale if the image is larger than the canvas
           if (downscale_ratio < 1) {
             // Render using the pre-downscaled image
@@ -2907,16 +2908,22 @@
               console.log("Expensive downscale of the high res image");
               // Expensive high resolution downscale
               downscaled_image = high_resolution_image_downscale(
-                transformed_image,
+                image,
                 1 / scaleFactor,
                 image_number
               );
             }
           }
 
+          // Flip the image horizontally
+          let transformed_image = flip_image_horizontally(
+            downscaled_image,
+            image_flip
+          );
+
           // Draw the image in the center of the mask (Constrained by the edges of the image)
           ctx.drawImage(
-            downscaled_image,
+            transformed_image,
             pos_x - img_x_position,
             pos_y - img_y_position,
             scaledWidth,
@@ -3289,7 +3296,7 @@
 
         function estimate_button_text_size(button_font_size) {
           ctx.font = "bold " + button_font_size + "px Akkurat LL"; // Measure button inner text width
-          return ctx.measureText(canvas_content.cta).width;
+          return ctx.measureText(canvas_content.button).width;
         }
 
         // Position starts top left corner
@@ -3354,10 +3361,9 @@
 
         // Content showing
         let show_body =
-          canvas_content.body.length > 0 &&
-          canvas_content.description_visibility;
+          canvas_content.body.length > 0 && canvas_content.body_visibility;
         let show_button =
-          canvas_content.cta.length > 0 && canvas_content.cta_visibility;
+          canvas_content.button.length > 0 && canvas_content.button_visibility;
 
         // Limit text area size to 80% max when in Landscape mode and the portal is 0% or 100% of the canvas
         if (
@@ -3403,7 +3409,7 @@
 
         // Precalculate BUTTON size so that it can removed from the available space
         let button_padding = calculate_button_padding(canvas.height);
-        let button_font_size = typescale[headline_fixed_font_size].cta;
+        let button_font_size = typescale[headline_fixed_font_size].button;
 
         let button_height = show_button
           ? button_padding * 2 + button_font_size
@@ -3432,7 +3438,7 @@
             ? position.y
             : position.y + headline_properties.height + headline_margin;
 
-        let body_text = canvas_content.description_visibility
+        let body_text = canvas_content.body_visibility
           ? canvas_content.body
           : "";
 
@@ -3453,7 +3459,9 @@
 
         // ----------------------- CALCULATE BUTTON --------------------------//
         // Buttons are positioned under the body unless there is no body then they are below the headline
-        let cta_text = canvas_content.cta_visibility ? canvas_content.cta : "";
+        let button_text = canvas_content.button_visibility
+          ? canvas_content.button
+          : "";
         let body_margin = show_body && show_button ? content_margin : 0;
         let button_position_y = show_body
           ? body_position_y + body_properties.height + body_margin
@@ -3461,8 +3469,8 @@
         let button_position_x = position.x;
 
         // Calculate the button size
-        let button_properties = add_to_canvas_cta_button(
-          cta_text,
+        let button_properties = add_button_to_canvas(
+          button_text,
           button_font_size,
           "bold",
           canvas_content.button_style,
@@ -3643,7 +3651,7 @@
           text_area.y,
           text_area.height,
           text_area.width,
-          cta_text.length > 0
+          button_text.length > 0
         );
 
         // Oddly specific square rules
@@ -3738,7 +3746,7 @@
             text_area.y,
             text_area.height,
             text_area.width,
-            cta_text.length > 0
+            button_text.length > 0
           );
 
           // Recalculate
@@ -3803,8 +3811,8 @@
         // RENDER THE BUTTON
         let button;
         if (show_button) {
-          button_properties = add_to_canvas_cta_button(
-            cta_text,
+          button_properties = add_button_to_canvas(
+            button_text,
             button_font_size,
             "bold",
             canvas_content.button_style,
@@ -3818,7 +3826,7 @@
         // Store font sizes
         canvas_content.font_size.headline = headline_properties.font_size;
         canvas_content.font_size.body = body_properties.font_size;
-        canvas_content.font_size.cta = button_font_size;
+        canvas_content.font_size.button = button_font_size;
         update_font_size_label();
 
         // Create error messages
@@ -4004,7 +4012,7 @@
 
           // Draw guides around button
           if (
-            canvas_content.cta.length > 0 &&
+            canvas_content.button.length > 0 &&
             canvas_content.error.button_overlapping_logo
           ) {
             ctx.strokeStyle = error_color;
@@ -4268,8 +4276,8 @@
         return modifiedString;
       }
 
-      // Draw CTA Button
-      function add_to_canvas_cta_button(
+      // Draw button Button
+      function add_button_to_canvas(
         text,
         fontSize,
         fontWeight,

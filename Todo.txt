@@ -1,4 +1,5 @@
 Glitches:
+Downgraded images arent flipping
 Sometimes the SLIDER Doesnt register on the first slide
 
 Need to be able to set the minimum width to the minimum width of the word in the body, headline, and button (calculate_headline_minimum_container_width())
