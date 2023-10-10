@@ -899,6 +899,15 @@
         };
       }
 
+      const template_sizes = [
+        "1200x1200 Square",
+        "1200x628 Landscape",
+        "628x1200 Portrait",
+        "1920x1080 [Desktop] Landscape",
+        "1080x1920 [Desktop] Portrait",
+      ];
+      canvas_content.template_size = template_sizes[1];
+
       // Typography scale
       const typescale = {
         80: { body: 48, button: 32 },
@@ -2420,30 +2429,9 @@
           // Templates
           add_label_to_inside_tools_container("Template (Size)");
           let select_template = create_dropdown_menu(
-            [
-              "Select...",
-              "1200x1200 Square",
-              "1200x628 Landscape",
-              "628x1200 Portrait",
-              "1920x1080 [Desktop] Landscape",
-              "1080x1920 [Desktop] Portrait",
-              /*
-              "1920x420",
-              "1800x300",
-              "1500x300",
-              "1220x180",
-              "990x120",
-              "728x90",
-              "616x205",
-              "600x150 [Email]",
-              "400x100 [Email]",
-              "300x600",
-              "300x250",
-              "160x600",
-              */
-            ],
+            template_sizes,
             "canvas_size",
-            "Select..."
+            canvas_content.template_size
           );
 
           // Update logo position
@@ -2716,15 +2704,11 @@
           }
 
           if (button_label == "canvas_size") {
-            const inputString = selected_value;
-            // Exit if not a number
-            if (inputString == "Select...") {
-              return;
-            }
+            canvas_content.template_size = selected_value;
 
             // Get the width
             const regex = /(\d+)x(\d+)/;
-            const match = inputString.match(regex);
+            const match = canvas_content.template_size.match(regex);
 
             const width = parseInt(match[1]);
             const height = parseInt(match[2]);
