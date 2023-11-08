@@ -860,6 +860,7 @@
 
       // Buton
       canvas_content.button_style = "none";
+      canvas_content.button_color = "white";
 
       // Canvas name
       canvas_content.project_name = "Spark-Social";
@@ -1463,18 +1464,18 @@
           false
         );
 
+        // Brand Image Library
         const brandImagesButton = document.createElement("button");
         brandImagesButton.style.marginTop = "8px";
         brandImagesButton.textContent = "Open Brand Image Library";
-        container.appendChild(brandImagesButton);
+        // Open the hyperlink in a new tab "https://mediaportal.spglobal.com/search/images"
         brandImagesButton.addEventListener("click", function () {
-          // Open hyperlink "https://mediaportal.spglobal.com/search/images"
-          // Open the hyperlink in a new tab
           window.open(
             "https://mediaportal.spglobal.com/search/images",
             "_blank"
           );
         });
+        container.appendChild(brandImagesButton);
 
         add_label_to_inside_tools_container("Add Image");
 
@@ -1946,6 +1947,8 @@
         // Color scheme
         if (current_panel_open == "Color") {
           update_color_scheme(button_label); // Set background color, font and logo colors
+          // Update panel
+          update_toolbox_panel("color_button");
         }
 
         if (current_panel_open == "Text") {
@@ -2234,6 +2237,16 @@
           add_color_indicator("Red", spglobal_colors.red, "white");
           add_color_indicator("Yellow", spglobal_colors.yellow, "black");
           add_color_indicator("Blue", spglobal_colors.blue, "black");
+
+          // If the color is black provide options for the CTA add_color_indicator("Black", spglobal_colors.black, "white");
+          if (canvas_content.background_color == spglobal_colors.black) {
+            add_label_to_inside_tools_container("Call to action");
+            let select_position = create_dropdown_menu(
+              ["white", "red", "yellow"],
+              "button_color",
+              canvas_content.button_color
+            );
+          }
         }
 
         if (buttonName === "file_button") {
@@ -2708,6 +2721,13 @@
           }
         }
 
+        if (current_panel_open == "Color") {
+          if (button_label == "button_color") {
+            canvas_content.button_color = selected_value;
+            console.log(canvas_content.button_color);
+          }
+        }
+
         if (current_panel_open == "Layout") {
           if (button_label == "logo_position") {
             var position_name = selected_value.toLowerCase();
@@ -2806,6 +2826,7 @@
         // Select the correct color scheme
         canvas_content.color_font = spglobal_colors.black;
         canvas_content.color_wordmark = spglobal_colors.red;
+        canvas_content.button_color = "white"; // Set to default when you select a color scheme
 
         if (color.includes("yellow") || color.includes("blue")) {
           canvas_content.color_wordmark = spglobal_colors.black;
@@ -4332,6 +4353,17 @@
         ctx.fillStyle = canvas_content.color_font;
         ctx.strokeStyle = canvas_content.color_font;
 
+        if (canvas_content.button_color != "white") {
+          if (canvas_content.button_color == "red") {
+            ctx.fillStyle = spglobal_colors.red;
+            ctx.strokeStyle = spglobal_colors.red;
+          }
+          if (canvas_content.button_color == "yellow") {
+            ctx.fillStyle = spglobal_colors.yellow;
+            ctx.strokeStyle = spglobal_colors.yellow;
+          }
+        }
+
         let rectangle_width = textWidth + 2 * hPadding;
         let rectangle_height = textHeight + 2 * vPadding;
 
@@ -4342,6 +4374,7 @@
               ctx.rect(x, y, rectangle_width, rectangle_height);
               ctx.stroke();
             } else {
+              // Solid
               ctx.rect(x, y, rectangle_width, rectangle_height);
               ctx.fill();
 
@@ -4360,6 +4393,21 @@
             }
 
             ctx.closePath();
+          }
+
+          if (canvas_content.button_color != "white") {
+            if (canvas_content.button_color == "red") {
+              fontColor = spglobal_colors.red;
+              if (backgroundColor == "solid") {
+                fontColor = spglobal_colors.white;
+              }
+            }
+            if (canvas_content.button_color == "yellow") {
+              fontColor = spglobal_colors.yellow;
+              if (backgroundColor == "solid") {
+                fontColor = spglobal_colors.black;
+              }
+            }
           }
 
           // Draw text
