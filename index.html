@@ -1462,6 +1462,20 @@
           "Can upload up to two images to be visible on the canvas. \nThe blue dot over the image represents the focal point. The canvas will try to automatically center the image around the focal point. \nMargins can be added to single portal images in the Layout Panel. \nImages may take a while to load, while they are processing a blue progress loading bar can be seen at the top of the application.",
           false
         );
+
+        const brandImagesButton = document.createElement("button");
+        brandImagesButton.style.marginTop = "8px";
+        brandImagesButton.textContent = "Open Brand Image Library";
+        container.appendChild(brandImagesButton);
+        brandImagesButton.addEventListener("click", function () {
+          // Open hyperlink "https://mediaportal.spglobal.com/search/images"
+          // Open the hyperlink in a new tab
+          window.open(
+            "https://mediaportal.spglobal.com/search/images",
+            "_blank"
+          );
+        });
+
         add_label_to_inside_tools_container("Add Image");
 
         const dragDropArea = document.createElement("div");
