@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>S&P Global | Spark Socia v1.0</title>
+    <title>S&P Global | Spark Social v1.1</title>
     <style>
       html,
       body {
@@ -858,7 +858,7 @@
         button_outside_bounds: false,
       };
 
-      // Buton
+      // Button
       canvas_content.button_style = "none";
       canvas_content.button_color = "white";
 
@@ -2238,11 +2238,19 @@
           add_color_indicator("Yellow", spglobal_colors.yellow, "black");
           add_color_indicator("Blue", spglobal_colors.blue, "black");
 
+          console.log(canvas_content.background_color);
           // If the color is black provide options for the CTA add_color_indicator("Black", spglobal_colors.black, "white");
-          if (canvas_content.background_color == spglobal_colors.black) {
+          if (
+            canvas_content.background_color == spglobal_colors.black ||
+            canvas_content.background_color == spglobal_colors.white
+          ) {
             add_label_to_inside_tools_container("Call to action");
+            var color_list =
+              canvas_content.background_color == spglobal_colors.black
+                ? ["white", "red", "yellow"]
+                : ["black", "red"];
             let select_position = create_dropdown_menu(
-              ["white", "red"],
+              color_list,
               "button_color",
               canvas_content.button_color
             );
@@ -2724,7 +2732,6 @@
         if (current_panel_open == "Color") {
           if (button_label == "button_color") {
             canvas_content.button_color = selected_value;
-            console.log(canvas_content.button_color);
           }
         }
 
@@ -2820,7 +2827,12 @@
       };
 
       function update_color_scheme(color) {
-        color = color.toLowerCase().slice(0, -2);
+        // Set to lower case
+        color = color.toLowerCase();
+        // Remove the Aa if included
+        if (color.includes("aa")) {
+          color = color.slice(0, -2);
+        }
         // Set background color
         canvas_content.background_color = spglobal_colors[color];
         // Select the correct color scheme
@@ -3030,6 +3042,12 @@
 
         svgElement.getElementById("Wordmark").style.fill =
           canvas_content.color_wordmark;
+
+        // Logo is white when the button is yellow
+        if (canvas_content.button_color == "yellow") {
+          svgElement.getElementById("Wordmark").style.fill =
+            spglobal_colors.white;
+        }
 
         // Set to solid color if the canvas image fills the entire screen
         if (is_fullscreen_image()) {
@@ -4353,6 +4371,7 @@
         ctx.fillStyle = canvas_content.color_font;
         ctx.strokeStyle = canvas_content.color_font;
 
+        // Custom button colors
         if (canvas_content.button_color != "white") {
           if (canvas_content.button_color == "red") {
             ctx.fillStyle = spglobal_colors.red;
