@@ -856,6 +856,7 @@
         body_widow: false,
         body_special_characters: 0,
         button_outside_bounds: false,
+        logo_overlapping: false,
       };
 
       // Button
@@ -2307,11 +2308,13 @@
           );
           project_name_inputbox.style.height = "40px";
           add_label_to_inside_tools_container("FILE");
-          // Create error label
-          if (
+          // Major errors
+          var found_errors =
             canvas_content.error.text_outside_bounds > 0 ||
-            canvas_content.error.button_overlapping_logo
-          ) {
+            canvas_content.error.button_overlapping_logo ||
+            canvas_content.error.logo_overlapping;
+          // Create error label
+          if (found_errors) {
             let error_label = add_label_to_inside_tools_container("Error");
             error_label.style.color = "red";
 
@@ -2321,6 +2324,9 @@
             }
             if (canvas_content.error.button_overlapping_logo) {
               error_string += "</br>Button is too close to the logo.";
+            }
+            if (canvas_content.error.logo_overlapping) {
+              error_string += "\nLogo and Cosponsor logos are overlapping.";
             }
             error_string +=
               "</br>Try altering the copy length, font size or layout to resolve";
@@ -2333,11 +2339,9 @@
             error_message_container.style.color = "red";
           }
 
-          let download_label =
-            canvas_content.error.text_outside_bounds > 0 ||
-            canvas_content.error.button_overlapping_logo
-              ? "Fix errors before downloading"
-              : "Download PNG";
+          let download_label = found_errors
+            ? "Fix errors before downloading"
+            : "Download PNG";
           let download_button = add_button_to_inside_tools_container(
             download_label,
             "download_template"
@@ -3033,15 +3037,16 @@
         // Get original size
         let logo_name = canvas_content.logo.name;
         let initial_logo_name = canvas_content.logo.name;
-        console.log(logo_name);
+        //console.log(logo_name);
 
         /* Consponsor logo */
         let sponsor_reference = { width: 369.3, height: 77 };
+        let sponsor_logo_visible = false;
         let svgSponsorElement = undefined;
         if (logo_name.includes("sustainable1")) {
           svgSponsorElement = document.getElementById("spg_sustainable1");
           logo_name = "spg_corporate"; // Change logo back to Corporate
-          console.log(svgSponsorElement);
+          sponsor_logo_visible = true;
         }
 
         let svgElement = document.getElementById(logo_name);
@@ -3154,6 +3159,14 @@
         let sp_ratio =
           logo_name == "spg_corporate" ? 0.6857142857 : 0.2948717949;
 
+        // Load as an image
+        let image = new Image();
+        image.onload = () => {
+          // Draw logo
+          ctx.drawImage(image, position.x, position.y, logo_width, logo_height);
+        };
+        image.src = blobURL;
+
         // Store dynamic information about the logo
         canvas_content.logo = {
           x: position.x,
@@ -3163,15 +3176,12 @@
           min_padding: logo_height * sp_ratio, // The size of the S&P Global text
           name: initial_logo_name,
           corner: logo_position,
+          sponsor: sponsor_logo_visible,
+          sponsor_x: 0,
+          sponsor_y: 0,
+          sponsor_width: 0,
+          sponsor_height: 0,
         };
-
-        // Load as an image
-        let image = new Image();
-        image.onload = () => {
-          // Draw logo
-          ctx.drawImage(image, position.x, position.y, logo_width, logo_height);
-        };
-        image.src = blobURL;
 
         // If there is a sponsor logo
         if (svgSponsorElement != undefined) {
@@ -3225,6 +3235,35 @@
             );
           };
           sponsor_image.src = sponsorblobURL;
+
+          // Store sponsor information
+          canvas_content.logo.sponsor_x = sponsor_position.x;
+          canvas_content.logo.sponsor_y = sponsor_position.y;
+          canvas_content.logo.sponsor_width = sponsor_logo_width;
+          canvas_content.logo.sponsor_height = sponsor_logo_height;
+        }
+
+        // Check for errors
+        canvas_content.error.logo_overlapping = false;
+        if (canvas_content.logo.sponsor) {
+          if (
+            canvas_content.logo.x + canvas_content.logo.width >
+            canvas_content.logo.sponsor_x
+          ) {
+            canvas_content.error.logo_overlapping = true;
+            console.log("Sponsor logos are overlapping");
+            if (canvas_content.error.logo_overlapping) {
+              var error_color = "red";
+              ctx.strokeStyle = error_color;
+              ctx.lineWidth = 2;
+              ctx.strokeRect(
+                canvas_content.logo.sponsor_x,
+                canvas_content.logo.sponsor_y,
+                canvas_content.logo.sponsor_width,
+                canvas_content.logo.sponsor_height
+              );
+            }
+          }
         }
       }
 
@@ -3772,10 +3811,13 @@
           button_text.length > 0
         );
 
+        // Check for cosponsor
+
         // Oddly specific square rules
+        var min_percent = canvas_content.logo.sponsor == true ? 50 : 30;
         const square_force_button_bottom_right =
           canvas_content.orientation == "square" &&
-          canvas_content.portal_size_percent > 30 &&
+          canvas_content.portal_size_percent > min_percent &&
           canvas_content.text_bottom_aligned == false &&
           (canvas_content.portal_side == "top" ||
             canvas_content.portal_side == "bottom");
@@ -3889,6 +3931,11 @@
                 canvas_content.logo.width +
                 logo_padding
             ) {
+              console.log("Button is overlapping logo");
+              button_overlapping_logo = true;
+            }
+
+            if (canvas_content.logo.sponsor) {
               console.log("Button is overlapping logo");
               button_overlapping_logo = true;
             }
@@ -4085,6 +4132,24 @@
             var error_color = "white";
             var error_text_color = "red";
           }
+
+          // Logos are overlapping
+          /*
+          if (canvas_content.error.logo_overlapping) {
+            ctx.strokeStyle = error_color;
+            ctx.lineWidth = 2;
+            ctx.strokeRect(
+              canvas_content.logo.sponsor_x,
+              canvas_content.logo.sponsor_y,
+              canvas_content.logo.sponsor_width,
+              canvas_content.logo.sponsor_height
+            );
+            drawTextInRedRectangle(ctx, "Logos Overlap", {
+              x: canvas_content.logo.sponsor_x,
+              y: canvas_content.logo.sponsor_y,
+            });
+          }
+          */
 
           // Draw guides around headline
           if (
