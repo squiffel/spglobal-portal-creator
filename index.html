@@ -906,7 +906,7 @@
         "1200x1200 Square (Instagram)",
         "628x1200 Portrait",
         /* "1920x1080 [Desktop] Landscape",
-        "1080x1920 [Desktop] Portrait", */
+              "1080x1920 [Desktop] Portrait", */
       ];
       canvas_content.template_size = template_sizes[0];
 
@@ -3044,7 +3044,32 @@
         let sponsor_logo_visible = false;
         let svgSponsorElement = undefined;
         if (logo_name.includes("sustainable1")) {
+          // Color version
           svgSponsorElement = document.getElementById("spg_sustainable1");
+
+          // Color version on white background
+          if (canvas_content.background_color != spglobal_colors.white) {
+            // Switch to knockout version
+            svgSponsorElement = document.getElementById(
+              "spg_sustainable1_white"
+            );
+            // Convert to black
+            var fill_color = "#ffffff";
+            if (
+              canvas_content.background_color == spglobal_colors.blue ||
+              canvas_content.background_color == spglobal_colors.yellow
+            ) {
+              fill_color = "#000000";
+            }
+            // Get all <path> elements within the SVG
+            var pathElements = svgSponsorElement.getElementsByTagName("path");
+
+            // Loop through each <path> element and set the "fill" attribute to black
+            for (var i = 0; i < pathElements.length; i++) {
+              pathElements[i].setAttribute("fill", fill_color);
+            }
+          }
+
           logo_name = "spg_corporate"; // Change logo back to Corporate
           sponsor_logo_visible = true;
         }
@@ -4135,21 +4160,21 @@
 
           // Logos are overlapping
           /*
-          if (canvas_content.error.logo_overlapping) {
-            ctx.strokeStyle = error_color;
-            ctx.lineWidth = 2;
-            ctx.strokeRect(
-              canvas_content.logo.sponsor_x,
-              canvas_content.logo.sponsor_y,
-              canvas_content.logo.sponsor_width,
-              canvas_content.logo.sponsor_height
-            );
-            drawTextInRedRectangle(ctx, "Logos Overlap", {
-              x: canvas_content.logo.sponsor_x,
-              y: canvas_content.logo.sponsor_y,
-            });
-          }
-          */
+                if (canvas_content.error.logo_overlapping) {
+                  ctx.strokeStyle = error_color;
+                  ctx.lineWidth = 2;
+                  ctx.strokeRect(
+                    canvas_content.logo.sponsor_x,
+                    canvas_content.logo.sponsor_y,
+                    canvas_content.logo.sponsor_width,
+                    canvas_content.logo.sponsor_height
+                  );
+                  drawTextInRedRectangle(ctx, "Logos Overlap", {
+                    x: canvas_content.logo.sponsor_x,
+                    y: canvas_content.logo.sponsor_y,
+                  });
+                }
+                */
 
           // Draw guides around headline
           if (
@@ -5328,7 +5353,7 @@
           sG = 0,
           sB = 0; // source's current point r,g,b
         /* untested !
-            var sA = 0;  //source alpha  */
+                  var sA = 0;  //source alpha  */
 
         for (sy = 0; sy < sh; sy++) {
           ty = sy * scale; // y src position within target
@@ -5365,14 +5390,14 @@
             }
 
             /* !! untested : handling alpha !!
-                       sA = sBuffer[sIndex + 3];
-                       if (!sA) continue;
-                       if (sA != 0xFF) {
-                           sR = (sR * sA) >> 8;  // or use /256 instead ??
-                           sG = (sG * sA) >> 8;
-                           sB = (sB * sA) >> 8;
-                       }
-                    */
+                             sA = sBuffer[sIndex + 3];
+                             if (!sA) continue;
+                             if (sA != 0xFF) {
+                                 sR = (sR * sA) >> 8;  // or use /256 instead ??
+                                 sG = (sG * sA) >> 8;
+                                 sB = (sB * sA) >> 8;
+                             }
+                          */
 
             if (!crossX && !crossY) {
               // pixel does not cross
