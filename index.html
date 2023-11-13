@@ -3032,13 +3032,16 @@
 
         // Get original size
         let logo_name = canvas_content.logo.name;
+        let initial_logo_name = canvas_content.logo.name;
         console.log(logo_name);
-        /* Sustainable1 */
+
+        /* Consponsor logo */
+        let sponsor_reference = { width: 369.3, height: 77 };
+        let svgSponsorElement = undefined;
         if (logo_name.includes("sustainable1")) {
-          let svgSponsorElement = document.getElementById("spg_sustainable1");
-          let sponsor_reference = { width: 369.3, height: 77 };
-          console.log(svgSponsorElement);
+          svgSponsorElement = document.getElementById("spg_sustainable1");
           logo_name = "spg_corporate"; // Change logo back to Corporate
+          console.log(svgSponsorElement);
         }
 
         let svgElement = document.getElementById(logo_name);
@@ -3127,6 +3130,7 @@
           y: canvas_content.marginBottom - logo_height,
         };
 
+        // Find the custom location
         let logo_position = canvas_content.logo.corner;
 
         // Move logo to position
@@ -3157,7 +3161,7 @@
           width: logo_width,
           height: logo_height,
           min_padding: logo_height * sp_ratio, // The size of the S&P Global text
-          name: logo_name,
+          name: initial_logo_name,
           corner: logo_position,
         };
 
@@ -3168,6 +3172,60 @@
           ctx.drawImage(image, position.x, position.y, logo_width, logo_height);
         };
         image.src = blobURL;
+
+        // If there is a sponsor logo
+        if (svgSponsorElement != undefined) {
+          // Rescale
+          let sponsor_logo_scale = logo_scale * 0.6;
+
+          // Add sponsor logo
+          var sponsor_logo_width = sponsor_reference.width * sponsor_logo_scale;
+          var sponsor_logo_height =
+            sponsor_reference.height * sponsor_logo_scale;
+
+          // Create centering offset
+          var sponsor_offset_y = sponsor_logo_height * 0.09;
+
+          // Position bottom right
+          let sponsor_position = {
+            x: canvas_content.marginRight - sponsor_logo_width,
+            y:
+              canvas_content.marginBottom -
+              sponsor_logo_height +
+              sponsor_offset_y,
+          };
+
+          // Position top right
+          if (logo_position == "top") {
+            sponsor_position.x =
+              canvas_content.marginRight - sponsor_logo_width;
+            sponsor_position.y = canvas_content.marginTop - sponsor_offset_y;
+          }
+
+          // Clone the SVG
+          let clonedSponsorSvgElement = svgSponsorElement.cloneNode(true);
+          let sponsorOuterHTML = clonedSponsorSvgElement.outerHTML,
+            sponsorblob = new Blob([sponsorOuterHTML], {
+              type: "image/svg+xml;charset=utf-8",
+            });
+
+          let sponsorURL = window.URL || window.webkitURL || window;
+          let sponsorblobURL = sponsorURL.createObjectURL(sponsorblob);
+
+          // Load as an image
+          let sponsor_image = new Image();
+          sponsor_image.onload = () => {
+            // Draw logo
+            ctx.drawImage(
+              sponsor_image,
+              sponsor_position.x,
+              sponsor_position.y,
+              sponsor_logo_width,
+              sponsor_logo_height
+            );
+          };
+          sponsor_image.src = sponsorblobURL;
+        }
       }
 
       // Margins
