@@ -3051,7 +3051,7 @@
           if (canvas_content.background_color != spglobal_colors.white) {
             // Switch to knockout version
             svgSponsorElement = document.getElementById(
-              "spg_sustainable1_white"
+              "spg_sustainable1_knockout"
             );
             // Convert to black
             var fill_color = "#ffffff";
@@ -3063,7 +3063,6 @@
             }
             // Get all <path> elements within the SVG
             var pathElements = svgSponsorElement.getElementsByTagName("path");
-
             // Loop through each <path> element and set the "fill" attribute to black
             for (var i = 0; i < pathElements.length; i++) {
               pathElements[i].setAttribute("fill", fill_color);
@@ -3270,6 +3269,7 @@
 
         // Check for errors
         canvas_content.error.logo_overlapping = false;
+
         if (canvas_content.logo.sponsor) {
           if (
             canvas_content.logo.x + canvas_content.logo.width >
@@ -3277,16 +3277,51 @@
           ) {
             canvas_content.error.logo_overlapping = true;
             console.log("Sponsor logos are overlapping");
-            if (canvas_content.error.logo_overlapping) {
-              var error_color = "red";
-              ctx.strokeStyle = error_color;
-              ctx.lineWidth = 2;
-              ctx.strokeRect(
-                canvas_content.logo.sponsor_x,
-                canvas_content.logo.sponsor_y,
-                canvas_content.logo.sponsor_width,
-                canvas_content.logo.sponsor_height
-              );
+
+            // Timeout
+            setTimeout(function () {
+              show_logo_overlap_text();
+            }, 500);
+
+            function show_logo_overlap_text() {
+              if (canvas_content.error.logo_overlapping) {
+                ctx.strokeStyle = "red";
+                ctx.lineWidth = 2;
+                ctx.strokeRect(
+                  canvas_content.logo.sponsor_x,
+                  canvas_content.logo.sponsor_y,
+                  canvas_content.logo.sponsor_width,
+                  canvas_content.logo.sponsor_height
+                );
+                // White text
+                drawTextInRedRectangle(ctx, "Logo Overlaps", {
+                  x: canvas_content.logo.sponsor_x,
+                  y: canvas_content.logo.sponsor_y,
+                });
+              }
+
+              function drawTextInRedRectangle(ctx, text, boundingBox) {
+                // Set the font and text style
+                ctx.font = "12px Arial";
+
+                // Calculate the width and height of the text
+                const textWidth = ctx.measureText(text).width;
+                const textHeight = 12; // 12px font size
+
+                // Calculate the position of the red rectangle inside the bounding box
+                const rectX = boundingBox.x; //+ boundingBox.width - textWidth - 6; // 6px padding from right
+                const rectY = boundingBox.y; //+ boundingBox.height - textHeight - 6; // 6px padding from bottom
+                const rectWidth = textWidth + 12; // 6px padding on both sides
+                const rectHeight = textHeight + 12; // 6px padding on both sides
+
+                // Draw the red rectangle
+                ctx.fillStyle = "red";
+                ctx.fillRect(rectX, rectY, rectWidth, rectHeight);
+
+                // Draw the white text inside the red rectangle
+                ctx.fillStyle = "white";
+                ctx.fillText(text, rectX + 6, rectY + 6 + 12); // 6px padding on both sides
+              }
             }
           }
         }
@@ -6366,7 +6401,7 @@
       <!-- Sustainable1 White -->
       <svg
         version="1.1"
-        id="spg_sustainable1_white"
+        id="spg_sustainable1_knockout"
         xmlns="http://www.w3.org/2000/svg"
         xmlns:xlink="http://www.w3.org/1999/xlink"
         x="0px"
