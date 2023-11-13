@@ -828,8 +828,31 @@
 
       gtag("config", "G-C9V5DRMH7B");
     </script>
+    <!-- Initialize Firebase -->
+    <!--
+    <script type="module">
+      // Import the functions you need from the SDKs you need
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-app.js";
+      // TODO: Add SDKs for Firebase products that you want to use
+      // https://firebase.google.com/docs/web/setup#available-libraries
+
+      // Your web app's Firebase configuration
+      const firebaseConfig = {
+        apiKey: "AIzaSyBKEKlepI4jwm1G-X7Wvebn304jYagVhTM",
+        authDomain: "creator-app-7ff1d.firebaseapp.com",
+        projectId: "creator-app-7ff1d",
+        storageBucket: "creator-app-7ff1d.appspot.com",
+        messagingSenderId: "664849551099",
+        appId: "1:664849551099:web:346faa4bfa728606e3aa5e",
+      };
+
+      // Initialize Firebase
+      const firebase_database = initializeApp(firebaseConfig);
+    </script>
+    -->
     <!-- Application Scripts -->
     <script>
+      /* Application starts */
       var canvas, ctx;
 
       create_footer_text();
@@ -1322,8 +1345,26 @@
         const formattedDate = `${today.getDate()}-${
           today.getMonth() + 1
         }-${today.getFullYear()}`;
-        link.download = canvas_content.project_name + `-${formattedDate}.png`;
+        var my_project_name =
+          canvas_content.project_name + `-${formattedDate}.png`;
+        link.download = my_project_name;
         link.click();
+
+        /*
+        // Save a record in the database
+        firebase_database.ref("download_image").push({
+          timestamp: new Date().toString(),
+          project_name: my_project_name,
+          headline: canvas_content.headline,
+          description: canvas_content.description,
+          cta: canvas_content.cta,
+          logo: canvas_content.logo.name,
+          orientation: canvas_content.orientation,
+          portal_size: canvas_content.portal_size_percent,
+          portal_count: canvas_content.portal_count,
+          background_color: canvas_content.background_color,
+        });
+        */
       }
 
       // Expand the left side toolbox
