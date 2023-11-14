@@ -591,6 +591,14 @@
         height: auto; /* Make the SVG fill the height of its container */
         width: 80%;
       }
+
+      #data-container {
+        display: none;
+      }
+
+      #firebase-data-button {
+        display: none;
+      }
     </style>
   </head>
   <body>
@@ -813,6 +821,10 @@
       </div>
     </div>
 
+    <!-- Data container -->
+    <div id="data-container"></div>
+    <button id="firebase-data-button"></button>
+
     <!-- ---------------------- SCRIPTS ---------------------- -->
     <!-- Google tag (gtag.js) -->
     <script
@@ -828,16 +840,21 @@
 
       gtag("config", "G-C9V5DRMH7B");
     </script>
+
     <!-- Initialize Firebase -->
-    <!--
     <script type="module">
       // Import the functions you need from the SDKs you need
       import { initializeApp } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-app.js";
+      import {
+        getFirestore,
+        collection,
+        addDoc,
+      } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-firestore.js";
       // TODO: Add SDKs for Firebase products that you want to use
       // https://firebase.google.com/docs/web/setup#available-libraries
 
       // Your web app's Firebase configuration
-      const firebaseConfig = {
+      var config = {
         apiKey: "AIzaSyBKEKlepI4jwm1G-X7Wvebn304jYagVhTM",
         authDomain: "creator-app-7ff1d.firebaseapp.com",
         projectId: "creator-app-7ff1d",
@@ -847,9 +864,28 @@
       };
 
       // Initialize Firebase
-      const firebase_database = initializeApp(firebaseConfig);
+      const app = initializeApp(config);
+      const db = getFirestore(app);
+
+      // Add an event listener to the button
+      document
+        .getElementById("firebase-data-button")
+        .addEventListener("click", function () {
+          // Convert JSON string back to object
+          var retrievedDataString =
+            document.getElementById("data-container").innerHTML;
+          var retrievedDataObject = JSON.parse(retrievedDataString);
+          // Data being sent
+          console.log(retrievedDataObject);
+          // Create a reference to the Collection and Document
+          //const docRef = db.collection("Download-Data").doc("Download-Data-ID");
+          const docRef = addDoc(
+            collection(db, "Download-Data"),
+            retrievedDataObject
+          );
+        });
     </script>
-    -->
+
     <!-- Application Scripts -->
     <script>
       /* Application starts */
@@ -957,7 +993,7 @@
         "1200x1200 Square (Instagram)",
         "628x1200 Portrait",
         /* "1920x1080 [Desktop] Landscape",
-              "1080x1920 [Desktop] Portrait", */
+                    "1080x1920 [Desktop] Portrait", */
       ];
       canvas_content.template_size = template_sizes[0];
 
@@ -1350,21 +1386,30 @@
         link.download = my_project_name;
         link.click();
 
-        /*
-        // Save a record in the database
-        firebase_database.ref("download_image").push({
+        // Your data object
+        var data_object = {
           timestamp: new Date().toString(),
           project_name: my_project_name,
           headline: canvas_content.headline,
-          description: canvas_content.description,
-          cta: canvas_content.cta,
+          description: canvas_content.body,
+          cta: canvas_content.button,
           logo: canvas_content.logo.name,
           orientation: canvas_content.orientation,
           portal_size: canvas_content.portal_size_percent,
           portal_count: canvas_content.portal_count,
           background_color: canvas_content.background_color,
-        });
-        */
+          canvas_width: canvas_content.canvas_width,
+          canvas_height: canvas_content.canvas_height,
+        };
+
+        // Convert object to JSON string
+        var jsonString = JSON.stringify(data_object);
+
+        // Update the HTML content of the "data-container" div
+        document.getElementById("data-container").innerHTML = jsonString;
+
+        // Click the send data button
+        document.getElementById("firebase-data-button").click();
       }
 
       // Expand the left side toolbox
@@ -4282,21 +4327,21 @@
 
           // Logos are overlapping
           /*
-                if (canvas_content.error.logo_overlapping) {
-                  ctx.strokeStyle = error_color;
-                  ctx.lineWidth = 2;
-                  ctx.strokeRect(
-                    canvas_content.logo.sponsor_x,
-                    canvas_content.logo.sponsor_y,
-                    canvas_content.logo.sponsor_width,
-                    canvas_content.logo.sponsor_height
-                  );
-                  drawTextInRedRectangle(ctx, "Logos Overlap", {
-                    x: canvas_content.logo.sponsor_x,
-                    y: canvas_content.logo.sponsor_y,
-                  });
-                }
-                */
+                      if (canvas_content.error.logo_overlapping) {
+                        ctx.strokeStyle = error_color;
+                        ctx.lineWidth = 2;
+                        ctx.strokeRect(
+                          canvas_content.logo.sponsor_x,
+                          canvas_content.logo.sponsor_y,
+                          canvas_content.logo.sponsor_width,
+                          canvas_content.logo.sponsor_height
+                        );
+                        drawTextInRedRectangle(ctx, "Logos Overlap", {
+                          x: canvas_content.logo.sponsor_x,
+                          y: canvas_content.logo.sponsor_y,
+                        });
+                      }
+                      */
 
           // Draw guides around headline
           if (
@@ -5475,7 +5520,7 @@
           sG = 0,
           sB = 0; // source's current point r,g,b
         /* untested !
-                  var sA = 0;  //source alpha  */
+                        var sA = 0;  //source alpha  */
 
         for (sy = 0; sy < sh; sy++) {
           ty = sy * scale; // y src position within target
@@ -5512,14 +5557,14 @@
             }
 
             /* !! untested : handling alpha !!
-                             sA = sBuffer[sIndex + 3];
-                             if (!sA) continue;
-                             if (sA != 0xFF) {
-                                 sR = (sR * sA) >> 8;  // or use /256 instead ??
-                                 sG = (sG * sA) >> 8;
-                                 sB = (sB * sA) >> 8;
-                             }
-                          */
+                                   sA = sBuffer[sIndex + 3];
+                                   if (!sA) continue;
+                                   if (sA != 0xFF) {
+                                       sR = (sR * sA) >> 8;  // or use /256 instead ??
+                                       sG = (sG * sA) >> 8;
+                                       sB = (sB * sA) >> 8;
+                                   }
+                                */
 
             if (!crossX && !crossY) {
               // pixel does not cross
