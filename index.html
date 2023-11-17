@@ -880,7 +880,7 @@
           // Create a reference to the Collection and Document
           //const docRef = db.collection("Download-Data").doc("Download-Data-ID");
           const docRef = addDoc(
-            collection(db, "Download-Data"),
+            collection(db, "Download-" + retrievedDataObject.download),
             retrievedDataObject
           );
         });
@@ -1388,7 +1388,7 @@
 
         // Your data object
         var data_object = {
-          download: "png",
+          download: "PNG",
           timestamp: new Date().toString(),
           project_name: my_project_name,
           headline: canvas_content.headline,
@@ -2500,7 +2500,7 @@
 
           let download_label = found_errors
             ? "Fix errors before downloading"
-            : "Download PNG";
+            : "Download Image (.PNG)";
           let download_button = add_button_to_inside_tools_container(
             download_label,
             "download_template"
@@ -2515,11 +2515,11 @@
 
           add_label_to_inside_tools_container("SAVE YOUR DESIGN");
           add_button_to_inside_tools_container(
-            "Save File (.JSON)",
+            "Save Editable File (.JSON)",
             "save_template"
           );
           add_button_to_inside_tools_container(
-            "Open File (.JSON)",
+            "Open Editable File (.JSON)",
             "import_template"
           );
         }
