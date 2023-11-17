@@ -807,15 +807,15 @@
     <div class="right-panel">
       <div class="container">
         <!-- Change to a login -->
-        <label class="toolbox_expanded_label" for="passwordInput"
-          >Password</label
+        <label class="toolbox_expanded_label" for="usernameInput"
+          >Username</label
         >
         <input
-          type="password"
-          id="passwordInput"
+          type="text"
+          id="usernameInput"
           value=""
           onkeydown="handleKeyPress(event)"
-          autocomplete="current-password"
+          autocomplete="username"
         />
         <button onclick="login()">Login</button>
       </div>
@@ -888,6 +888,16 @@
 
     <!-- Application Scripts -->
     <script>
+      if (window !== window.top) {
+        // If the page is inside an iframe
+        console.log("On the Brand Center");
+      } else {
+        // Redirect them to the brand center if is not in an iframe
+        console.log("Redirecting to the Brand Center");
+        window.location.href =
+          "https://brandcenter.spglobal.com/content/essentialcanvas";
+      }
+
       /* Application starts */
       var canvas, ctx;
 
@@ -902,6 +912,7 @@
         blue: "#C7DAE0",
       };
 
+      var username = "";
       var password = "";
       // Image loading animation
       let image_stop_loading_animation;
@@ -1205,7 +1216,7 @@
       }
 
       function login() {
-        password = document.getElementById("passwordInput").value;
+        username = document.getElementById("usernameInput").value;
         create_canvas();
         // Open help panel
         document.getElementsByName("help_button")[0].click();
@@ -1221,8 +1232,8 @@
       // Functions
       function create_canvas() {
         // Check password
-        if (check_login(password) != "pV56vv") {
-          alert("Please check your password and try again");
+        if (username != "") {
+          alert("Please provide a username");
           return;
         }
         let width, height;
@@ -1388,6 +1399,7 @@
 
         // Your data object
         var data_object = {
+          username: username,
           download: "PNG",
           timestamp: new Date().toString(),
           project_name: my_project_name,
@@ -2059,6 +2071,7 @@
 
               // Your data object
               var data_object = {
+                username: username,
                 download: "JSON",
                 timestamp: new Date().toString(),
                 project_name: filename,
