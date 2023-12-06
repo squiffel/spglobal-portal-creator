@@ -1014,6 +1014,7 @@
       canvas_content.portal_image_scale = [0, 0];
       canvas_content.portal_image_src = [];
       canvas_content.portal_focal_point = [];
+
       // Set focal point defaults
       for (var i = 0; i < 2; i++) {
         canvas_content.portal_focal_point[i] = {
@@ -3255,6 +3256,10 @@
             );
           }
 
+          // Render the text for the Speaker
+          render_speaker_text();
+
+          /*
           // Render text over image if there is one full screen image
           if (is_fullscreen_image()) {
             // Render transparent overlay
@@ -3268,7 +3273,23 @@
             // Render text overlay
             render_text();
           }
+          */
         };
+      }
+
+      function render_speaker_text() {
+        // If there is only one image
+        if (canvas_content.portal_count == 1) {
+          // If there is any text
+          if (
+            canvas_content.speaker_name != "" ||
+            canvas_content.speaker_title != ""
+          ) {
+            // Render the text
+            console.log(canvas_content.speaker_name);
+            console.log(canvas_content.speaker_title);
+          }
+        }
       }
 
       function flip_image_horizontally(img, flip) {
