@@ -1002,6 +1002,7 @@
         "1200x628 Landscape",
         "1200x1200 Square (Instagram)",
         "628x1200 Portrait",
+        "800x418 Landscape",
         /* "1920x1080 [Desktop] Landscape",
                     "1080x1920 [Desktop] Portrait", */
       ];
@@ -1231,10 +1232,12 @@
       // Functions
       function create_canvas() {
         // Check password
+        /*
         if (username == "") {
           alert("Please provide a username");
           return;
         }
+        */
         let width, height;
 
         // If there is no width available go to the saved data
@@ -3287,7 +3290,11 @@
         // Logo scale
         let rescaled = false;
         // Default is based on the margins. Scale is 1 if the margins are 40px
-        let logo_scale = Math.max(0.65, canvas_content.margin / 40); // 1
+        let logo_scale = Math.max(0.65, canvas_content.margin / 40);
+        // Rescale if the canvas height is small
+        if (canvas_content.canvas_height < 628) {
+          logo_scale = logo_scale * 0.8;
+        }
 
         // Then we have to check if the logo will fit in the space provided which is the margins
         if (reference.width * logo_scale > canvas_content.marginWidth) {
