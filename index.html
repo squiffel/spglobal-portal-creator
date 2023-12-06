@@ -772,6 +772,29 @@
         </svg>
         <span class="tooltiptext">Logo</span>
       </button>
+      <!-- Speaker -->
+      <button
+        class="toolbox_button"
+        name="event_button"
+        onclick="pressed_toolbox_button(this.name)"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="25"
+          height="20"
+          viewBox="0 0 25 20"
+        >
+          <path
+            id="Path_11107"
+            data-name="Path 11107"
+            d="M3.125-5a.625.625,0,0,1,.625-.625A.625.625,0,0,1,4.375-5a.625.625,0,0,1-.625.625A.625.625,0,0,1,3.125-5ZM6.25-5A2.5,2.5,0,0,0,5-7.165a2.5,2.5,0,0,0-2.5,0A2.5,2.5,0,0,0,1.25-5,2.5,2.5,0,0,0,2.5-2.835a2.5,2.5,0,0,0,2.5,0A2.5,2.5,0,0,0,6.25-5ZM7.5,2.5,6.25-1.25h-5L0,2.5ZM11.875-5a.625.625,0,0,1,.625-.625A.625.625,0,0,1,13.125-5a.625.625,0,0,1-.625.625A.625.625,0,0,1,11.875-5ZM15-5a2.5,2.5,0,0,0-1.25-2.165,2.5,2.5,0,0,0-2.5,0A2.5,2.5,0,0,0,10-5a2.5,2.5,0,0,0,1.25,2.165,2.5,2.5,0,0,0,2.5,0A2.5,2.5,0,0,0,15-5Zm1.25,7.5L15-1.25H10L8.75,2.5Zm5-8.125A.625.625,0,0,1,21.875-5a.625.625,0,0,1-.625.625A.625.625,0,0,1,20.625-5,.625.625,0,0,1,21.25-5.625Zm0,3.125a2.5,2.5,0,0,0,2.165-1.25,2.5,2.5,0,0,0,0-2.5A2.5,2.5,0,0,0,21.25-7.5a2.5,2.5,0,0,0-2.165,1.25,2.5,2.5,0,0,0,0,2.5A2.5,2.5,0,0,0,21.25-2.5Zm2.5,1.25h-5L17.5,2.5H25ZM21.875-8.7a3.717,3.717,0,0,1,1.875.9v-9.7H1.25v9.7a3.749,3.749,0,0,1,1.875-.9v-6.926h18.75Z"
+            transform="translate(0 17.5)"
+            fill="#707070"
+          />
+        </svg>
+
+        <span class="tooltiptext">Event</span>
+      </button>
       <!-- Help -->
       <button
         class="toolbox_button"
@@ -970,6 +993,11 @@
       canvas_content.body_visibility = true;
       canvas_content.button_visibility = false;
 
+      // Event
+      canvas_content.event_name = "";
+      canvas_content.speaker_name = "";
+      canvas_content.speaker_title = "";
+
       // Downscaled images
       temp_portal_downscaled_image = [null, null];
       temp_portal_image = [];
@@ -1000,7 +1028,7 @@
 
       const template_sizes = [
         "1200x628 Landscape",
-        "1200x1200 Square (Instagram)",
+        "1200x1200 Square",
         "628x1200 Portrait",
         "800x418 Landscape",
         /* "1920x1080 [Desktop] Landscape",
@@ -2735,6 +2763,31 @@
               );
             }
           }
+        }
+        if (buttonName === "event_button") {
+          // FAQ
+          addAccordion("Event", "Add Speaker Names or Event Titles", true);
+          // Event Title
+          add_label_to_inside_tools_container("Event name");
+          let event_name = add_input_box_to_inside_tools_container(
+            "event_name",
+            canvas_content.event_name
+          );
+          event_name.style.height = "40px";
+          // Speaker Name
+          add_label_to_inside_tools_container("Speaker name");
+          let speaker_name = add_input_box_to_inside_tools_container(
+            "speaker_name",
+            canvas_content.speaker_name
+          );
+          speaker_name.style.height = "40px";
+          // Speaker Title
+          add_label_to_inside_tools_container("Speaker title");
+          let speaker_title = add_input_box_to_inside_tools_container(
+            "speaker_title",
+            canvas_content.speaker_title
+          );
+          speaker_title.style.height = "40px";
         }
 
         // HELP
