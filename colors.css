@@ -1,0 +1,41 @@
+:root {
+  --spg-color-primary-red-55: #d6002a;
+  --spg-color-primary-black-100: #000000;
+  --spg-color-primary-white-0: #ffffff;
+
+  --spg-color-secondary-yellow-10: #edf86f;
+
+  --spg-color-tertiary-brown-20: #9e8d73;
+  --spg-color-tertiary-taupe-40: #c2c4c3;
+  --spg-color-tertiary-blue-15: #c7dae0;
+
+  --spg-color-gray-95: #0b0b0b;
+  --spg-color-gray-90: #1b1b1b;
+  --spg-color-gray-80: #2e2e2e;
+  --spg-color-gray-70: #454545;
+  --spg-color-gray-60: #5c5c5c;
+  --spg-color-gray-50: #757575;
+  --spg-color-gray-40: #919191;
+  --spg-color-gray-30: #adadad;
+  --spg-color-gray-20: #c9c9c9;
+  --spg-color-gray-10: #e6e6e6;
+  --spg-color-gray-5: #f0f0f0;
+  --spg-color-gray-2: #f7f7f7;
+
+  --spg-color-notification-info-55: #0d71c6;
+  --spg-color-notification-warning-30: #f89406;
+  --spg-color-notification-success-45: #009900;
+}
+
+/*
+Accessibility
+The numbers at the end of the colors represent it's grade.
+
+We call the difference in grade between any two colors the magic number. Magic numbers have important contrast implications:.
+A magic number of 40+ results in WCAG 2.0 AA Large Text contrast (example: gray-90 and gray-50).
+A magic number of 50+ results in WCAG 2.0 AA contrast or AAA Large Text contrast (example: gray-90 and gray-40).
+A magic number of 70+ results in WCAG 2.0 AAA contrast (example: gray-10 and gray-80).
+Colors of grade 50 result in Section 508 AA contrast against both pure white (grade 0) and pure black (grade 100).
+
+https://contrastchecker.online/color-relative-luminance-calculator
+ */
