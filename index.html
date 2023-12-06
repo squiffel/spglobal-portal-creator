@@ -2184,9 +2184,11 @@
         // Layout
         if (current_panel_open == "Layout") {
           // Resize Canvas
+          /*
           if (button_label.includes("Submit")) {
             create_canvas();
           }
+          */
         }
 
         // Image
@@ -3286,8 +3288,8 @@
             canvas_content.speaker_title != ""
           ) {
             // Render the text
-            console.log(canvas_content.speaker_name);
-            console.log(canvas_content.speaker_title);
+            console.log("Speaker: " + canvas_content.speaker_name);
+            console.log("Title: " + canvas_content.speaker_title);
           }
         }
       }
