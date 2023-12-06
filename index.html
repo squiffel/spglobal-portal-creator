@@ -1616,12 +1616,6 @@
           return;
         }
 
-        addAccordion(
-          "Portals",
-          "Can upload up to two images to be visible on the canvas. \nThe blue dot over the image represents the focal point. The canvas will try to automatically center the image around the focal point. \nMargins can be added to single portal images in the Layout Panel. \nImages may take a while to load, while they are processing a blue progress loading bar can be seen at the top of the application.",
-          false
-        );
-
         // Brand Image Library
         const brandImagesButton = document.createElement("button");
         brandImagesButton.style.marginTop = "8px";
@@ -1633,7 +1627,15 @@
             "_blank"
           );
         });
-        container.appendChild(brandImagesButton);
+        //container.appendChild(brandImagesButton);
+
+        addAccordion(
+          "Portals",
+          "Can upload up to two images to be visible on the canvas. \nThe blue dot over the image represents the focal point. The canvas will try to automatically center the image around the focal point. \nMargins can be added to single portal images in the Layout Panel. \nImages may take a while to load, while they are processing a blue progress loading bar can be seen at the top of the application. \nFind on brand images:",
+          false,
+          "0px",
+          brandImagesButton
+        );
 
         add_label_to_inside_tools_container("Add Image");
 
@@ -1896,7 +1898,8 @@
         closedStateCopy,
         openStateCopy,
         isOpen,
-        setMarginTop = "0px"
+        setMarginTop = "0px",
+        addButton = undefined
       ) {
         // Create a new accordion element
         const accordion = document.createElement("div");
@@ -1941,6 +1944,11 @@
         // Append title and content to the accordion
         accordion.appendChild(title);
         accordion.appendChild(content);
+
+        // Add button
+        if (addButton != undefined) {
+          content.appendChild(addButton);
+        }
 
         // Add the accordion to the side panel
         const sidePanel = document.querySelector(".inside_tools_container");
@@ -2050,6 +2058,19 @@
 
         if (button_label == "input_project") {
           canvas_content.project_name = event.target.value;
+        }
+
+        // Update Event Text
+        if (button_label == "input_event_name") {
+          canvas_content.event_name = event.target.value;
+        }
+
+        // Update Speaker Text
+        if (button_label == "input_speaker_name") {
+          canvas_content.speaker_name = event.target.value;
+        }
+        if (button_label == "input_speaker_title") {
+          canvas_content.speaker_title = event.target.value;
         }
 
         update_canvas();
@@ -2398,6 +2419,7 @@
         if (canvas == undefined) {
           alert("Please login to start");
           return;
+          //create_canvas();
         }
 
         current_panel_open = "None";
@@ -2766,7 +2788,7 @@
         }
         if (buttonName === "event_button") {
           // FAQ
-          addAccordion("Event", "Add Speaker Names or Event Titles", true);
+          addAccordion("Event", "Add Speaker Names or Event Titles", false);
           // Event Title
           add_label_to_inside_tools_container("Event name");
           let event_name = add_input_box_to_inside_tools_container(
@@ -2774,20 +2796,38 @@
             canvas_content.event_name
           );
           event_name.style.height = "40px";
-          // Speaker Name
-          add_label_to_inside_tools_container("Speaker name");
-          let speaker_name = add_input_box_to_inside_tools_container(
-            "speaker_name",
-            canvas_content.speaker_name
-          );
-          speaker_name.style.height = "40px";
-          // Speaker Title
-          add_label_to_inside_tools_container("Speaker title");
-          let speaker_title = add_input_box_to_inside_tools_container(
-            "speaker_title",
-            canvas_content.speaker_title
-          );
-          speaker_title.style.height = "40px";
+          if (canvas_content.portal_count == 1) {
+            // Speaker Name
+            add_label_to_inside_tools_container("Speaker name");
+            let speaker_name = add_input_box_to_inside_tools_container(
+              "speaker_name",
+              canvas_content.speaker_name
+            );
+            speaker_name.style.height = "40px";
+            // Speaker Title
+            add_label_to_inside_tools_container("Speaker title");
+            let speaker_title = add_input_box_to_inside_tools_container(
+              "speaker_title",
+              canvas_content.speaker_title
+            );
+            speaker_title.style.height = "40px";
+          } else {
+            add_label_to_inside_tools_container("Speaker");
+            if (canvas_content.portal_count == 0) {
+              addAccordion(
+                "Add Speaker",
+                "Upload an image of the Speaker to access additional options",
+                true
+              );
+            }
+            if (canvas_content.portal_count == 2) {
+              addAccordion(
+                "Add Speaker",
+                "Too many images uploaded.\n Upload a single image of the Speaker to access additional options",
+                true
+              );
+            }
+          }
         }
 
         // HELP
