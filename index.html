@@ -2183,12 +2183,7 @@
 
         // Layout
         if (current_panel_open == "Layout") {
-          // Resize Canvas
-          /*
-          if (button_label.includes("Submit")) {
-            create_canvas();
-          }
-          */
+          //
         }
 
         // Image
@@ -3261,22 +3256,25 @@
           // Render the text for the Speaker
           render_speaker_text();
 
-          /*
           // Render text over image if there is one full screen image
-          if (is_fullscreen_image()) {
-            // Render transparent overlay
-            if (canvas_content.portal_color_overlay && is_fullscreen_image()) {
-              let color =
-                canvas_content.color_font != spglobal_colors.black
-                  ? "#000000"
-                  : "#ffffff";
-              render_background(color, 0.4);
-            }
-            // Render text overlay
-            render_text();
-          }
-          */
+          //render_text_over_image();
         };
+      }
+
+      function render_text_over_image() {
+        // Render text over image if there is one full screen image
+        if (is_fullscreen_image()) {
+          // Render transparent overlay
+          if (canvas_content.portal_color_overlay && is_fullscreen_image()) {
+            let color =
+              canvas_content.color_font != spglobal_colors.black
+                ? "#000000"
+                : "#ffffff";
+            render_background(color, 0.4);
+          }
+          // Render text overlay
+          render_text();
+        }
       }
 
       function render_speaker_text() {
