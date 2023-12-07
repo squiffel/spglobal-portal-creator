@@ -2761,6 +2761,9 @@
 
           // Update labels
           update_font_size_label();
+        } else {
+          // If it's not the TEXT button, revert back
+          last_active_textbox = "input_headline";
         }
 
         if (buttonName === "layout_button") {
