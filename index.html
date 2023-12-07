@@ -235,6 +235,13 @@
         pointer-events: none;
       }
 
+      .toolbox_fixed_width_button {
+        width: 36px;
+        display: inline-block;
+        margin-right: 4px;
+        text-align: center;
+      }
+
       .toolbox_expanded_label {
         padding: 11px 0;
         width: 100%;
@@ -773,6 +780,7 @@
         <span class="tooltiptext">Logo</span>
       </button>
       <!-- Speaker -->
+      <!-- 
       <button
         class="toolbox_button"
         name="event_button"
@@ -795,6 +803,7 @@
 
         <span class="tooltiptext">Event</span>
       </button>
+      -->
       <!-- Help -->
       <button
         class="toolbox_button"
@@ -992,6 +1001,12 @@
       canvas_content.headline_visibility = true;
       canvas_content.body_visibility = true;
       canvas_content.button_visibility = false;
+
+      // Textbox
+      var last_active_textbox = "input_headline";
+      var headline_character_limit = 65;
+      var body_character_limit = 175;
+      var button_character_limit = 24;
 
       // Event
       canvas_content.event_name = "";
@@ -1879,12 +1894,19 @@
       }
 
       // Add buttons
-      function add_button_to_inside_tools_container(label_string, name = "") {
+      function add_button_to_inside_tools_container(
+        label_string,
+        name = "",
+        inline_fixed_width = false
+      ) {
         const insideToolsContainer = document.querySelector(
           ".inside_tools_container"
         );
         const button = document.createElement("button");
         button.className = "toolbox_expanded_button";
+        if (inline_fixed_width) {
+          button.classList.add("toolbox_fixed_width_button");
+        }
         button.textContent = label_string;
         button.name = name;
         console.log(button.textContent);
@@ -2038,22 +2060,28 @@
         let button_label = event.target.name;
 
         if (button_label == "input_headline") {
-          update_character_limit_inputbox(event.target, 65); // Max recommended headline length
+          last_active_textbox = button_label;
+          update_character_limit_inputbox(
+            event.target,
+            headline_character_limit
+          ); // Max recommended headline length
           canvas_content.headline = event.target.value;
           calculate_headline_minimum_container_width();
         }
 
         if (button_label == "input_body") {
-          update_character_limit_inputbox(event.target, 150); // Max recommended body length
+          last_active_textbox = button_label;
+          update_character_limit_inputbox(event.target, body_character_limit); // Max recommended body length
           canvas_content.body = event.target.value;
         }
 
         if (button_label == "input_button") {
+          last_active_textbox = button_label;
           // Remove newline and return line special characters
           const cleanedValue = event.target.value.replace(/(\r\n|\n|\r)/g, "");
           event.target.value = cleanedValue;
           // Update box
-          update_character_limit_inputbox(event.target, 20); // Max recommended button length
+          update_character_limit_inputbox(event.target, button_character_limit); // Max recommended button length
           canvas_content.button = event.target.value;
         }
 
@@ -2171,6 +2199,48 @@
             // Update headline box
             document.getElementsByName("input_button")[0].value =
               canvas_content.button;
+          }
+          if (
+            button_label == "TM" ||
+            button_label == "®" ||
+            button_label == "©"
+          ) {
+            console.log(button_label);
+            console.log(last_active_textbox);
+            var special_character = button_label;
+            if (button_label == "TM") {
+              special_character = "™";
+            }
+            if (last_active_textbox == "input_headline") {
+              canvas_content.headline += special_character;
+              var headline_textbox = document.getElementById("input_headline");
+              headline_textbox.value = canvas_content.headline;
+              update_character_limit_inputbox(
+                headline_textbox,
+                headline_character_limit
+              );
+              headline_textbox.focus();
+            }
+            if (last_active_textbox == "input_body") {
+              canvas_content.body += special_character;
+              var body_textbox = document.getElementById("input_body");
+              body_textbox.value = canvas_content.body;
+              update_character_limit_inputbox(
+                body_textbox,
+                body_character_limit
+              );
+              body_textbox.focus();
+            }
+            if (last_active_textbox == "input_button") {
+              canvas_content.button += special_character;
+              var button_textbox = document.getElementById("input_button");
+              button_textbox.value = canvas_content.button;
+              update_character_limit_inputbox(
+                button_textbox,
+                button_character_limit
+              );
+              button_textbox.focus();
+            }
           }
         }
 
@@ -2343,6 +2413,7 @@
         inputBox.id = "input_" + input_box_name;
         inputBox.addEventListener("input", inputbox_event_listener);
         inputBox.addEventListener("paste", inputbox_event_listener);
+        inputBox.addEventListener("focus", inputbox_event_listener);
         inputBox.setAttribute("spellcheck", "true");
 
         div.appendChild(inputBox);
@@ -2616,6 +2687,19 @@
             "Small",
             canvas_content.font_size.small
           );
+
+          add_label_to_inside_tools_container("INSERT SPECIAL CHARACTER");
+          add_button_to_inside_tools_container(
+            "TM",
+            (name = "Trademark"),
+            true
+          );
+          add_button_to_inside_tools_container(
+            "®",
+            (name = "Registered"),
+            true
+          );
+          add_button_to_inside_tools_container("©", (name = "Copyright"), true);
 
           add_label_to_inside_tools_container("COPYWRITING");
 
@@ -3254,7 +3338,7 @@
           }
 
           // Render the text for the Speaker
-          render_speaker_text();
+          render_speaker_text(maskRectWidth, maskRectHeight);
 
           // Render text over image if there is one full screen image
           //render_text_over_image();
@@ -3277,7 +3361,7 @@
         }
       }
 
-      function render_speaker_text() {
+      function render_speaker_text(portal_width, portal_height) {
         // If there is only one image
         if (canvas_content.portal_count == 1) {
           // If there is any text
@@ -4172,7 +4256,8 @@
           canvas_content.portal_size_percent > min_percent &&
           canvas_content.text_bottom_aligned == false &&
           (canvas_content.portal_side == "top" ||
-            canvas_content.portal_side == "bottom");
+            canvas_content.portal_side == "bottom") &&
+          canvas_content.portal_count > 0;
 
         // Check if button is out of bounds
         var button_overlapping_logo = false;
