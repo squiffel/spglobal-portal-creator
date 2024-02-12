@@ -780,7 +780,7 @@
         <span class="tooltiptext">Logo</span>
       </button>
       <!-- Speaker -->
-      <!-- 
+
       <button
         class="toolbox_button"
         name="event_button"
@@ -803,7 +803,7 @@
 
         <span class="tooltiptext">Event</span>
       </button>
-      -->
+
       <!-- Help -->
       <button
         class="toolbox_button"
@@ -2900,15 +2900,15 @@
             add_label_to_inside_tools_container("Speaker");
             if (canvas_content.portal_count == 0) {
               addAccordion(
-                "Add Speaker",
-                "Upload an image of the Speaker to access additional options",
+                "Speaker (Section hidden)",
+                "Upload an image to access Speaker option",
                 true
               );
             }
             if (canvas_content.portal_count == 2) {
               addAccordion(
-                "Add Speaker",
-                "Too many images uploaded.\n Upload a single image of the Speaker to access additional options",
+                "Speaker (Section hidden)",
+                "Must be 1 image to access Speaker options",
                 true
               );
             }
@@ -3895,6 +3895,8 @@
           return ctx.measureText(canvas_content.button).width;
         }
 
+        let event_name_height = canvas_content.event_name == "" ? 0 : 128;
+
         // Position starts top left corner
         let position = {
           x: canvas_content.marginLeft,
@@ -3907,7 +3909,8 @@
           height:
             canvas_content.marginHeight -
             canvas_content.logo.height -
-            logo_padding,
+            logo_padding -
+            event_name_height,
         };
 
         // Dynamic font size
@@ -4288,7 +4291,7 @@
         headline_properties = add_text_to_canvas(
           headline_text,
           position.x,
-          headline_position_y,
+          headline_position_y, // This one effects the position
           text_area.width,
           headline_properties.height + 1,
           headline_properties.font_size,
