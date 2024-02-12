@@ -2882,11 +2882,21 @@
           addAccordion("Event", "Add Speaker Names or Event Titles", false);
           // Event Title
           add_label_to_inside_tools_container("Event name");
-          let event_name = add_input_box_to_inside_tools_container(
-            "event_name",
-            canvas_content.event_name
-          );
-          event_name.style.height = "40px";
+
+          if (canvas_content.text_bottom_aligned == false) {
+            let event_name = add_input_box_to_inside_tools_container(
+              "event_name",
+              canvas_content.event_name
+            );
+            event_name.style.height = "40px";
+          } else {
+            addAccordion(
+              "Event title: Hidden*",
+              "Change Logo Alignement to Bottom under the Layout Panel.",
+              true
+            );
+          }
+
           if (canvas_content.portal_count == 1) {
             // Speaker Name
             add_label_to_inside_tools_container("Speaker name");
@@ -2906,15 +2916,15 @@
             add_label_to_inside_tools_container("Speaker");
             if (canvas_content.portal_count == 0) {
               addAccordion(
-                "Speaker (Section hidden)",
-                "Upload an image to access Speaker option",
+                "Speaker: Hidden*",
+                "Upload an image under the Image Panel",
                 true
               );
             }
             if (canvas_content.portal_count == 2) {
               addAccordion(
-                "Speaker (Section hidden)",
-                "Must be 1 image to access Speaker options",
+                "Speaker: Hidden*",
+                "Reduce to one image under the Image Panel",
                 true
               );
             }
