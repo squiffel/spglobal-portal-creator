@@ -2091,6 +2091,12 @@
 
         // Update Event Text
         if (button_label == "input_event_name") {
+          let event_name_character_limit = 32;
+          update_character_limit_inputbox(
+            event.target,
+            event_name_character_limit
+          );
+          event.target.value = event.target.value.toUpperCase();
           canvas_content.event_name = event.target.value;
         }
 
@@ -3922,7 +3928,7 @@
           let event_name_font_size = 16; // 16 is the minimum font size for all content using add_text_to_canvas
 
           var event_name_properties = add_text_to_canvas(
-            canvas_content.event_name.toUpperCase(),
+            canvas_content.event_name,
             position.x,
             position.y,
             text_area.width,
