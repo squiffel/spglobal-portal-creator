@@ -3895,8 +3895,6 @@
           return ctx.measureText(canvas_content.button).width;
         }
 
-        let event_name_height = canvas_content.event_name == "" ? 0 : 128;
-
         // Position starts top left corner
         let position = {
           x: canvas_content.marginLeft,
@@ -3909,8 +3907,7 @@
           height:
             canvas_content.marginHeight -
             canvas_content.logo.height -
-            logo_padding -
-            event_name_height,
+            logo_padding,
         };
 
         // Dynamic font size
@@ -3918,6 +3915,33 @@
           canvas.width,
           canvas.height
         );
+
+        // Event name
+        let event_name_height = 0;
+        if (canvas_content.text_bottom_aligned == false) {
+          let event_name_font_size = 16; // 16 is the minimum font size for all content using add_text_to_canvas
+
+          var event_name_properties = add_text_to_canvas(
+            canvas_content.event_name.toUpperCase(),
+            position.x,
+            position.y,
+            text_area.width,
+            text_area.height,
+            event_name_font_size,
+            canvas_content.color_font,
+            0,
+            1.05,
+            700,
+            true
+          );
+
+          event_name_height =
+            canvas_content.event_name == ""
+              ? 0
+              : event_name_properties.height + event_name_font_size;
+          position.y = canvas_content.marginTop + event_name_height;
+          text_area.height = text_area.height - event_name_height;
+        }
 
         // Headline
         let headline_unformatted = remove_new_lines_and_return_lines(
@@ -3951,7 +3975,7 @@
         font_size = estimate_headline_size;
 
         // Calculate the position
-        var headline_position_y = position.y;
+        var headline_position_y = position.y + event_name_height;
 
         // Remove line breaks if user has turned off formating
         let headline_text = canvas_content.headline_visibility
@@ -4152,7 +4176,7 @@
         // Determine the starting location of the container
         let text_initial_position_y = canvas_content.text_bottom_aligned
           ? canvas_content.marginBottom - total_content_height
-          : canvas_content.marginTop;
+          : canvas_content.marginTop + event_name_height; // Sets the headline position
 
         // Recalculate y positions
         headline_position_y = text_initial_position_y;
@@ -4468,10 +4492,12 @@
         //log_dictionary_keys_and_values(canvas_content.error);
 
         let show_boundingboxes = false;
+        let show_text_safe_area = true;
         if (
           canvas_content.error.text_outside_bounds > 0 ||
           canvas_content.error.button_overlapping_logo ||
-          show_boundingboxes
+          show_boundingboxes ||
+          show_text_safe_area
         ) {
           const delayInSeconds = 0.2; // Replace x with the number of seconds you want to delay
           setTimeout(() => {
@@ -4481,7 +4507,8 @@
               headline_properties,
               body_properties,
               button_properties,
-              show_boundingboxes // show all
+              show_boundingboxes, // show all
+              show_text_safe_area
             );
           }, delayInSeconds * 1000); // Convert seconds to milliseconds
         }
@@ -4492,10 +4519,14 @@
           headline_properties,
           body_properties,
           button_properties,
-          show_boundingboxes
+          show_boundingboxes,
+          show_text_safe_area
         ) {
           // Draw guides around total available text area
-          if (canvas_content.error.text_outside_bounds > 0) {
+          if (
+            canvas_content.error.text_outside_bounds > 0 ||
+            show_text_safe_area
+          ) {
             ctx.strokeStyle = "blue"; // Set stroke color to blue
             ctx.lineWidth = 1;
             ctx.setLineDash([4, 4]); // Set the line to be dashed with a pattern of 5 pixels on and 5 pixels off
