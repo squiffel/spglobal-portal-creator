@@ -839,6 +839,7 @@
     <div class="right-panel">
       <div class="container">
         <!-- Change to a login -->
+        <!--
         <label class="toolbox_expanded_label" for="usernameInput"
           >Username</label
         >
@@ -850,6 +851,7 @@
           autocomplete="username"
         />
         <button onclick="login()">Login</button>
+        -->
       </div>
     </div>
 
@@ -931,6 +933,11 @@
 
       /* Application starts */
       var canvas, ctx;
+
+      // Login
+      setTimeout(function () {
+        login();
+      }, 100);
 
       create_footer_text();
 
@@ -1260,7 +1267,7 @@
       }
 
       function login() {
-        username = document.getElementById("usernameInput").value;
+        username = "annoymous"; //document.getElementById("usernameInput").value;
         create_canvas();
         // Open help panel
         document.getElementsByName("help_button")[0].click();
@@ -2896,7 +2903,7 @@
               true
             );
           }
-
+          /* -- Hide speaker
           if (canvas_content.portal_count == 1) {
             // Speaker Name
             add_label_to_inside_tools_container("Speaker name");
@@ -2929,6 +2936,7 @@
               );
             }
           }
+          */
         }
 
         // HELP
